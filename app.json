@@ -34,7 +34,7 @@
 
     "android": {
       "package": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.fismpc",
-      "versionCode": 2,
+      "versionCode": 1,
       "userInterfaceStyle": "light",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/applogoicon.jpg",
@@ -53,10 +53,8 @@
       [
         "expo-navigation-bar",
         {
-          "backgroundColor": "#FFFFFF",
           "barStyle": "dark",
-          "visibility": "visible",
-          "enforceContrast": false
+          "visibility": "visible"
         }
       ],
       "expo-secure-store",
@@ -72,15 +70,6 @@
         "expo-camera",
         {
           "cameraPermission": "Allow Filipino Land Inventors to access your camera to scan QR codes."
-        }
-      ],
-      [
-        "expo-media-library",
-        {
-          "photosPermission": "Allow Filipino Land Inventors to save QR codes to your gallery.",
-          "savePhotosPermission": "Allow Filipino Land Inventors to save QR codes to your gallery.",
-          "isAccessMediaLocationEnabled": false,
-          "granularPermissions": ["photo"]
         }
       ],
       "expo-sharing",

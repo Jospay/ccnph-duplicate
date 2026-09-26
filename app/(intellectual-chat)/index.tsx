@@ -3,7 +3,6 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
-import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -97,18 +96,6 @@ function ChatIntellectualPageInner() {
     }
   }, [messages]);
 
-  const requestFilePermissions = useCallback(async () => {
-    if (Platform.OS !== "android") return true;
-
-    try {
-      const permission = await Promise.resolve(true);
-      return permission;
-    } catch (error) {
-      console.warn("Permission request failed:", error);
-      return false;
-    }
-  }, []);
-
   const normalizePath = useCallback((attachment: any): string => {
     const rawPath =
       attachment.path ||
@@ -148,16 +135,6 @@ function ChatIntellectualPageInner() {
     try {
       setDownloadingFileId(attachment.id);
 
-      const hasPermission = await requestFilePermissions();
-      if (!hasPermission) {
-        Alert.alert(
-          "Permission Required",
-          "File storage permission is required to download files.",
-        );
-        setDownloadingFileId(null);
-        return;
-      }
-
       let baseDir: string | null = null;
 
       if (FileSystem.cacheDirectory && FileSystem.cacheDirectory.length > 0) {
@@ -175,9 +152,7 @@ function ChatIntellectualPageInner() {
       }
 
       if (!baseDir || baseDir.length === 0) {
-        throw new Error(
-          "No writable directory available. Try saving to gallery instead.",
-        );
+        throw new Error("No writable directory available.");
       }
 
       if (!baseDir.endsWith("/")) {
@@ -201,39 +176,13 @@ function ChatIntellectualPageInner() {
       } else {
         Alert.alert("Success", `${fileName} downloaded successfully`);
       }
-
-      setDownloadingFileId(null);
     } catch (error) {
-      try {
-        const mediaPermission = await MediaLibrary.requestPermissionsAsync();
-
-        if (mediaPermission.status !== "granted") {
-          throw new Error("Media Library permission denied");
-        }
-
-        const tempUri = `${FileSystem.cacheDirectory || FileSystem.documentDirectory}temp_${Date.now()}_${fileName}`;
-
-        const downloadResult = await FileSystem.downloadAsync(
-          finalUrl,
-          tempUri,
-        );
-
-        if (downloadResult.status === 200) {
-          const asset = await MediaLibrary.createAssetAsync(downloadResult.uri);
-          await MediaLibrary.createAlbumAsync("Downloads", asset, false);
-
-          Alert.alert("Success", `${fileName} saved to your gallery`);
-          setDownloadingFileId(null);
-          return;
-        }
-      } catch (fallbackError) {
-        console.error("Fallback download failed:", fallbackError);
-      }
-
-      setDownloadingFileId(null);
+      console.error("Download failed:", error);
       const errorMsg =
         error instanceof Error ? error.message : "Unknown error occurred";
       Alert.alert("Download Error", "Could not download file. " + errorMsg);
+    } finally {
+      setDownloadingFileId(null);
     }
   };
 
@@ -431,13 +380,9 @@ function ChatIntellectualPageInner() {
 
   const handlePickImage = async () => {
     if (sending) return;
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert("Permission Denied", "We need access to add images.");
-      return;
-    }
 
+    // No permission request needed on Android — launchImageLibraryAsync
+    // opens the system Photo Picker, which requires no runtime permission.
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: false,

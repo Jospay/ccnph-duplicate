@@ -1,5 +1,5 @@
-import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import React, { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -44,22 +44,20 @@ export default function TransferSuccessPage() {
     try {
       setIsSaving(true);
 
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission Required",
-          "Please grant media library access to save the receipt to your gallery.",
-        );
-        setIsSaving(false);
+      if (!viewShotRef.current?.capture) {
+        Alert.alert("Error", "Could not capture receipt layout.");
         return;
       }
 
-      if (viewShotRef.current?.capture) {
-        const uri = await viewShotRef.current.capture();
-        await MediaLibrary.saveToLibraryAsync(uri);
-        Alert.alert("Success", "Receipt saved to your photo gallery!");
+      const uri = await viewShotRef.current.capture();
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, {
+          mimeType: "image/png",
+          dialogTitle: "Save or share your receipt",
+        });
       } else {
-        Alert.alert("Error", "Could not capture receipt layout.");
+        Alert.alert("Error", "Sharing is not available on this device.");
       }
     } catch (error) {
       console.error("Save receipt error:", error);
@@ -186,7 +184,7 @@ export default function TransferSuccessPage() {
             <ActivityIndicator color="#034194" />
           ) : (
             <Text className="text-primary font-bold text-lg">
-              Save Receipt as Image
+              Save or Share Receipt
             </Text>
           )}
         </TouchableOpacity>

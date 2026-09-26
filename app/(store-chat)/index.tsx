@@ -3,7 +3,6 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
-import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -176,33 +175,13 @@ function ChatSellerPageInner() {
       } else {
         Alert.alert("Success", `${fileName} downloaded successfully`);
       }
-      setDownloadingFileId(null);
     } catch (error) {
-      console.error("Primary download failed:", error);
-      try {
-        const mediaPermission = await MediaLibrary.requestPermissionsAsync();
-        if (mediaPermission.status !== "granted") {
-          throw new Error("Media Library permission denied");
-        }
-        const tempUri = `${FileSystem.cacheDirectory || FileSystem.documentDirectory}temp_${Date.now()}_${fileName}`;
-        const downloadResult = await FileSystem.downloadAsync(
-          finalUrl,
-          tempUri,
-        );
-        if (downloadResult.status === 200) {
-          const asset = await MediaLibrary.createAssetAsync(downloadResult.uri);
-          await MediaLibrary.createAlbumAsync("Downloads", asset, false);
-          Alert.alert("Success", `${fileName} saved to your gallery`);
-          setDownloadingFileId(null);
-          return;
-        }
-      } catch (fallbackError) {
-        console.error("Fallback also failed:", fallbackError);
-      }
-      setDownloadingFileId(null);
+      console.error("Download failed:", error);
       const msg =
         error instanceof Error ? error.message : "Unknown error occurred";
       Alert.alert("Download Error", "Could not download file. " + msg);
+    } finally {
+      setDownloadingFileId(null);
     }
   };
 
@@ -433,13 +412,9 @@ function ChatSellerPageInner() {
 
   const handlePickImage = async () => {
     if (sending) return;
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert("Permission Denied", "We need access to add images.");
-      return;
-    }
 
+    // No permission request needed on Android — launchImageLibraryAsync
+    // opens the system Photo Picker, which requires no runtime permission.
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: false,

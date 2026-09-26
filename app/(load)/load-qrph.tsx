@@ -2,8 +2,8 @@ import { CustomAlert } from "@/components/CustomAlert";
 import { checkPaymentStatus } from "@/services/walletService";
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system/legacy";
-import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -91,24 +91,13 @@ export default function WalletLoadQRPage() {
   }, [paymentIntentId]);
 
   // =========================
-  // SAVE QR
+  // SAVE / SHARE QR
   // =========================
   const handleSaveQR = async () => {
     if (!qrUrl) return;
 
     try {
       setSaving(true);
-
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-
-      if (status !== "granted") {
-        showAlert(
-          "Permission Required",
-          "Allow gallery access to save the QR.",
-        );
-
-        return;
-      }
 
       const filename = `Wallet_Load_QR_${Date.now()}.png`;
 
@@ -131,9 +120,14 @@ export default function WalletLoadQRPage() {
         }
       }
 
-      await MediaLibrary.saveToLibraryAsync(fileUri);
-
-      showAlert("Saved!", "QR Code has been saved to your gallery.");
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: "image/png",
+          dialogTitle: "Save or share your QR code",
+        });
+      } else {
+        showAlert("Error", "Sharing is not available on this device.");
+      }
     } catch (error) {
       console.log("SAVE QR ERROR:", error);
 
@@ -236,7 +230,7 @@ export default function WalletLoadQRPage() {
               )}
 
               <Text className="text-primary font-bold ml-2">
-                {saving ? "Saving..." : "Save to Gallery"}
+                {saving ? "Saving..." : "Save or Share QR"}
               </Text>
             </TouchableOpacity>
           </View>
