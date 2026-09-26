@@ -439,7 +439,7 @@ export default function MainLayout() {
               {/* Information Icon */}
               <View
                 style={{ elevation: 8 }}
-                className="absolute start-0 bottom-[-34px] pe-2 py-2 ps-7 bg-white rounded-r-full"
+                className="absolute start-0 bottom-[-34px] z-10 pe-2 py-2 ps-7 bg-white rounded-r-full"
               >
                 <TouchableOpacity
                   // onPress={handleComingSoon}
@@ -470,7 +470,7 @@ export default function MainLayout() {
               </View> */}
 
               {/* Centered Image */}
-              <View className="absolute bottom-0 left-0 right-0 items-center">
+              <View className="absolute bottom-0 z-1 left-0 right-0 items-center">
                 <Image
                   source={logo}
                   style={{
