@@ -1,0 +1,103 @@
+{
+  "expo": {
+    "name": "expo-filipino-land-inventors",
+    "slug": "expo-filipino-land-inventors",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/applogoicon.jpg",
+
+    "splash": {
+      "image": "./assets/images/AppLogo.jpg",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+
+    "scheme": "fismpc",
+    "userInterfaceStyle": "light",
+
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#00000000",
+      "translucent": true
+    },
+
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.fismpc",
+      "statusBarHidden": false,
+      "statusBarStyle": "dark",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSFaceIDUsageDescription": "Allow FISMPC to use Face ID for secure authentication."
+      }
+    },
+
+    "android": {
+      "package": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.fismpc",
+      "versionCode": 2,
+      "userInterfaceStyle": "light",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/applogoicon.jpg",
+        "backgroundColor": "#FFFFFF"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["USE_BIOMETRIC", "USE_FINGERPRINT"],
+      "softwareKeyboardLayoutMode": "resize"
+    },
+
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-image",
+      "expo-web-browser",
+      [
+        "expo-navigation-bar",
+        {
+          "backgroundColor": "#FFFFFF",
+          "barStyle": "dark",
+          "visibility": "visible",
+          "enforceContrast": false
+        }
+      ],
+      "expo-secure-store",
+      "expo-system-ui",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow FISMPC to use Face ID for secure authentication."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Filipino Land Inventors to access your camera to scan QR codes."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Filipino Land Inventors to save QR codes to your gallery.",
+          "savePhotosPermission": "Allow Filipino Land Inventors to save QR codes to your gallery.",
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": ["photo"]
+        }
+      ],
+      "expo-sharing",
+      "expo-video",
+      "./plugins/withDisableForceDark.js"
+    ],
+
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true,
+      "tsconfigPaths": true
+    },
+
+    "extra": {
+      "eas": {
+        "projectId": "ef4a234f-3fe7-42e5-995a-7ca344dad038"
+      }
+    }
+  }
+}

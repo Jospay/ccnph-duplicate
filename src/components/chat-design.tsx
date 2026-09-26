@@ -1,0 +1,308 @@
+// components/chat-design.tsx
+import { Dimensions, Platform, StyleSheet } from "react-native";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+// ---------- LIGHT THEME (BLUE & WHITE) ----------
+export const COLORS = {
+  bg: "#ffffff",
+  panel: "#ffffff",
+  panel2: "#f8f9fa",
+  rail: "#eef1f6",
+  ink: "#1e293b",
+  inkDim: "#64748b",
+  inkFaint: "#94a3b8",
+  brand: "#034194",
+  brandLight: "#0284c7",
+  bubbleOut: "#034194",
+  bubbleOutText: "#ffffff",
+  bubbleIn: "#f1f5f9",
+  bubbleInText: "#1e293b",
+  bubbleInEdge: "#e2e8f0",
+};
+
+export const mono = Platform.select({
+  ios: "Menlo",
+  android: "monospace",
+  default: "monospace",
+});
+
+export const styles = StyleSheet.create({
+  // No manual StatusBar.currentHeight padding here — top/bottom safe-area
+  // insets are applied dynamically in the screen component via
+  // useSafeAreaInsets, so this stays neutral and lets the status bar /
+  // nav bar show automatically without double-padding.
+  safe: {
+    flex: 1,
+    backgroundColor: COLORS.panel,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.bg,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: COLORS.panel,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.rail,
+  },
+  headName: { color: COLORS.ink, fontSize: 15.5, fontWeight: "600" },
+  headStatusRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
+  headStatus: {
+    color: COLORS.brand,
+    fontSize: 11,
+    fontFamily: mono,
+    opacity: 0.85,
+  },
+  pulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.brand,
+    marginRight: 5,
+  },
+  avatarMain: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.brand,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarMainText: { color: "#ffffff", fontWeight: "700", fontSize: 14 },
+  avatarMini: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: COLORS.rail,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 17,
+    marginRight: 8,
+  },
+  avatarMiniText: { color: COLORS.inkDim, fontWeight: "600", fontSize: 10 },
+  avatarDot: {
+    position: "absolute",
+    right: -1,
+    bottom: -1,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#3ddc84",
+    borderWidth: 2,
+    borderColor: COLORS.panel,
+  },
+  threadContent: { paddingHorizontal: 12, paddingTop: 14, paddingBottom: 20 },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 80,
+  },
+  emptyText: { color: COLORS.inkDim, fontSize: 13.5, fontFamily: mono },
+  row: { flexDirection: "row", alignItems: "flex-end", marginVertical: 5 },
+  rowIn: { justifyContent: "flex-start" },
+  rowOut: { justifyContent: "flex-end" },
+  // railDot: {
+  //   width: 6,
+  //   height: 6,
+  //   borderRadius: 3,
+  //   marginHorizontal: 8,
+  //   marginBottom: 10,
+  // },
+  bubbleWrap: { maxWidth: "72%" },
+  senderLabel: {
+    color: COLORS.inkDim,
+    fontFamily: mono,
+    fontSize: 10,
+    marginBottom: 3,
+    marginLeft: 2,
+    textTransform: "uppercase",
+  },
+  bubble: {
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  bubbleIn: {
+    backgroundColor: COLORS.bubbleIn,
+    borderColor: COLORS.bubbleInEdge,
+    borderBottomLeftRadius: 4,
+  },
+  bubbleOut: {
+    backgroundColor: COLORS.bubbleOut,
+    borderColor: COLORS.bubbleOut,
+    borderBottomRightRadius: 4,
+  },
+  bubbleInText: { color: COLORS.bubbleInText, fontSize: 14, lineHeight: 20 },
+  bubbleOutText: { color: COLORS.bubbleOutText, fontSize: 14, lineHeight: 20 },
+  mediaBubbleBox: {
+    borderRadius: 10,
+    overflow: "hidden",
+    marginVertical: 4,
+    maxWidth: 230,
+  },
+  media: {
+    width: 230,
+    height: 170,
+    borderRadius: 9,
+    backgroundColor: "#f1f5f9",
+  },
+  docContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 6,
+    width: 210,
+  },
+  docMe: {
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderColor: "rgba(255,255,255,0.25)",
+  },
+  docThem: { backgroundColor: COLORS.panel2, borderColor: COLORS.rail },
+  docName: { fontSize: 12, fontWeight: "600" },
+  metaLine: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+    marginHorizontal: 2,
+  },
+  metaText: { color: COLORS.inkFaint, fontFamily: mono, fontSize: 10 },
+  composer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 14,
+    backgroundColor: COLORS.panel,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.rail,
+    gap: 10,
+  },
+  compField: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.panel2,
+    borderWidth: 1,
+    borderColor: COLORS.rail,
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  compInput: {
+    flex: 1,
+    color: COLORS.ink,
+    fontSize: 15,
+    maxHeight: 90,
+    paddingVertical: 0,
+  },
+  sendBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: COLORS.brand,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  // ---------- DYNAMIC DATE HEADERS ----------
+  dateHeaderContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 16,
+    paddingHorizontal: 20,
+  },
+  dateDivider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.rail,
+  },
+  dateHeaderText: {
+    color: COLORS.inkDim,
+    fontSize: 11,
+    fontFamily: mono,
+    fontWeight: "600",
+    marginHorizontal: 10,
+    textTransform: "uppercase",
+  },
+
+  // ---------- IMAGE SLIDER MODAL ----------
+  // Fully opaque background (no transparency), as requested.
+  viewerContainer: {
+    flex: 1,
+    backgroundColor: "#000000",
+    justifyContent: "space-between",
+    position: "relative",
+    zIndex: 0,
+  },
+  // No hardcoded top padding (was 60/40) — insets.top is applied
+  // dynamically by the screen component so this adapts automatically
+  // per device instead of relying on a guessed constant.
+  viewerHeader: {
+    // flexDirection: "row",
+    // justifyContent: "space-between",
+    // alignItems: "center",
+    // paddingHorizontal: 16,
+    // paddingBottom: 10,
+    // paddingTop: 10,
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 1,
+  },
+  viewerCloseBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  viewerCounter: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontFamily: mono,
+    fontWeight: "600",
+  },
+  viewerMain: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+  },
+  viewerFullImage: {
+    width: SCREEN_WIDTH,
+    height: "100%",
+  },
+  viewerControls: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
+    top: "50%",
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
+    marginTop: -20,
+  },
+  navBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+});
