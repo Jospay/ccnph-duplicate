@@ -252,7 +252,7 @@ export default function EditProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -281,7 +281,7 @@ export default function EditProfileScreen() {
             className={`px-4 py-2 rounded-full ${isEditing ? "bg-[#FEF2F2]" : "bg-blue"}`}
           >
             <Text
-              className={`font-bold ${isEditing ? "text-[#D70127]" : "text-[#034194]"}`}
+              className={`font-bold ${isEditing ? "text-[#D70127]" : "text-primary"}`}
             >
               {isEditing ? "Cancel" : "Edit Details"}
             </Text>
@@ -328,7 +328,7 @@ export default function EditProfileScreen() {
                   selectedValue={form.gender}
                   onValueChange={(v) => setForm({ ...form, gender: v })}
                   style={pickerTextStyle}
-                  dropdownIconColor="#034194"
+                  dropdownIconColor="#3E4093"
                 >
                   <Picker.Item label="Select Gender" value="" color="#9CA3AF" />
                   <Picker.Item label="Male" value="Male" color="#1f2937" />
@@ -376,7 +376,7 @@ export default function EditProfileScreen() {
                     fetchProvinces(v);
                   }}
                   style={pickerTextStyle}
-                  dropdownIconColor="#034194"
+                  dropdownIconColor="#3E4093"
                 >
                   <Picker.Item label="Select Region" value="" color="#9CA3AF" />
                   {regions.map((r) => (
@@ -405,7 +405,7 @@ export default function EditProfileScreen() {
                     fetchCities(v);
                   }}
                   style={pickerTextStyle}
-                  dropdownIconColor="#034194"
+                  dropdownIconColor="#3E4093"
                 >
                   <Picker.Item
                     label={
@@ -442,7 +442,7 @@ export default function EditProfileScreen() {
                     fetchBarangays(v);
                   }}
                   style={pickerTextStyle}
-                  dropdownIconColor="#034194"
+                  dropdownIconColor="#3E4093"
                 >
                   <Picker.Item label="Select City" value="" color="#9CA3AF" />
                   {cities.map((c) => (
@@ -468,7 +468,7 @@ export default function EditProfileScreen() {
                   selectedValue={form.barangay}
                   onValueChange={(v) => setForm({ ...form, barangay: v })}
                   style={pickerTextStyle}
-                  dropdownIconColor="#034194"
+                  dropdownIconColor="#3E4093"
                 >
                   <Picker.Item
                     label="Select Barangay"
@@ -532,7 +532,7 @@ export default function EditProfileScreen() {
                       setForm({ ...form, valid_id_type: v })
                     }
                     style={pickerTextStyle}
-                    dropdownIconColor="#034194"
+                    dropdownIconColor="#3E4093"
                   >
                     <Picker.Item
                       label="Select ID Type"

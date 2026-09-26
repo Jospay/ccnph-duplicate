@@ -65,7 +65,7 @@ export default function CongratulationPage() {
                 </View>
               ) : (
                 <>
-                  <Text className="text-center font-bold text-[#034194] text-3xl">
+                  <Text className="text-center font-bold text-primary text-3xl">
                     Congratulations!
                   </Text>
                   <Text className="text-center text-slate-500 text-lg/7 pt-3 px-2">
@@ -88,7 +88,7 @@ export default function CongratulationPage() {
             disabled={navigating}
             activeOpacity={0.8}
             className={`h-16 rounded-2xl justify-center items-center ${
-              navigating ? "bg-slate-400" : "bg-[#034194]"
+              navigating ? "bg-slate-400" : "bg-primary"
             }`}
           >
             {navigating ? (

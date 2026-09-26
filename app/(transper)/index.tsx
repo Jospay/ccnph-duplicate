@@ -70,7 +70,7 @@ const toggleStyles = StyleSheet.create({
     fontSize: 14,
   },
   labelActive: {
-    color: "#034194",
+    color: "#3E4093",
   },
   labelInactive: {
     color: "#94a3b8",

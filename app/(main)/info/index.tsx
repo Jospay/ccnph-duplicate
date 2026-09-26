@@ -115,8 +115,8 @@ export default function InfoIndex() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["#034194"]}
-          tintColor="#034194"
+          colors={["#3E4093"]}
+          tintColor="#3E4093"
         />
       }
     >
@@ -165,7 +165,7 @@ export default function InfoIndex() {
 
         <Card>
           <View className="flex-row items-center mb-2">
-            <Ionicons name="eye-outline" size={20} color="#034194" />
+            <Ionicons name="eye-outline" size={20} color="#3E4093" />
             <Text className="text-primary font-bold ml-2">Our Vision</Text>
           </View>
           <Text className="text-slate-600 leading-6">
@@ -178,7 +178,7 @@ export default function InfoIndex() {
 
         <Card>
           <View className="flex-row items-center mb-2">
-            <Ionicons name="flag-outline" size={20} color="#034194" />
+            <Ionicons name="flag-outline" size={20} color="#3E4093" />
             <Text className="text-primary font-bold ml-2">Our Mission</Text>
           </View>
           <Text className="text-slate-600 leading-6">
@@ -198,7 +198,7 @@ export default function InfoIndex() {
           <Card key={p.title}>
             <View className="flex-row items-start">
               <View className="bg-primary/10 rounded-full p-2 mr-3">
-                <Ionicons name={p.icon as any} size={20} color="#034194" />
+                <Ionicons name={p.icon as any} size={20} color="#3E4093" />
               </View>
               <View className="flex-1">
                 <Text className="text-primary font-bold mb-1">{p.title}</Text>
@@ -247,7 +247,7 @@ export default function InfoIndex() {
             className="flex-row items-center py-2"
             onPress={call}
           >
-            <Ionicons name="call-outline" size={20} color="#034194" />
+            <Ionicons name="call-outline" size={20} color="#3E4093" />
             <Text className="text-slate-600 ml-3">(02) 1234-5678</Text>
           </TouchableOpacity> */}
 
@@ -255,7 +255,7 @@ export default function InfoIndex() {
             className="flex-row items-center py-2 border-slate-100"
             onPress={email}
           >
-            <Ionicons name="mail-outline" size={20} color="#034194" />
+            <Ionicons name="mail-outline" size={20} color="#3E4093" />
             <Text className="text-slate-600 ml-3">
               info@fisinventorscoop.org
             </Text>
@@ -268,7 +268,7 @@ export default function InfoIndex() {
             <Ionicons
               name="location-outline"
               size={20}
-              color="#034194"
+              color="#3E4093"
               style={{ marginTop: 2 }}
             />
             <Text className="text-slate-600 ml-3 flex-1">
@@ -286,7 +286,7 @@ export default function InfoIndex() {
               onPress={() => Linking.openURL(s.url)}
               className="bg-white border border-primary/20 rounded-full p-3 mx-2 shadow-brand"
             >
-              <Ionicons name={s.icon as any} size={20} color="#034194" />
+              <Ionicons name={s.icon as any} size={20} color="#3E4093" />
             </TouchableOpacity>
           ))}
         </View>*/}

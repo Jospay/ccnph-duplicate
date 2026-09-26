@@ -181,7 +181,7 @@ export default function TransferSuccessPage() {
           className="h-14 rounded-xl justify-center items-center border border-primary bg-white"
         >
           {isSaving ? (
-            <ActivityIndicator color="#034194" />
+            <ActivityIndicator color="#3E4093" />
           ) : (
             <Text className="text-primary font-bold text-lg">
               Save or Share Receipt

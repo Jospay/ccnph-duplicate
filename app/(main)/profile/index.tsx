@@ -384,7 +384,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -396,8 +396,8 @@ export default function ProfileScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["#034194"]}
-          tintColor="#034194"
+          colors={["#3E4093"]}
+          tintColor="#3E4093"
         />
       }
     >
@@ -445,12 +445,12 @@ export default function ProfileScreen() {
           activeOpacity={0.8}
           className="relative"
         >
-          <View className="w-24 h-24 rounded-full bg-blue items-center justify-center border-4 border-[#03419420] overflow-hidden">
+          <View className="w-24 h-24 rounded-full bg-blue items-center justify-center border-4 border-primary overflow-hidden">
             {uploading ? (
               <View className="items-center">
-                <ActivityIndicator color="#034194" />
+                <ActivityIndicator color="#3E4093" />
 
-                <Text className="text-[10px] text-[#034194] font-bold mt-1">
+                <Text className="text-[10px] text-primary font-bold mt-1">
                   {uploadProgress}%
                 </Text>
               </View>
@@ -462,16 +462,16 @@ export default function ProfileScreen() {
                 className="w-full h-full"
               />
             ) : (
-              <Ionicons name="person" size={50} color="#034194" />
+              <Ionicons name="person" size={50} color="#3E4093" />
             )}
           </View>
 
-          <View className="absolute bottom-0 right-0 bg-[#034194] p-1.5 rounded-full border-2 border-white shadow-sm">
+          <View className="absolute bottom-0 right-0 bg-primary p-1.5 rounded-full border-2 border-white shadow-sm">
             <Ionicons name="camera" size={14} color="white" />
           </View>
         </TouchableOpacity>
 
-        <Text className="text-2xl font-bold mt-4 text-[#034194]">
+        <Text className="text-2xl font-bold mt-4 text-primary">
           {user?.name || "Member"}
         </Text>
 
@@ -686,7 +686,7 @@ export default function ProfileScreen() {
                 className="flex-row items-center justify-between p-4"
               >
                 <View className="flex-row items-center">
-                  <Ionicons name="settings-outline" size={22} color="#034194" />
+                  <Ionicons name="settings-outline" size={22} color="#3E4093" />
                   <Text className="text-gray-800 font-bold ml-3 text-base">
                     Account Management
                   </Text>
@@ -728,7 +728,7 @@ export default function ProfileScreen() {
         <View className="flex-1 bg-black/40 justify-center items-center px-5">
           <View className="bg-white p-8 rounded-[40px] items-center w-full max-w-[380px] shadow-2xl">
             <View className="w-16 h-16 bg-blue rounded-full items-center justify-center mb-4">
-              <Ionicons name="image" size={32} color="#034194" />
+              <Ionicons name="image" size={32} color="#3E4093" />
             </View>
 
             <Text className="text-xl font-bold text-[#333] mb-2 text-center">
@@ -745,7 +745,7 @@ export default function ProfileScreen() {
                   }}
                   className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
                 >
-                  <Ionicons name="eye-outline" size={20} color="#034194" />
+                  <Ionicons name="eye-outline" size={20} color="#3E4093" />
 
                   <Text className="ml-3 font-bold text-gray-700">
                     View Photo
@@ -758,7 +758,7 @@ export default function ProfileScreen() {
                 onPress={() => openImageSource("camera")}
                 className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
               >
-                <Ionicons name="camera-outline" size={20} color="#034194" />
+                <Ionicons name="camera-outline" size={20} color="#3E4093" />
 
                 <Text className="ml-3 font-bold text-gray-700">Take Photo</Text>
               </TouchableOpacity>
@@ -771,12 +771,10 @@ export default function ProfileScreen() {
                 <Ionicons
                   name="cloud-upload-outline"
                   size={20}
-                  color="#034194"
+                  color="#3E4093"
                 />
 
-                <Text className="ml-3 font-bold text-[#034194]">
-                  Upload New
-                </Text>
+                <Text className="ml-3 font-bold text-primary">Upload New</Text>
               </TouchableOpacity>
 
               {/* DELETE PHOTO - ONLY IF AVATAR EXISTS */}
@@ -849,7 +847,7 @@ export default function ProfileScreen() {
             </Text>
 
             {previewUri && (
-              <View className="w-56 h-56 rounded-full overflow-hidden border-4 border-[#03419420] mb-6">
+              <View className="w-56 h-56 rounded-full overflow-hidden border-4 border-primary mb-6">
                 <Image
                   source={{
                     uri: previewUri,
@@ -863,7 +861,7 @@ export default function ProfileScreen() {
             <View className="w-full gap-y-3">
               <TouchableOpacity
                 onPress={confirmAndUpload}
-                className="w-full py-3.5 bg-[#034194] rounded-2xl items-center flex-row justify-center"
+                className="w-full py-3.5 bg-primary rounded-2xl items-center flex-row justify-center"
               >
                 <Ionicons
                   name="checkmark-circle-outline"
@@ -1183,7 +1181,7 @@ function CropScreen({
           <TouchableOpacity
             onPress={handleCropConfirm}
             disabled={cropping}
-            className="w-full py-3.5 bg-[#034194] rounded-2xl items-center flex-row justify-center"
+            className="w-full py-3.5 bg-primary rounded-2xl items-center flex-row justify-center"
           >
             {cropping ? (
               <ActivityIndicator color="white" />
@@ -1229,7 +1227,7 @@ function ProfileMenuItem({ icon, title, onPress, isLast }: any) {
     >
       <View className="flex-row items-center">
         <View className="bg-blue p-2 rounded-lg">
-          <Ionicons name={icon} size={22} color="#034194" />
+          <Ionicons name={icon} size={22} color="#3E4093" />
         </View>
 
         <Text className="text-[#333] font-semibold text-base ml-3">

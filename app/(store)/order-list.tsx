@@ -308,12 +308,12 @@ export default function OrderList() {
                 key={`${tab.slug}-${tab.label}`}
                 onPress={() => handleTabChange(tab.slug)}
                 className={`mx-3 py-2 flex-row items-center ${
-                  isTabActive ? "border-b-2 border-[#034194]" : ""
+                  isTabActive ? "border-b-2 border-primary" : ""
                 }`}
               >
                 <Text
                   className={`text-sm px-1 ${
-                    isTabActive ? "text-[#034194] font-bold" : "text-slate-600"
+                    isTabActive ? "text-primary font-bold" : "text-slate-600"
                   }`}
                 >
                   {tab.label}
@@ -334,7 +334,7 @@ export default function OrderList() {
       {/* RENDER LIST COMPONENT */}
       {isLoading ? (
         <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#034194" />
+          <ActivityIndicator size="large" color="#3E4093" />
         </View>
       ) : (
         <FlatList
@@ -345,7 +345,7 @@ export default function OrderList() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              colors={["#034194"]}
+              colors={["#3E4093"]}
             />
           }
           onEndReached={handleLoadMore}
@@ -440,7 +440,7 @@ export default function OrderList() {
                                   params: { slug: productSlug },
                                 });
                               }}
-                              className="bg-[#034194] px-4 py-2 rounded-lg"
+                              className="bg-primary px-4 py-2 rounded-lg"
                             >
                               <Text className="text-white text-xs font-semibold">
                                 Buy Again
@@ -466,7 +466,7 @@ export default function OrderList() {
                 <View className="pt-3 mt-1 border-t border-slate-100">
                   <View className="flex-row justify-end items-center gap-2">
                     <Text className="text-slate-500 text-sm">Order Total:</Text>
-                    <Text className="font-bold text-base text-[#034194]">
+                    <Text className="font-bold text-base text-primary">
                       ₱{item.total}
                     </Text>
                   </View>
@@ -593,7 +593,7 @@ export default function OrderList() {
                           params: { orderId: item.id },
                         })
                       }
-                      className="bg-[#034194] px-4 py-2 rounded-lg"
+                      className="bg-primary px-4 py-2 rounded-lg"
                     >
                       <Text className="text-white text-xs font-semibold">
                         Track Order
@@ -618,7 +618,7 @@ export default function OrderList() {
           ListFooterComponent={
             isLoadingMore ? (
               <View className="py-4">
-                <ActivityIndicator size="small" color="#034194" />
+                <ActivityIndicator size="small" color="#3E4093" />
               </View>
             ) : null
           }

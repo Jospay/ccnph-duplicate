@@ -138,7 +138,7 @@ export default function BuyerProfile() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-slate-50">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -223,7 +223,7 @@ export default function BuyerProfile() {
               onPress={() => handleTrackOrderPress("To Pay")}
               className="items-center justify-center w-16 relative"
             >
-              <Ionicons name="wallet-outline" size={24} color="#034194" />
+              <Ionicons name="wallet-outline" size={24} color="#3E4093" />
               <Text className="text-[11px] text-primary font-medium mt-2 text-center">
                 To Pay
               </Text>
@@ -242,7 +242,7 @@ export default function BuyerProfile() {
               onPress={() => handleTrackOrderPress("To Ship")}
               className="items-center justify-center w-16 relative"
             >
-              <Ionicons name="cube-outline" size={24} color="#034194" />
+              <Ionicons name="cube-outline" size={24} color="#3E4093" />
               <Text className="text-[11px] text-primary font-medium mt-2 text-center">
                 To Ship
               </Text>
@@ -261,7 +261,7 @@ export default function BuyerProfile() {
               onPress={() => handleTrackOrderPress("To Receive")}
               className="items-center justify-center w-16 relative"
             >
-              <Ionicons name="airplane-outline" size={24} color="#034194" />
+              <Ionicons name="airplane-outline" size={24} color="#3E4093" />
               <Text className="text-[11px] text-primary font-medium mt-2 text-center">
                 To Receive
               </Text>
@@ -280,7 +280,7 @@ export default function BuyerProfile() {
               onPress={() => router.push("/to-rate")} // <-- Direct routing here
               className="items-center justify-center w-16 relative"
             >
-              <Ionicons name="star-outline" size={24} color="#034194" />
+              <Ionicons name="star-outline" size={24} color="#3E4093" />
               <Text className="text-[11px] text-primary font-medium mt-2 text-center">
                 To Rate
               </Text>
@@ -303,7 +303,7 @@ export default function BuyerProfile() {
             className="flex-row items-center justify-between p-4 border-b border-slate-50"
           >
             <View className="flex-row items-center">
-              <Ionicons name="location-outline" size={20} color="#034194" />
+              <Ionicons name="location-outline" size={20} color="#3E4093" />
               <Text className="ml-3 text-slate-700 font-medium">
                 Shipping Address
               </Text>
@@ -317,7 +317,7 @@ export default function BuyerProfile() {
             className="flex-row items-center justify-between p-4"
           >
             <View className="flex-row items-center">
-              <Ionicons name="storefront-outline" size={20} color="#034194" />
+              <Ionicons name="storefront-outline" size={20} color="#3E4093" />
               <Text className="ml-3 text-slate-700 font-medium">
                 Return to FISMPC
               </Text>

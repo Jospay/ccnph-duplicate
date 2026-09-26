@@ -167,7 +167,7 @@ export default function CartPage() {
   if (loading) {
     return (
       <View className="flex-1 bg-slate-100 items-center justify-center">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -185,7 +185,7 @@ export default function CartPage() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#034194"]}
+            colors={["#3E4093"]}
           />
         }
         ListEmptyComponent={
@@ -208,14 +208,14 @@ export default function CartPage() {
                   <Ionicons
                     name={sellerSelected ? "checkbox" : "square-outline"}
                     size={24}
-                    color="#034194"
+                    color="#3E4093"
                   />
                 </TouchableOpacity>
 
                 <Ionicons
                   name="storefront-outline"
                   size={20}
-                  color="#034194"
+                  color="#3E4093"
                   style={{ marginLeft: 10 }}
                 />
 
@@ -242,7 +242,7 @@ export default function CartPage() {
                       <Ionicons
                         name={item.selected ? "checkbox" : "square-outline"}
                         size={24}
-                        color="#034194"
+                        color="#3E4093"
                       />
                     </TouchableOpacity>
 
@@ -354,7 +354,7 @@ export default function CartPage() {
                     : "square-outline"
                 }
                 size={24}
-                color="#034194"
+                color="#3E4093"
               />
               <Text className="ml-2 text-slate-700 font-medium">
                 Select All

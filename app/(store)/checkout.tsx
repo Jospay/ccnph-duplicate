@@ -276,7 +276,7 @@ export default function Checkout() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-slate-100">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
         <Text className="mt-3 text-slate-500 font-medium">
           Preparing checkout records...
         </Text>
@@ -294,11 +294,11 @@ export default function Checkout() {
         <View className="bg-white rounded-2xl p-4 mb-3">
           <View className="flex-row justify-between items-center">
             <View className="flex-row items-center">
-              <Ionicons name="location-outline" size={24} color="#034194" />
+              <Ionicons name="location-outline" size={24} color="#3E4093" />
               <Text className="ml-2 font-bold text-lg">Delivery Address</Text>
             </View>
             <TouchableOpacity onPress={() => router.push("/address")}>
-              <Text className="text-[#034194] font-semibold">
+              <Text className="text-[#3E4093] font-semibold">
                 {selectedAddress ? "Change" : "Add"}
               </Text>
             </TouchableOpacity>
@@ -335,7 +335,7 @@ export default function Checkout() {
           {groupedItems.map((shop) => (
             <View key={shop.seller} className="mb-2">
               <View className="flex-row items-center mb-3">
-                <Ionicons name="storefront-outline" size={20} color="#034194" />
+                <Ionicons name="storefront-outline" size={20} color="#3E4093" />
                 <Text className="ml-2 font-semibold text-slate-800">
                   {shop.seller}
                 </Text>
@@ -373,7 +373,7 @@ export default function Checkout() {
                       )}
 
                       <View className="flex-row items-center justify-between mt-1">
-                        <Text className="font-bold text-[#034194] text-base">
+                        <Text className="font-bold text-primary text-base">
                           ₱{Number(item.variant.price).toLocaleString()}
                         </Text>
                         <Text className="text-slate-500 font-medium">
@@ -428,7 +428,7 @@ export default function Checkout() {
                       : "radio-button-off"
                   }
                   size={22}
-                  color="#034194"
+                  color="#3E4093"
                 />
                 <Text className="ml-3 font-medium text-slate-700">
                   {method.name}
@@ -467,7 +467,7 @@ export default function Checkout() {
               <Text className="font-bold text-lg text-slate-800">
                 Total Payment
               </Text>
-              <Text className="font-bold text-[#034194] text-lg">
+              <Text className="font-bold text-primary text-lg">
                 ₱{Number(summary.total).toLocaleString()}
               </Text>
             </View>
@@ -480,7 +480,7 @@ export default function Checkout() {
         <TouchableOpacity
           onPress={handlePlaceOrder}
           disabled={submitting}
-          className={`rounded-2xl py-4 items-center ${submitting ? "bg-slate-400" : "bg-[#034194]"}`}
+          className={`rounded-2xl py-4 items-center ${submitting ? "bg-slate-400" : "bg-primary"}`}
         >
           <Text className="text-white font-bold text-lg">
             {submitting

@@ -206,7 +206,7 @@ export default function SearchPage() {
                 returnKeyType="search"
                 autoCorrect={false}
                 autoCapitalize="none"
-                selectionColor="#034194"
+                selectionColor="#3E4093"
                 onSubmitEditing={() => executeSearch()}
                 className="flex-1 text-sm ml-3 text-slate-800"
               />
@@ -368,7 +368,7 @@ export default function SearchPage() {
                     ListFooterComponent={
                       loadingMore ? (
                         <View className="py-4 items-center justify-center">
-                          <ActivityIndicator size="small" color="#034194" />
+                          <ActivityIndicator size="small" color="#3E4093" />
                         </View>
                       ) : null
                     }

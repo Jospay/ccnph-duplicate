@@ -187,8 +187,8 @@ export default function MembershipBreakdown() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#034194"]}
-            tintColor="#034194"
+            colors={["#3E4093"]}
+            tintColor="#3E4093"
           />
         }
       >

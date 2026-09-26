@@ -248,7 +248,7 @@ export default function ManageAddressesScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -266,7 +266,7 @@ export default function ManageAddressesScreen() {
           </Text>
           <TouchableOpacity
             onPress={() => handleOpenModal(null)}
-            className="flex-row items-center bg-[#034194] px-4 py-2 rounded-full"
+            className="flex-row items-center bg-primary px-4 py-2 rounded-full"
           >
             <Ionicons name="add" size={18} color="white" />
             <Text className="text-white font-bold ml-1">Add New</Text>
@@ -284,7 +284,7 @@ export default function ManageAddressesScreen() {
                   className={`px-3 py-1 rounded-full ${item.label === "home" ? "bg-green-50" : "bg-blue-50"}`}
                 >
                   <Text
-                    className={`font-bold text-xs capitalize ${item.label === "home" ? "text-green-600" : "text-[#034194]"}`}
+                    className={`font-bold text-xs capitalize ${item.label === "home" ? "text-green-600" : "text-primary"}`}
                   >
                     {item.label}
                   </Text>
@@ -385,10 +385,10 @@ export default function ManageAddressesScreen() {
                 <TouchableOpacity
                   key={type}
                   onPress={() => setForm({ ...form, label: type })}
-                  className={`flex-1 py-3 rounded-xl items-center border capitalize ${form.label === type ? "border-[#034194] bg-blue-50" : "border-gray-200"}`}
+                  className={`flex-1 py-3 rounded-xl items-center border capitalize ${form.label === type ? "border-primary bg-blue-50" : "border-gray-200"}`}
                 >
                   <Text
-                    className={`font-bold ${form.label === type ? "text-[#034194]" : "text-gray-500"}`}
+                    className={`font-bold ${form.label === type ? "text-primary" : "text-gray-500"}`}
                   >
                     {type}
                   </Text>
@@ -593,7 +593,7 @@ export default function ManageAddressesScreen() {
                 value={form.is_default}
                 onValueChange={(v) => setForm({ ...form, is_default: v })}
                 trackColor={{ false: "#E2E8F0", true: "#DBEAFE" }}
-                thumbColor={form.is_default ? "#034194" : "#94A3B8"}
+                thumbColor={form.is_default ? "#3E4093" : "#94A3B8"}
               />
             </View>
             <View className="h-10" />
@@ -610,7 +610,7 @@ export default function ManageAddressesScreen() {
             <TouchableOpacity
               onPress={handleSave}
               disabled={actionLoading}
-              className="h-14 rounded-2xl justify-center items-center bg-[#034194]"
+              className="h-14 rounded-2xl justify-center items-center bg-primary"
             >
               {actionLoading ? (
                 <ActivityIndicator color="#fff" />

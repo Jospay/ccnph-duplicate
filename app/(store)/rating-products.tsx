@@ -330,7 +330,7 @@ export default function RatingProductsScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center bg-slate-100">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -503,7 +503,7 @@ export default function RatingProductsScreen() {
                   onValueChange={(val) =>
                     updateItemState(index, "is_anonymous", val)
                   }
-                  trackColor={{ false: "#cbd5e1", true: "#034194" }}
+                  trackColor={{ false: "#cbd5e1", true: "#3E4093" }}
                 />
               </View>
             </View>
@@ -522,7 +522,7 @@ export default function RatingProductsScreen() {
           disabled={isSubmitting}
           onPress={handleSubmit}
           className={`py-3.5 rounded-xl justify-center items-center flex-row ${
-            isSubmitting ? "bg-slate-400" : "bg-[#034194]"
+            isSubmitting ? "bg-slate-400" : "bg-primary"
           }`}
         >
           {isSubmitting && (

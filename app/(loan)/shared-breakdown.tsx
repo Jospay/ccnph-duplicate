@@ -247,14 +247,14 @@ export default function SharedBreakdownPage() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#034194"]}
-            tintColor="#034194"
+            colors={["#3E4093"]}
+            tintColor="#3E4093"
           />
         }
       >
         <View className="bg-white rounded-3xl p-6 mb-6">
           {loading ? (
-            <ActivityIndicator color="#034194" />
+            <ActivityIndicator color="#3E4093" />
           ) : (
             <>
               <Text className="text-slate-400 text-xs font-bold uppercase">
@@ -274,7 +274,7 @@ export default function SharedBreakdownPage() {
         </Text>
 
         {loading ? (
-          <ActivityIndicator className="mt-10" color="#034194" />
+          <ActivityIndicator className="mt-10" color="#3E4093" />
         ) : schedules.length === 0 ? (
           <View className="bg-white rounded-2xl p-8 border border-slate-100 items-center justify-center mt-4">
             <Text className="text-center text-slate-500 font-medium">

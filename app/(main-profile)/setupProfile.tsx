@@ -603,7 +603,7 @@ export default function SetupProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -617,7 +617,7 @@ export default function SetupProfileScreen() {
   const CARD_STYLE =
     "bg-white p-5 rounded-3xl mb-4 shadow-sm border border-gray-100";
 
-  const LABEL_STYLE = "text-[#034194] mb-1 ps-2 text-sm";
+  const LABEL_STYLE = "text-primary mb-1 ps-2 text-sm";
 
   const INPUT_STYLE =
     "border border-gray-200 bg-white p-4 rounded-2xl mb-4 text-gray-800 font-medium overflow-hidden";
@@ -670,7 +670,7 @@ export default function SetupProfileScreen() {
 
         <View className={`${CARD_STYLE} mt-4`}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="person-circle-outline" size={24} color="#034194" />
+            <Ionicons name="person-circle-outline" size={24} color="#3E4093" />
 
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Basic Information
@@ -755,7 +755,7 @@ export default function SetupProfileScreen() {
 
         <View className={CARD_STYLE}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="location-outline" size={24} color="#034194" />
+            <Ionicons name="location-outline" size={24} color="#3E4093" />
 
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Address Details
@@ -893,7 +893,7 @@ export default function SetupProfileScreen() {
 
         <View className={CARD_STYLE}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="card-outline" size={24} color="#034194" />
+            <Ionicons name="card-outline" size={24} color="#3E4093" />
 
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Identity Verification
@@ -952,7 +952,7 @@ export default function SetupProfileScreen() {
               className="w-[48%] bg-gray-50 h-32 rounded-3xl items-center justify-center overflow-hidden border border-gray-200"
             >
               {processingId === "front_valid_id_picture" ? (
-                <ActivityIndicator color="#034194" />
+                <ActivityIndicator color="#3E4093" />
               ) : form.front_valid_id_picture?.uri ? (
                 <Image
                   source={{
@@ -985,7 +985,7 @@ export default function SetupProfileScreen() {
               className="w-[48%] bg-gray-50 h-32 rounded-3xl items-center justify-center overflow-hidden border border-gray-200"
             >
               {processingId === "back_valid_id_picture" ? (
-                <ActivityIndicator color="#034194" />
+                <ActivityIndicator color="#3E4093" />
               ) : form.back_valid_id_picture?.uri ? (
                 <Image
                   source={{
@@ -1024,7 +1024,7 @@ export default function SetupProfileScreen() {
         <TouchableOpacity
           onPress={handleUpdate}
           disabled={saving || !isFormComplete()}
-          className="h-16 rounded-2xl justify-center items-center bg-[#034194] mb-8"
+          className="h-16 rounded-2xl justify-center items-center bg-primary mb-8"
           style={{
             opacity: saving || !isFormComplete() ? 0.5 : 1,
           }}
@@ -1052,7 +1052,7 @@ export default function SetupProfileScreen() {
         <View className="flex-1 bg-black/40 justify-center items-center px-5">
           <View className="bg-white p-8 rounded-[40px] items-center w-full max-w-[380px] shadow-2xl">
             <View className="w-16 h-16 bg-blue rounded-full items-center justify-center mb-4">
-              <Ionicons name="card" size={32} color="#034194" />
+              <Ionicons name="card" size={32} color="#3E4093" />
             </View>
             <Text className="text-xl font-bold text-[#333] mb-2 text-center">
               {idOptionsField ? idFieldLabel(idOptionsField) : ""} Photo
@@ -1067,7 +1067,7 @@ export default function SetupProfileScreen() {
                   }}
                   className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
                 >
-                  <Ionicons name="eye-outline" size={20} color="#034194" />
+                  <Ionicons name="eye-outline" size={20} color="#3E4093" />
                   <Text className="ml-3 font-bold text-gray-700">
                     View Photo
                   </Text>
@@ -1080,7 +1080,7 @@ export default function SetupProfileScreen() {
                 }
                 className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
               >
-                <Ionicons name="camera-outline" size={20} color="#034194" />
+                <Ionicons name="camera-outline" size={20} color="#3E4093" />
                 <Text className="ml-3 font-bold text-gray-700">Take Photo</Text>
               </TouchableOpacity>
 
@@ -1093,11 +1093,9 @@ export default function SetupProfileScreen() {
                 <Ionicons
                   name="cloud-upload-outline"
                   size={20}
-                  color="#034194"
+                  color="#3E4093"
                 />
-                <Text className="ml-3 font-bold text-[#034194]">
-                  Upload New
-                </Text>
+                <Text className="ml-3 font-bold text-primary">Upload New</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -1435,10 +1433,10 @@ function IdCropScreen({
             onPress={() => setOrientation("landscape")}
             style={{
               backgroundColor:
-                orientation === "landscape" ? "#034194" : "transparent",
+                orientation === "landscape" ? "#3E4093" : "transparent",
               borderColor:
                 orientation === "landscape"
-                  ? "#034194"
+                  ? "#3E4093"
                   : "rgba(255,255,255,0.3)",
             }}
             className="px-5 py-2 rounded-full border-2 flex-row items-center gap-x-2"
@@ -1457,10 +1455,10 @@ function IdCropScreen({
             onPress={() => setOrientation("portrait")}
             style={{
               backgroundColor:
-                orientation === "portrait" ? "#034194" : "transparent",
+                orientation === "portrait" ? "#3E4093" : "transparent",
               borderColor:
                 orientation === "portrait"
-                  ? "#034194"
+                  ? "#3E4093"
                   : "rgba(255,255,255,0.3)",
             }}
             className="px-5 py-2 rounded-full border-2 flex-row items-center gap-x-2"
@@ -1480,7 +1478,7 @@ function IdCropScreen({
           <TouchableOpacity
             onPress={handleCropConfirm}
             disabled={cropping}
-            className="w-full py-3.5 bg-[#034194] rounded-2xl items-center flex-row justify-center"
+            className="w-full py-3.5 bg-primary rounded-2xl items-center flex-row justify-center"
           >
             {cropping ? (
               <ActivityIndicator color="white" />

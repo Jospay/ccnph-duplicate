@@ -125,7 +125,7 @@ export default function ChangePasswordScreen() {
       bottomOffset={20}
     >
       <View className="p-6">
-        <Text className="text-2xl font-bold text-[#034194] mb-2">Security</Text>
+        <Text className="text-2xl font-bold text-primary mb-2">Security</Text>
         <Text className="text-gray-500 mb-8">
           Update your password to keep your account secure.
         </Text>
@@ -168,7 +168,7 @@ export default function ChangePasswordScreen() {
         <TouchableOpacity
           onPress={handleChangePassword}
           disabled={loading}
-          className="bg-[#034194] py-5 rounded-3xl mt-6 shadow-lg shadow-primary/20 flex-row justify-center"
+          className="bg-primary py-5 rounded-3xl mt-6 shadow-lg shadow-primary/20 flex-row justify-center"
           style={{ opacity: loading ? 0.7 : 1 }}
         >
           {loading ? (

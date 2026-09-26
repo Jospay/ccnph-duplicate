@@ -157,7 +157,7 @@ export default function FavoritesPage() {
             onPress={() => router.push("/cart")}
             className="ml-3 bg-white h-12 w-12 rounded-2xl items-center justify-center border border-slate-200 relative"
           >
-            <Ionicons name="cart-outline" size={22} color="#034194" />
+            <Ionicons name="cart-outline" size={22} color="#3E4093" />
             {cartCount > 0 && (
               <View className="absolute -top-1 -right-1 bg-[#D70127] rounded-full min-w-[18px] h-[18px] items-center justify-center px-1 border border-white">
                 <Text className="text-white text-[10px] font-bold">
@@ -272,8 +272,8 @@ export default function FavoritesPage() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#034194"]}
-            tintColor="#034194"
+            colors={["#3E4093"]}
+            tintColor="#3E4093"
           />
         }
       />

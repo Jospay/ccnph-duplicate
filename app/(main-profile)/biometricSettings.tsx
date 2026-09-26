@@ -429,7 +429,7 @@ export default function BiometricSettingsScreen() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -443,8 +443,8 @@ export default function BiometricSettingsScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["#034194"]}
-          tintColor="#034194"
+          colors={["#3E4093"]}
+          tintColor="#3E4093"
         />
       }
     >
@@ -514,7 +514,7 @@ export default function BiometricSettingsScreen() {
         >
           <View className="flex-row items-center flex-1 mr-3">
             <View className="bg-blue-50 p-3 rounded-xl">
-              <Ionicons name="finger-print-outline" size={24} color="#034194" />
+              <Ionicons name="finger-print-outline" size={24} color="#3E4093" />
             </View>
 
             <View className="ml-3 flex-1">
@@ -529,7 +529,7 @@ export default function BiometricSettingsScreen() {
           </View>
 
           {processing ? (
-            <ActivityIndicator color="#034194" />
+            <ActivityIndicator color="#3E4093" />
           ) : (
             <Switch
               value={isCurrentDeviceEnabled}
@@ -537,7 +537,7 @@ export default function BiometricSettingsScreen() {
               disabled={!isSupported || processing}
               trackColor={{
                 false: "#CBD5E1",
-                true: "#034194",
+                true: "#3E4093",
               }}
               thumbColor="#FFFFFF"
             />
@@ -601,7 +601,7 @@ export default function BiometricSettingsScreen() {
 
                         {isThisDevice && (
                           <View className="ml-2 bg-blue-100 px-2 py-0.5 rounded-full">
-                            <Text className="text-[#034194] text-[10px] font-bold">
+                            <Text className="text-primary text-[10px] font-bold">
                               This Device
                             </Text>
                           </View>

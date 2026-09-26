@@ -223,7 +223,7 @@ export function TransferVerifyModal({
 
             {viewMode === "checking" && (
               <View className="items-center py-6">
-                <ActivityIndicator color="#034194" />
+                <ActivityIndicator color="#3E4093" />
               </View>
             )}
 
@@ -353,7 +353,7 @@ export function TransferVerifyModal({
                     <Ionicons
                       name="finger-print-outline"
                       size={22}
-                      color="#034194"
+                      color="#3E4093"
                     />
                   </View>
 

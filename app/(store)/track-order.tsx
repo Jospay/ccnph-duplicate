@@ -41,7 +41,7 @@ export default function TrackOrder() {
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center bg-slate-50">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -205,7 +205,7 @@ export default function TrackOrder() {
           </Text>
         </View>
         <View className="bg-blue px-3 py-1.5 rounded-full border border-primary">
-          <Text className="text-xs font-semibold text-[#034194] capitalize">
+          <Text className="text-xs font-semibold text-primary capitalize">
             {order.status_label || order.status || "In Progress"}
           </Text>
         </View>
@@ -307,7 +307,7 @@ export default function TrackOrder() {
       {/* RECIPIENT / SHIPPING INFO */}
       <View className="mb-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
         <View className="flex-row items-center mb-2">
-          <Ionicons name="location-sharp" size={18} color="#034194" />
+          <Ionicons name="location-sharp" size={18} color="#3E4093" />
           <Text className="ml-2 font-bold text-slate-800 text-sm">
             Shipping Address
           </Text>

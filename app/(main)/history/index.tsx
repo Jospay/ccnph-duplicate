@@ -90,7 +90,7 @@ export default function HistoryPage() {
       <TouchableOpacity
         onPress={() => setFilter(value)}
         className={`px-4 py-2 rounded-full mr-2 ${
-          active ? "bg-[#034194]" : "bg-white border border-slate-200"
+          active ? "bg-primary" : "bg-white border border-slate-200"
         }`}
       >
         <Text
@@ -142,8 +142,8 @@ export default function HistoryPage() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={["#034194"]}
-              tintColor="#034194"
+              colors={["#3E4093"]}
+              tintColor="#3E4093"
             />
           }
           ListEmptyComponent={

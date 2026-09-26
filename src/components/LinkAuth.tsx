@@ -45,7 +45,7 @@ export default function AuthNavigationButton({
       >
         {isNavigating ? (
           <View className="flex-row items-center gap-x-2">
-            <ActivityIndicator size="small" color="#034194" />
+            <ActivityIndicator size="small" color="#3E4093" />
             <Text className="text-primary font-bold text-lg italic">
               Loading...
             </Text>

@@ -224,7 +224,7 @@ export default function SharedPaymentPage() {
   if (checking || loading) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
         <Text className="mt-2 text-slate-500">Loading...</Text>
       </View>
     );

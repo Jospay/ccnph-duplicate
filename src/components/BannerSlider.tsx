@@ -225,7 +225,7 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ ads, loading }) => {
             <View
               key={index}
               style={{
-                backgroundColor: currentIndex === index ? "#034194" : "#cbd5e1",
+                backgroundColor: currentIndex === index ? "#3E4093" : "#cbd5e1",
                 width: currentIndex === index ? 16 : 6,
               }}
               className="h-1.5 rounded-full"

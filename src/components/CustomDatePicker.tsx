@@ -31,7 +31,7 @@ interface CustomDatePickerProps {
 const ITEM_HEIGHT = 48;
 const VISIBLE_ITEMS = 5;
 const LOOP_COUNT = 30;
-const PRIMARY_COLOR = "#034194";
+const PRIMARY_COLOR = "#3E4093";
 
 const formatDisplayDate = (dateString: string) => {
   if (!dateString) return "";

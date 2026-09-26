@@ -266,7 +266,7 @@ export default function ProductFeedbackScreen() {
                 onPress={() => setSelectedFilter(filter)}
                 className={`px-3.5 py-1.5 rounded-full mr-2 border flex-row items-center ${
                   isActive
-                    ? "bg-[#034194] border-[#034194]"
+                    ? "bg-primary border-primary"
                     : "bg-white border-slate-200"
                 }`}
               >
@@ -294,7 +294,7 @@ export default function ProductFeedbackScreen() {
       {/* Main Review List */}
       {loading ? (
         <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#034194" />
+          <ActivityIndicator size="large" color="#3E4093" />
           <Text className="text-xs text-slate-400 mt-2">
             Loading feedback...
           </Text>
@@ -314,7 +314,7 @@ export default function ProductFeedbackScreen() {
             loadingMore ? (
               <ActivityIndicator
                 size="small"
-                color="#034194"
+                color="#3E4093"
                 className="py-4"
               />
             ) : null

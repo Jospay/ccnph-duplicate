@@ -388,8 +388,8 @@ export default function DashboardPage() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["#034194"]}
-          tintColor="#034194"
+          colors={["#3E4093"]}
+          tintColor="#3E4093"
         />
       }
     >
@@ -441,14 +441,14 @@ export default function DashboardPage() {
                   // onPress={handleComingSoon}
                   className="bg-white h-10 w-10 flex justify-center items-center rounded-lg"
                 >
-                  <FontAwesome name="plus" size={22} color="#034194" />
+                  <FontAwesome name="plus" size={22} color="#3E4093" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => router.push("/(transper)/")}
                   // onPress={handleComingSoon}
                   className="bg-white h-10 w-10 flex justify-center items-center rounded-lg"
                 >
-                  <FontAwesome name="send" size={20} color="#034194" />
+                  <FontAwesome name="send" size={20} color="#3E4093" />
                 </TouchableOpacity>
               </View>
             </View>

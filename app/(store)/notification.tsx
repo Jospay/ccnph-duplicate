@@ -104,7 +104,7 @@ export default function NotificationsPage() {
             onPress={() => router.push("/cart")}
             className="ml-3 bg-white h-12 w-12 rounded-2xl items-center justify-center border border-slate-200 relative"
           >
-            <Ionicons name="cart-outline" size={24} color="#034194" />
+            <Ionicons name="cart-outline" size={24} color="#3E4093" />
             {cartCount > 0 && (
               <View className="absolute -top-1 -right-1 bg-[#D70127] rounded-full min-w-[18px] h-[18px] items-center justify-center px-1 border border-white">
                 <Text className="text-white text-[10px] font-bold">
@@ -173,7 +173,7 @@ export default function NotificationsPage() {
 
             {/* Unread Active Badge Dot Indicator */}
             {!item.isRead && (
-              <View className="w-2 h-2 rounded-full bg-[#034194] self-center ml-1" />
+              <View className="w-2 h-2 rounded-full bg-primary self-center ml-1" />
             )}
           </TouchableOpacity>
         )}

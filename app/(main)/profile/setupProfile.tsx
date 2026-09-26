@@ -292,7 +292,7 @@ export default function SetupProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -314,7 +314,7 @@ export default function SetupProfileScreen() {
         {/* BASIC INFO */}
         <View className={`${card} mt-4`}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="person-circle-outline" size={24} color="#034194" />
+            <Ionicons name="person-circle-outline" size={24} color="#3E4093" />
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Basic Information
             </Text>
@@ -350,7 +350,7 @@ export default function SetupProfileScreen() {
               selectedValue={form.gender}
               onValueChange={(value) => setForm({ ...form, gender: value })}
               style={pickerTextStyle}
-              dropdownIconColor="#034194"
+              dropdownIconColor="#3E4093"
             >
               <Picker.Item label="Select Gender" value="" color="#9CA3AF" />
               <Picker.Item label="Male" value="Male" color="#1f2937" />
@@ -386,7 +386,7 @@ export default function SetupProfileScreen() {
         {/* ADDRESS */}
         <View className={card}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="location-outline" size={24} color="#034194" />
+            <Ionicons name="location-outline" size={24} color="#3E4093" />
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Address Details
             </Text>
@@ -398,7 +398,7 @@ export default function SetupProfileScreen() {
               selectedValue={form.region}
               onValueChange={handleRegionChange}
               style={pickerTextStyle}
-              dropdownIconColor="#034194"
+              dropdownIconColor="#3E4093"
             >
               <Picker.Item label="Select Region" value="" color="#9CA3AF" />
               {regions.map((r) => (
@@ -422,7 +422,7 @@ export default function SetupProfileScreen() {
                 if (v) fetchCities(v);
               }}
               style={pickerTextStyle}
-              dropdownIconColor="#034194"
+              dropdownIconColor="#3E4093"
             >
               <Picker.Item
                 label={
@@ -453,7 +453,7 @@ export default function SetupProfileScreen() {
                 if (v) fetchBarangays(v);
               }}
               style={pickerTextStyle}
-              dropdownIconColor="#034194"
+              dropdownIconColor="#3E4093"
             >
               <Picker.Item label="Select City" value="" color="#9CA3AF" />
               {cities.map((c) => (
@@ -473,7 +473,7 @@ export default function SetupProfileScreen() {
               selectedValue={form.barangay}
               onValueChange={(v) => setForm({ ...form, barangay: v })}
               style={pickerTextStyle}
-              dropdownIconColor="#034194"
+              dropdownIconColor="#3E4093"
             >
               <Picker.Item label="Select Barangay" value="" color="#9CA3AF" />
               {barangays.map((b) => (
@@ -508,7 +508,7 @@ export default function SetupProfileScreen() {
         {/* VERIFICATION / ID */}
         <View className={card}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="card-outline" size={24} color="#034194" />
+            <Ionicons name="card-outline" size={24} color="#3E4093" />
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Identity Verification
             </Text>
@@ -520,7 +520,7 @@ export default function SetupProfileScreen() {
               selectedValue={form.valid_id_type}
               onValueChange={(v) => setForm({ ...form, valid_id_type: v })}
               style={pickerTextStyle}
-              dropdownIconColor="#034194"
+              dropdownIconColor="#3E4093"
             >
               <Picker.Item label="Select ID Type" value="" color="#9CA3AF" />
               <Picker.Item
@@ -592,7 +592,7 @@ export default function SetupProfileScreen() {
         <TouchableOpacity
           onPress={handleUpdate}
           disabled={saving || !isFormComplete()}
-          className="h-16 rounded-2xl justify-center items-center bg-[#034194] mb-8"
+          className="h-16 rounded-2xl justify-center items-center bg-primary mb-8"
           style={{ opacity: saving || !isFormComplete() ? 0.5 : 1 }}
         >
           {saving ? (

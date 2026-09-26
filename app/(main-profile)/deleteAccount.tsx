@@ -113,7 +113,7 @@ export default function DeleteAccountScreen() {
             className="p-2 rounded-xl mr-3"
             style={{ backgroundColor: "#EFF6FF" }}
           >
-            <Ionicons name="time-outline" size={20} color="#034194" />
+            <Ionicons name="time-outline" size={20} color="#3E4093" />
           </View>
           <View className="flex-1">
             <Text className="font-bold text-gray-800 text-sm">

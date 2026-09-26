@@ -166,14 +166,14 @@ export default function TopDealPage() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#034194"]}
-            tintColor="#034194"
+            colors={["#3E4093"]}
+            tintColor="#3E4093"
           />
         }
         ListFooterComponent={
           loadingMore ? (
             <View className="py-4">
-              <ActivityIndicator color="#034194" />
+              <ActivityIndicator color="#3E4093" />
             </View>
           ) : null
         }

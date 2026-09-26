@@ -142,7 +142,7 @@ export default function NewsIndex() {
               onPress={() => router.push("/(news)/search")}
               className="p-2"
             >
-              <Ionicons name="search" size={24} color="#034194" />
+              <Ionicons name="search" size={24} color="#3E4093" />
             </TouchableOpacity>
           </View>
 

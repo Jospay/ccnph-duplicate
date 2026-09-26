@@ -208,7 +208,7 @@ export default function ToRateScreen() {
         <View className="flex-row justify-between items-center pt-3 mt-1 border-t border-slate-100">
           <View>
             <Text className="text-[11px] text-slate-400">Total Amount</Text>
-            <Text className="text-sm font-bold text-[#034194]">
+            <Text className="text-sm font-bold text-primary">
               ₱{Number(item.total).toLocaleString()}
             </Text>
           </View>
@@ -217,12 +217,12 @@ export default function ToRateScreen() {
             <TouchableOpacity
               onPress={() => handleViewFeedback(item.id)}
               disabled={isFetchingThis}
-              className="border border-[#034194] bg-blue-50 px-4 py-2 rounded-lg flex-row items-center"
+              className="border border-primary bg-blue-50 px-4 py-2 rounded-lg flex-row items-center"
             >
               {isFetchingThis ? (
-                <ActivityIndicator size="small" color="#034194" />
+                <ActivityIndicator size="small" color="#3E4093" />
               ) : (
-                <Text className="text-xs text-[#034194] font-semibold">
+                <Text className="text-xs text-primary font-semibold">
                   View Feedback
                 </Text>
               )}
@@ -235,7 +235,7 @@ export default function ToRateScreen() {
                   params: { orderId: item.id },
                 })
               }
-              className="bg-[#034194] px-5 py-2.5 rounded-lg"
+              className="bg-primary px-5 py-2.5 rounded-lg"
             >
               <Text className="text-xs text-white font-semibold">
                 Rate Order
@@ -250,7 +250,7 @@ export default function ToRateScreen() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-slate-50">
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
         <Text className="text-xs text-slate-400 mt-2">Loading orders...</Text>
       </View>
     );
@@ -268,7 +268,7 @@ export default function ToRateScreen() {
         >
           <Text
             className={`text-xs font-bold ${
-              activeTab === "to-rate" ? "text-[#034194]" : "text-slate-500"
+              activeTab === "to-rate" ? "text-primary" : "text-slate-500"
             }`}
           >
             To Rate
@@ -283,7 +283,7 @@ export default function ToRateScreen() {
         >
           <Text
             className={`text-xs font-bold ${
-              activeTab === "rated" ? "text-[#034194]" : "text-slate-500"
+              activeTab === "rated" ? "text-primary" : "text-slate-500"
             }`}
           >
             Rated
@@ -300,7 +300,7 @@ export default function ToRateScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={["#034194"]}
+            colors={["#3E4093"]}
           />
         }
         onEndReached={handleLoadMore}
@@ -309,7 +309,7 @@ export default function ToRateScreen() {
           loadingMore ? (
             <ActivityIndicator
               size="small"
-              color="#034194"
+              color="#3E4093"
               style={{ marginVertical: 16 }}
             />
           ) : null

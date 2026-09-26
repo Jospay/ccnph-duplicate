@@ -258,7 +258,7 @@ export default function RootLayout() {
                     <Ionicons
                       name="chatbubble-ellipses"
                       size={20}
-                      color="#034194"
+                      color="#3E4093"
                     />
                   </View>
                   <View className="flex-1">

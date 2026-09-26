@@ -294,7 +294,7 @@ export default function MainLayout() {
           backgroundColor: "#ffffff",
         }}
       >
-        <ActivityIndicator size="large" color="#034194" />
+        <ActivityIndicator size="large" color="#3E4093" />
       </View>
     );
   }
@@ -393,7 +393,7 @@ export default function MainLayout() {
             }}
           >
             <View className="bg-[#0084FF]/10 w-10 h-10 rounded-full items-center justify-center mr-3">
-              <Ionicons name="chatbubble-ellipses" size={20} color="#034194" />
+              <Ionicons name="chatbubble-ellipses" size={20} color="#3E4093" />
             </View>
 
             <View className="flex-1">
@@ -448,7 +448,7 @@ export default function MainLayout() {
                     <Ionicons
                       name="information-circle"
                       size={35}
-                      color="#034194"
+                      color="#3E4093"
                     />
                   </View>
                 </TouchableOpacity>
@@ -481,7 +481,7 @@ export default function MainLayout() {
                   activeOpacity={0.7}
                 >
                   <View className="bg-white rounded-full border border-primary/20 p-2">
-                    <Entypo name="message" size={35} color="#034194" />
+                    <Entypo name="message" size={35} color="#3E4093" />
                   </View>
 
                   {/* Unread badge */}

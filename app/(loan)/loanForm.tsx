@@ -292,7 +292,7 @@ export default function LoanFormPage() {
 
                 {isComputing ? (
                   <View className="py-10">
-                    <ActivityIndicator size="small" color="#034194" />
+                    <ActivityIndicator size="small" color="#3E4093" />
                   </View>
                 ) : hasInvalidScheduleAmount ? (
                   <View className="py-8 bg-red-50 items-center">

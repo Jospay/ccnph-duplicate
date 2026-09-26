@@ -250,7 +250,7 @@ export default function HomePage() {
         ListFooterComponent={
           loadingMore ? (
             <View className="py-4 items-center justify-center">
-              <ActivityIndicator size="small" color="#034194" />
+              <ActivityIndicator size="small" color="#3E4093" />
             </View>
           ) : null
         }
@@ -274,7 +274,7 @@ export default function HomePage() {
                 onPress={() => router.push("/cart")}
                 className="ml-3 bg-white h-12 w-12 rounded-2xl items-center justify-center border border-slate-200 relative"
               >
-                <Ionicons name="cart-outline" size={24} color="#034194" />
+                <Ionicons name="cart-outline" size={24} color="#3E4093" />
                 {cartCount > 0 && (
                   <View className="absolute -top-1 -right-1 bg-[#D70127] rounded-full min-w-[18px] h-[18px] items-center justify-center px-1 border border-white">
                     <Text className="text-white text-[10px] font-bold">
@@ -475,8 +475,8 @@ export default function HomePage() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#034194"]}
-            tintColor="#034194"
+            colors={["#3E4093"]}
+            tintColor="#3E4093"
           />
         }
       />
