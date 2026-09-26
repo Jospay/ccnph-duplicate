@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#034194",
+    backgroundColor: "#3E4093",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 2,
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   sendButtonActive: {
-    backgroundColor: "#034194",
+    backgroundColor: "#3E4093",
   },
   sendButtonInactive: {
     backgroundColor: "#F1F5F9",

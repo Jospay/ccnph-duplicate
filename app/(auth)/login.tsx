@@ -307,13 +307,13 @@ export default function LoginPage() {
                       }`}
                     >
                       {loadingState.biometric ? (
-                        <ActivityIndicator color="#034194" />
+                        <ActivityIndicator color="#3E4093" />
                       ) : (
                         <>
                           <Ionicons
                             name="finger-print"
                             size={20}
-                            color="#034194"
+                            color="#3E4093"
                             style={{ marginRight: 8 }}
                           />
                           <Text className="text-primary font-bold text-base">

@@ -287,7 +287,7 @@ export default function ChatListScreen() {
       {/* Structural Header Wrapper */}
       <View className="bg-white px-5 py-4 flex-row items-center justify-between border-b border-slate-100">
         <View className="flex-row items-center">
-          <Ionicons name="chatbubbles" size={24} color="#034194" />
+          <Ionicons name="chatbubbles" size={24} color="#3E4093" />
           <Text className="text-xl font-black text-slate-900 ml-2.5 tracking-tight">
             Chats
           </Text>
@@ -304,7 +304,7 @@ export default function ChatListScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center bg-white">
-          <ActivityIndicator size="large" color="#034194" />
+          <ActivityIndicator size="large" color="#3E4093" />
         </View>
       ) : (
         <FlatList
@@ -316,8 +316,8 @@ export default function ChatListScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handlePullToRefresh}
-              colors={["#034194"]}
-              tintColor="#034194"
+              colors={["#3E4093"]}
+              tintColor="#3E4093"
             />
           }
           ListEmptyComponent={

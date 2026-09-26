@@ -47,7 +47,7 @@ export default function CategoryPage() {
                 resizeMode="contain"
               />
             ) : (
-              <Ionicons name="business" size={72} color="#034194" />
+              <Ionicons name="business" size={72} color="#3E4093" />
             )}
           </View>
         </View>
