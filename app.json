@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-filipino-land-inventors",
-    "slug": "expo-filipino-land-inventors",
+    "name": "CCNPH",
+    "slug": "CCNPH",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/applogoicon.jpg",
@@ -12,7 +12,7 @@
       "backgroundColor": "#FFFFFF"
     },
 
-    "scheme": "fismpc",
+    "scheme": "ccnph",
     "userInterfaceStyle": "light",
 
     "androidStatusBar": {
@@ -23,17 +23,17 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.fismpc",
+      "bundleIdentifier": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.ccnph",
       "statusBarHidden": false,
       "statusBarStyle": "dark",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSFaceIDUsageDescription": "Allow FISMPC to use Face ID for secure authentication."
+        "NSFaceIDUsageDescription": "Allow CCNPH to use Face ID for secure authentication."
       }
     },
 
     "android": {
-      "package": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.fismpc",
+      "package": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.ccnph",
       "versionCode": 1,
       "userInterfaceStyle": "light",
       "adaptiveIcon": {
@@ -63,13 +63,13 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow FISMPC to use Face ID for secure authentication."
+          "faceIDPermission": "Allow CCNPH to use Face ID for secure authentication."
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Filipino Land Inventors to access your camera to scan QR codes."
+          "cameraPermission": "Allow CCNPH to access your camera to scan QR codes."
         }
       ],
       "expo-sharing",

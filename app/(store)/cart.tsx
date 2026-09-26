@@ -63,7 +63,7 @@ export default function CartPage() {
     const groups: Record<string, typeof cartItems> = {};
 
     cartItems.forEach((item) => {
-      const sellerName = item.product?.seller || "FISMPC Store";
+      const sellerName = item.product?.seller || "CCNPH Store";
       if (!groups[sellerName]) {
         groups[sellerName] = [];
       }
@@ -116,13 +116,13 @@ export default function CartPage() {
 
   const toggleSeller = (sellerName: string) => {
     const sellerItems = cartItems.filter(
-      (item) => (item.product?.seller || "FISMPC Store") === sellerName,
+      (item) => (item.product?.seller || "CCNPH Store") === sellerName,
     );
     const allSellerItemsSelected = sellerItems.every((item) => item.selected);
 
     setCartItems((prev) =>
       prev.map((item) => {
-        const currentItemSeller = item.product?.seller || "FISMPC Store";
+        const currentItemSeller = item.product?.seller || "CCNPH Store";
         if (currentItemSeller === sellerName) {
           return { ...item, selected: !allSellerItemsSelected };
         }

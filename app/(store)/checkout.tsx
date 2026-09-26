@@ -211,7 +211,7 @@ export default function Checkout() {
       [key: string]: { seller: string; products: CheckoutItem[] };
     } = {};
     items.forEach((item) => {
-      const storeName = item.product?.store?.name || "FISMPC Store";
+      const storeName = item.product?.store?.name || "CCNPH Store";
       if (!groups[storeName]) {
         groups[storeName] = { seller: storeName, products: [] };
       }

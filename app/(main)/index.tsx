@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
-  Image,
   Modal,
   RefreshControl,
   ScrollView,
@@ -32,15 +31,12 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 // import Ask from "../../assets/images/icon/Ask.png";
-import Businessicon from "../../assets/images/icon/Businessicon.png";
-import Coop from "../../assets/images/icon/coop.png";
 // import FISMPC from "../../assets/images/icon/FISMPC.png";
 // import Funding from "../../assets/images/icon/Funding.png";
 // import Intellectual from "../../assets/images/icon/Intellectual.png";
 // import Licensing from "../../assets/images/icon/Licensing.png";
 // import Loan from "../../assets/images/icon/Loan.png";
 // import Lost from "../../assets/images/icon/Lost.png";
-import News from "../../assets/images/icon/News.png";
 // import Product from "../../assets/images/icon/Product.png";
 // import RD from "../../assets/images/icon/RD.png";
 // import Suggest from "../../assets/images/icon/Suggest.png";
@@ -202,7 +198,7 @@ export default function DashboardPage() {
       (isBasic && isActive)
     ) {
       if (
-        item.label === "FISMPC Online Store" ||
+        item.label === "CCNPH Online Store" ||
         item.label === "Coop Membership" ||
         item.label === "News & Event"
       ) {
@@ -214,7 +210,7 @@ export default function DashboardPage() {
 
     // 2. Normal free access items for other users/statuses
     if (
-      item.label === "FISMPC Online Store" ||
+      item.label === "CCNPH Online Store" ||
       item.label === "Coop Membership" ||
       item.label === "News & Event"
     ) {
@@ -241,7 +237,8 @@ export default function DashboardPage() {
     {
       label: "Business Training",
       href: "/(business)/",
-      source: Businessicon,
+      iconFamily: Ionicons,
+      iconName: "school-outline",
     },
     // {
     //   label: "Intellectual Property Assistant",
@@ -273,8 +270,19 @@ export default function DashboardPage() {
     // { label: "Product Validation Services", href: "/", source: Product },
     // { label: "Lost & Found", href: "/", source: Lost },
     // { label: "Suggest a Service", href: "/", source: Suggest },
-    { label: "Coop Membership", href: "/(coop)/", source: Coop },
-    { label: "News & Event", href: "/(news)/", source: News },
+
+    {
+      label: "Coop Membership",
+      href: "/(coop)/",
+      iconFamily: Ionicons,
+      iconName: "people-outline",
+    },
+    {
+      label: "News & Event",
+      href: "/(news)/",
+      iconFamily: Ionicons,
+      iconName: "newspaper-outline",
+    },
   ];
 
   const getPopupContent = () => {
@@ -459,32 +467,35 @@ export default function DashboardPage() {
         <BannerSlider ads={ads} loading={pageLoading} />
 
         {/* 4. RESPONSIVE GRID MENU (3 Per Row) */}
-        <View className="flex-row flex-wrap justify-between pb-5 pt-4">
+        <View className="flex-row flex-wrap justify-between pb-5">
           {pageLoading
-            ? Array.from({ length: 9 }).map((_, i) => (
-                <View key={i} className="w-[30%] items-center mb-8">
+            ? Array.from({ length: 12 }).map((_, i) => (
+                <View key={i} className="w-[30%] items-center mb-5 mt-8">
                   <Skeleton className="w-16 h-16 rounded-2xl" />
                   <Skeleton className="w-20 h-4 mt-2" />
                 </View>
               ))
-            : menuItems.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleMenuPress(item)}
-                  className="!w-[30%] items-center mb-8"
-                >
-                  <View className="rounded-3xl mb-3 items-center justify-center">
-                    <Image
-                      source={item.source}
-                      className="!w-12 !h-12"
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <Text className="text-center text-sm font-medium text-slate-700">
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+            : menuItems.map((item, index) => {
+                const IconComponent = item.iconFamily;
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => handleMenuPress(item)}
+                    className="!w-[30%] items-center mb-8"
+                  >
+                    <View className="w-14 h-14 mb-2 items-center justify-center">
+                      <IconComponent
+                        name={item.iconName as any}
+                        size={42}
+                        color={"#3E4093"}
+                      />
+                    </View>
+                    <Text className="text-center text-sm font-medium text-slate-700">
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
         </View>
       </View>
 

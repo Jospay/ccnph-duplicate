@@ -26,7 +26,6 @@ import {
 import echo from "@/services/echo";
 import { getNotifications } from "@/services/notificationService";
 
-import Camera from "../../assets/images/icon/camera.png";
 import History from "../../assets/images/icon/History.png";
 import Home from "../../assets/images/icon/Home.png";
 import Notification from "../../assets/images/icon/notification.png";
@@ -39,6 +38,8 @@ const queryClient = new QueryClient();
 export default function MainLayout() {
   const { token, isLoading, user } = useAuthStore();
   const { comingSoonVisible, setComingSoonVisible } = useUIStore();
+
+  const CENTER_LOGO_HEIGHT = 74;
 
   const router = useRouter();
   const pathname = usePathname();
@@ -117,9 +118,9 @@ export default function MainLayout() {
   // SUPPORT CHAT
   // ============================================================
 
-  const handleComingSoon = () => {
-    setComingSoonVisible(true);
-  };
+  // const handleComingSoon = () => {
+  //   setComingSoonVisible(true);
+  // };
 
   // ===== Load initial support conversation state =====
   useEffect(() => {
@@ -454,8 +455,7 @@ export default function MainLayout() {
                 </TouchableOpacity>
               </View>
 
-              {/* Logo */}
-              <View
+              {/* <View
                 style={{ elevation: 6 }}
                 className="absolute bottom-[-43px] bg-white rounded-full"
               >
@@ -464,6 +464,18 @@ export default function MainLayout() {
                   style={{
                     width: 96,
                     height: 96,
+                  }}
+                  resizeMode="contain"
+                />
+              </View> */}
+
+              {/* Centered Image */}
+              <View className="absolute bottom-0 left-0 right-0 items-center">
+                <Image
+                  source={logo}
+                  style={{
+                    height: CENTER_LOGO_HEIGHT,
+                    bottom: -CENTER_LOGO_HEIGHT / 2,
                   }}
                   resizeMode="contain"
                 />
@@ -577,7 +589,7 @@ export default function MainLayout() {
             <View
               style={{
                 borderTopWidth: 5,
-                borderTopColor: "#D70127",
+                borderTopColor: "#CCE8D5",
                 width: "100%",
                 paddingBottom: insets.bottom,
                 zIndex: 99,
@@ -643,19 +655,13 @@ export default function MainLayout() {
                       borderRadius: 45,
                       backgroundColor: "white",
                       borderWidth: 3,
-                      borderColor: "#C6890F",
+                      borderColor: "#F7EF8A",
                       alignItems: "center",
                       justifyContent: "center",
                       elevation: 10,
                     }}
                   >
-                    <Image
-                      source={Camera}
-                      style={{
-                        width: 50,
-                        height: 50,
-                      }}
-                    />
+                    <Entypo name="camera" size={50} color="#3E4093" />
                   </TouchableOpacity>
                 </View>
 

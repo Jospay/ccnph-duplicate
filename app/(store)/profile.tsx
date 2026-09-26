@@ -319,7 +319,7 @@ export default function BuyerProfile() {
             <View className="flex-row items-center">
               <Ionicons name="storefront-outline" size={20} color="#3E4093" />
               <Text className="ml-3 text-slate-700 font-medium">
-                Return to FISMPC
+                Return to CCNPH
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color="#cbd5e1" />

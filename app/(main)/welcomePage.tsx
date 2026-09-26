@@ -16,7 +16,6 @@ import {
 import logo from "../../assets/images/logo.png";
 import s1 from "../../assets/images/vector/s1.png";
 import s2 from "../../assets/images/vector/s2.png";
-import s3 from "../../assets/images/vector/s3.png";
 import s4 from "../../assets/images/vector/s4.png";
 import "../../global.css";
 
@@ -24,24 +23,18 @@ const { width } = Dimensions.get("window");
 
 const slides = [
   {
-    highlight: "Develop your skills",
-    second: "and grow your business with confidence.",
+    second: "Ready to",
+    second_highlight: "Grow Together?",
     image: s1,
   },
   {
-    highlight: "Stay informed",
-    second: "with the latest news, events, and activities.",
+    second: "Discover",
+    second_highlight: "Better Opportunities",
     image: s2,
   },
   {
-    highlight: "Join our growing community",
-    second: "and discover opportunities together.",
-    image: s3,
-  },
-  {
-    highlight: "Empowering Filipino ideas",
-    second: "and",
-    second_highlight: "innovation.",
+    highlight: "Stay Connected",
+    second: "Wherever You Go.",
     image: s4,
   },
 ];

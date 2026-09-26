@@ -302,7 +302,7 @@ export default function RootLayout() {
                               ? "Seller"
                               : isShop
                                 ? "Store Shop"
-                                : "FISMPC Online Store"}
+                                : "CCNPH Online Store"}
                   </Text>
 
                   {/* Right Side: Message Icon with Unread Badge (hidden on chat screens) */}
