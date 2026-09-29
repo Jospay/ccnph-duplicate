@@ -8,7 +8,7 @@ export interface TermsAndCondition {
 
 export const termsAndConditionsService = {
   getTermsAndConditions: async (): Promise<TermsAndCondition> => {
-    const response = await api.get("/terms-and-conditions-ccnph");
+    const response = await api.get("/terms-and-conditions");
 
     return response.data;
   },

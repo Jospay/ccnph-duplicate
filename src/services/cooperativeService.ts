@@ -1,5 +1,13 @@
 import api from "./api";
 
+export interface Cooperative {
+  id: number;
+  name: string;
+  primary_color: string;
+  secondary_color: string;
+  logo: string;
+}
+
 export interface AllocationBreakdown {
   id: number;
   name: string;
@@ -29,9 +37,6 @@ export interface AllocationSummary {
   slug: string;
   description: string | null;
   amount: number;
-  // No percentage: not every service uses every allocation, so a
-  // "% of total fund" figure at this grand-summary level would
-  // misrepresent allocations that only apply to a subset of services.
 }
 
 export interface CooperativeSummary {
@@ -52,6 +57,16 @@ export interface CooperativeServiceOption {
 }
 
 export const cooperativeService = {
+  getCooperatives: async (): Promise<Cooperative[]> => {
+    try {
+      const { data } = await api.get("/cooperatives");
+      return data;
+    } catch (error: any) {
+      console.error("Error fetching cooperatives:", error);
+      return [];
+    }
+  },
+
   getYears: async (): Promise<string[]> => {
     const response = await api.get("/cooperative/years");
     return response.data.data || [];
@@ -70,5 +85,15 @@ export const cooperativeService = {
       params: { year, service: serviceSlug },
     });
     return response.data.data as CooperativeSummary;
+  },
+
+  getMyCooperative: async (): Promise<Cooperative | null> => {
+    try {
+      const { data } = await api.get("/profile/cooperative");
+      return data;
+    } catch (error: any) {
+      console.error("Error fetching user's cooperative:", error);
+      return null;
+    }
   },
 };

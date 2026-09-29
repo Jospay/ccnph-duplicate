@@ -1,5 +1,6 @@
 import { AuthInput } from "@/components/AuthInput";
 import { CustomAlert } from "@/components/CustomAlert";
+import { CustomPicker } from "@/components/CustomPicker";
 import HeaderAuth from "@/components/HeaderAuth";
 import LinkAuth from "@/components/LinkAuth";
 import { LoginSkeleton } from "@/components/LoginSkeleton";
@@ -9,7 +10,8 @@ import {
   accountRegisterService,
   RegisterPayload,
 } from "@/services/accountRegister";
-import { useMutation } from "@tanstack/react-query";
+import { Cooperative, cooperativeService } from "@/services/cooperativeService";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -27,8 +29,11 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const [form, setForm] = useState({
-    fullName: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
     number: "",
+    cooperativeId: "",
   });
 
   const [status, setStatus] = useState({
@@ -40,6 +45,11 @@ export default function RegisterPage() {
     visible: false,
     title: "",
     message: "",
+  });
+
+  const { data: cooperatives = [], isLoading: isLoadingCoops } = useQuery({
+    queryKey: ["cooperatives"],
+    queryFn: cooperativeService.getCooperatives,
   });
 
   useFocusEffect(
@@ -122,8 +132,16 @@ export default function RegisterPage() {
   const handleRegister = () => {
     if (mutation.isPending || status.navigating) return;
 
-    if (!form.fullName.trim() || !form.number.trim()) {
-      return showAlert("Required", "Please fill in all fields");
+    if (
+      !form.firstName.trim() ||
+      !form.lastName.trim() ||
+      !form.number.trim()
+    ) {
+      return showAlert("Required", "Please fill in all required fields");
+    }
+
+    if (!form.cooperativeId) {
+      return showAlert("Required", "Please select a cooperative");
     }
 
     if (form.number.length !== 11) {
@@ -133,13 +151,30 @@ export default function RegisterPage() {
       );
     }
 
+    const fullName = [
+      form.firstName.trim(),
+      form.middleName.trim(),
+      form.lastName.trim(),
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     mutation.mutate({
-      name: form.fullName.trim(),
+      name: fullName,
+      first_name: form.firstName.trim(),
+      middle_name: form.middleName.trim() || null,
+      last_name: form.lastName.trim(),
       phone: `63${form.number.substring(1)}`,
+      cooperative_id: parseInt(form.cooperativeId),
     });
   };
 
   const isBusy = mutation.isPending || status.navigating;
+
+  const cooperativeOptions = cooperatives.map((coop: Cooperative) => ({
+    label: coop.name,
+    value: String(coop.id),
+  }));
 
   return (
     <>
@@ -176,15 +211,54 @@ export default function RegisterPage() {
                     />
 
                     <AuthInput
-                      label="Full Name"
-                      placeholder="Enter your full name"
-                      value={form.fullName}
+                      label="First Name"
+                      placeholder="Enter your first name"
+                      value={form.firstName}
                       onChangeText={(val) =>
-                        setForm({ ...form, fullName: val })
+                        setForm({ ...form, firstName: val })
                       }
                       autoCapitalize="words"
                       editable={!isBusy}
                     />
+
+                    <AuthInput
+                      label="Middle Name (Optional)"
+                      placeholder="Enter your middle name"
+                      value={form.middleName}
+                      onChangeText={(val) =>
+                        setForm({ ...form, middleName: val })
+                      }
+                      autoCapitalize="words"
+                      editable={!isBusy}
+                    />
+
+                    <AuthInput
+                      label="Last Name"
+                      placeholder="Enter your last name"
+                      value={form.lastName}
+                      onChangeText={(val) =>
+                        setForm({ ...form, lastName: val })
+                      }
+                      autoCapitalize="words"
+                      editable={!isBusy}
+                    />
+
+                    {isLoadingCoops ? (
+                      <View className="mb-5 h-[56px] justify-center items-center border border-slate-200 bg-white rounded-2xl">
+                        <ActivityIndicator size="small" color="#00A859" />
+                      </View>
+                    ) : (
+                      <CustomPicker
+                        label="Select Cooperative"
+                        placeholder="Choose a cooperative"
+                        options={cooperativeOptions}
+                        selectedValue={form.cooperativeId}
+                        onValueChange={(val) =>
+                          setForm({ ...form, cooperativeId: String(val) })
+                        }
+                        disabled={isBusy}
+                      />
+                    )}
 
                     <AuthInput
                       label="Mobile Number"

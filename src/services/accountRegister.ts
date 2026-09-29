@@ -1,8 +1,12 @@
-import api from "./api"; // The red line should disappear now
+import api from "./api";
 
 export interface RegisterPayload {
   name: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
   phone: string;
+  cooperative_id: number;
 }
 
 export const accountRegisterService = {
