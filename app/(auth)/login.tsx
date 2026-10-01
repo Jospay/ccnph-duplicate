@@ -155,7 +155,7 @@ export default function LoginPage() {
 
     try {
       const data = await authService.login(form.number, form.password);
-      await setAuth(data.token, data.user);
+      await setAuth(data.token, data.user, data.cooperative);
 
       setLoadingState((prev) => ({ ...prev, nav: true }));
       router.replace("/(main)");
@@ -231,7 +231,7 @@ export default function LoginPage() {
 
       const publicKey = await biometricService.createKeys();
       const data = await authService.biometricLogin(currentDeviceId, publicKey);
-      await setAuth(data.token, data.user);
+      await setAuth(data.token, data.user, data.cooperative);
 
       setLoadingState((prev) => ({ ...prev, nav: true }));
       router.replace("/(main)");
