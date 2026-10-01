@@ -121,6 +121,7 @@ export default function CreatePasswordPage() {
         params: {
           token: data.token,
           user: JSON.stringify(data.user),
+          cooperative: JSON.stringify(data.cooperative ?? null),
         },
       });
     },
