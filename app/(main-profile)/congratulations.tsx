@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -14,6 +15,7 @@ import Congratulations from "../../assets/images/vector/ProfileCongratulations.p
 
 export default function CongratulationPage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const isProcessing = useRef(false);
 
   const [pageLoading, setPageLoading] = useState(true);
@@ -65,7 +67,10 @@ export default function CongratulationPage() {
                 </View>
               ) : (
                 <>
-                  <Text className="text-center font-bold text-primary text-3xl">
+                  <Text
+                    style={{ color: primary }}
+                    className="text-center font-bold text-3xl"
+                  >
                     Congratulations!
                   </Text>
                   <Text className="text-center text-slate-500 text-lg/7 pt-3 px-2">
@@ -87,9 +92,8 @@ export default function CongratulationPage() {
             onPress={handleReturnHome}
             disabled={navigating}
             activeOpacity={0.8}
-            className={`h-16 rounded-2xl justify-center items-center ${
-              navigating ? "bg-slate-400" : "bg-primary"
-            }`}
+            className="h-16 rounded-2xl justify-center items-center"
+            style={{ backgroundColor: navigating ? "#94a3b8" : primary }}
           >
             {navigating ? (
               <ActivityIndicator color="#fff" />
