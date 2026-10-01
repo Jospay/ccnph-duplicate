@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Ionicons } from "@expo/vector-icons";
 import * as NavigationBar from "expo-navigation-bar";
 import {
@@ -70,6 +71,9 @@ function CustomHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useLocalSearchParams();
+
+  // Cooperative brand color (falls back to the default blue)
+  const { primary } = useCoopTheme();
 
   const historyRef = useRef<string[]>([]);
 
@@ -163,8 +167,9 @@ function CustomHeader() {
 
   return (
     <View
-      className="bg-primary w-full items-center rounded-b-2xl"
+      className="w-full items-center rounded-b-2xl"
       style={{
+        backgroundColor: primary,
         paddingTop: 56,
         paddingBottom: 16,
       }}
