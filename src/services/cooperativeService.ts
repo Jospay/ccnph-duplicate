@@ -1,11 +1,17 @@
 import api from "./api";
 
+export interface CoopBranding {
+  primary_color: string;
+  secondary_color: string;
+  logo: string | null;
+}
+
 export interface Cooperative {
   id: number;
   name: string;
   primary_color: string;
   secondary_color: string;
-  logo: string;
+  logo: string | null;
 }
 
 export interface AllocationBreakdown {
@@ -90,7 +96,8 @@ export const cooperativeService = {
   getMyCooperative: async (): Promise<Cooperative | null> => {
     try {
       const { data } = await api.get("/profile/cooperative");
-      return data;
+      // Accept { cooperative: {...} }, { data: {...} } or the plain object
+      return data?.cooperative ?? data?.data ?? data ?? null;
     } catch (error: any) {
       console.error("Error fetching user's cooperative:", error);
       return null;
