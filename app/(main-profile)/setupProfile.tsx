@@ -1,6 +1,7 @@
 import { CustomAlert } from "@/components/CustomAlert";
 import { CustomDatePicker } from "@/components/CustomDatePicker";
 import { CustomPicker } from "@/components/CustomPicker";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { profileService } from "@/services/profileService";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -82,6 +83,7 @@ const VALID_ID_TYPE_OPTIONS = [
 
 export default function SetupProfileScreen() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -603,7 +605,7 @@ export default function SetupProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#3E4093" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -617,7 +619,7 @@ export default function SetupProfileScreen() {
   const CARD_STYLE =
     "bg-white p-5 rounded-3xl mb-4 shadow-sm border border-gray-100";
 
-  const LABEL_STYLE = "text-primary mb-1 ps-2 text-sm";
+  const LABEL_STYLE = "mb-1 ps-2 text-sm";
 
   const INPUT_STYLE =
     "border border-gray-200 bg-white p-4 rounded-2xl mb-4 text-gray-800 font-medium overflow-hidden";
@@ -670,7 +672,7 @@ export default function SetupProfileScreen() {
 
         <View className={`${CARD_STYLE} mt-4`}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="person-circle-outline" size={24} color="#3E4093" />
+            <Ionicons name="person-circle-outline" size={24} color={primary} />
 
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Basic Information
@@ -679,7 +681,9 @@ export default function SetupProfileScreen() {
 
           {/* NAME */}
 
-          <Text className={LABEL_STYLE}>Full Name</Text>
+          <Text className={LABEL_STYLE} style={{ color: primary }}>
+            Full Name
+          </Text>
 
           <TextInput
             value={form.name}
@@ -689,7 +693,9 @@ export default function SetupProfileScreen() {
 
           {/* PHONE */}
 
-          <Text className={LABEL_STYLE}>Phone Number</Text>
+          <Text className={LABEL_STYLE} style={{ color: primary }}>
+            Phone Number
+          </Text>
 
           <TextInput
             value={form.phone}
@@ -699,7 +705,9 @@ export default function SetupProfileScreen() {
 
           {/* EMAIL */}
 
-          <Text className={LABEL_STYLE}>Email Address</Text>
+          <Text className={LABEL_STYLE} style={{ color: primary }}>
+            Email Address
+          </Text>
 
           <TextInput
             value={form.email}
@@ -755,7 +763,7 @@ export default function SetupProfileScreen() {
 
         <View className={CARD_STYLE}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="location-outline" size={24} color="#3E4093" />
+            <Ionicons name="location-outline" size={24} color={primary} />
 
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Address Details
@@ -842,7 +850,9 @@ export default function SetupProfileScreen() {
 
           {/* STREET */}
 
-          <Text className={LABEL_STYLE}>Street / House No.</Text>
+          <Text className={LABEL_STYLE} style={{ color: primary }}>
+            Street / House No.
+          </Text>
 
           <TextInput
             value={form.street}
@@ -868,7 +878,9 @@ export default function SetupProfileScreen() {
 
           {/* POSTAL CODE */}
 
-          <Text className={LABEL_STYLE}>Postal Code</Text>
+          <Text className={LABEL_STYLE} style={{ color: primary }}>
+            Postal Code
+          </Text>
 
           <TextInput
             value={form.postal_code}
@@ -893,7 +905,7 @@ export default function SetupProfileScreen() {
 
         <View className={CARD_STYLE}>
           <View className="flex-row items-center mb-4">
-            <Ionicons name="card-outline" size={24} color="#3E4093" />
+            <Ionicons name="card-outline" size={24} color={primary} />
 
             <Text className="text-lg font-bold ml-2 text-gray-800">
               Identity Verification
@@ -917,7 +929,9 @@ export default function SetupProfileScreen() {
 
           {/* ID NUMBER */}
 
-          <Text className={LABEL_STYLE}>ID Number</Text>
+          <Text className={LABEL_STYLE} style={{ color: primary }}>
+            ID Number
+          </Text>
 
           <TextInput
             value={form.valid_id_number}
@@ -942,7 +956,9 @@ export default function SetupProfileScreen() {
 
           {/* ID IMAGES */}
 
-          <Text className={LABEL_STYLE}>Valid ID Images</Text>
+          <Text className={LABEL_STYLE} style={{ color: primary }}>
+            Valid ID Images
+          </Text>
 
           <View className="flex-row justify-between mt-2">
             {/* FRONT */}
@@ -952,7 +968,7 @@ export default function SetupProfileScreen() {
               className="w-[48%] bg-gray-50 h-32 rounded-3xl items-center justify-center overflow-hidden border border-gray-200"
             >
               {processingId === "front_valid_id_picture" ? (
-                <ActivityIndicator color="#3E4093" />
+                <ActivityIndicator color={primary} />
               ) : form.front_valid_id_picture?.uri ? (
                 <Image
                   source={{
@@ -985,7 +1001,7 @@ export default function SetupProfileScreen() {
               className="w-[48%] bg-gray-50 h-32 rounded-3xl items-center justify-center overflow-hidden border border-gray-200"
             >
               {processingId === "back_valid_id_picture" ? (
-                <ActivityIndicator color="#3E4093" />
+                <ActivityIndicator color={primary} />
               ) : form.back_valid_id_picture?.uri ? (
                 <Image
                   source={{
@@ -1024,8 +1040,9 @@ export default function SetupProfileScreen() {
         <TouchableOpacity
           onPress={handleUpdate}
           disabled={saving || !isFormComplete()}
-          className="h-16 rounded-2xl justify-center items-center bg-primary mb-8"
+          className="h-16 rounded-2xl justify-center items-center mb-8"
           style={{
+            backgroundColor: primary,
             opacity: saving || !isFormComplete() ? 0.5 : 1,
           }}
         >
@@ -1052,7 +1069,7 @@ export default function SetupProfileScreen() {
         <View className="flex-1 bg-black/40 justify-center items-center px-5">
           <View className="bg-white p-8 rounded-[40px] items-center w-full max-w-[380px] shadow-2xl">
             <View className="w-16 h-16 bg-blue rounded-full items-center justify-center mb-4">
-              <Ionicons name="card" size={32} color="#3E4093" />
+              <Ionicons name="card" size={32} color={primary} />
             </View>
             <Text className="text-xl font-bold text-[#333] mb-2 text-center">
               {idOptionsField ? idFieldLabel(idOptionsField) : ""} Photo
@@ -1067,7 +1084,7 @@ export default function SetupProfileScreen() {
                   }}
                   className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
                 >
-                  <Ionicons name="eye-outline" size={20} color="#3E4093" />
+                  <Ionicons name="eye-outline" size={20} color={primary} />
                   <Text className="ml-3 font-bold text-gray-700">
                     View Photo
                   </Text>
@@ -1080,7 +1097,7 @@ export default function SetupProfileScreen() {
                 }
                 className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
               >
-                <Ionicons name="camera-outline" size={20} color="#3E4093" />
+                <Ionicons name="camera-outline" size={20} color={primary} />
                 <Text className="ml-3 font-bold text-gray-700">Take Photo</Text>
               </TouchableOpacity>
 
@@ -1093,9 +1110,11 @@ export default function SetupProfileScreen() {
                 <Ionicons
                   name="cloud-upload-outline"
                   size={20}
-                  color="#3E4093"
+                  color={primary}
                 />
-                <Text className="ml-3 font-bold text-primary">Upload New</Text>
+                <Text style={{ color: primary }} className="ml-3 font-bold">
+                  Upload New
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -1225,6 +1244,7 @@ function IdCropScreen({
   onCancel: () => void;
   onDone: (croppedUri: string) => void;
 }) {
+  const { primary } = useCoopTheme();
   const [cropping, setCropping] = useState(false);
   const [zoomDisplay, setZoomDisplay] = useState(MIN_ZOOM);
   const [orientation, setOrientation] = useState<IdOrientation>("landscape");
@@ -1433,11 +1453,9 @@ function IdCropScreen({
             onPress={() => setOrientation("landscape")}
             style={{
               backgroundColor:
-                orientation === "landscape" ? "#3E4093" : "transparent",
+                orientation === "landscape" ? primary : "transparent",
               borderColor:
-                orientation === "landscape"
-                  ? "#3E4093"
-                  : "rgba(255,255,255,0.3)",
+                orientation === "landscape" ? primary : "rgba(255,255,255,0.3)",
             }}
             className="px-5 py-2 rounded-full border-2 flex-row items-center gap-x-2"
           >
@@ -1455,11 +1473,9 @@ function IdCropScreen({
             onPress={() => setOrientation("portrait")}
             style={{
               backgroundColor:
-                orientation === "portrait" ? "#3E4093" : "transparent",
+                orientation === "portrait" ? primary : "transparent",
               borderColor:
-                orientation === "portrait"
-                  ? "#3E4093"
-                  : "rgba(255,255,255,0.3)",
+                orientation === "portrait" ? primary : "rgba(255,255,255,0.3)",
             }}
             className="px-5 py-2 rounded-full border-2 flex-row items-center gap-x-2"
           >
@@ -1478,7 +1494,8 @@ function IdCropScreen({
           <TouchableOpacity
             onPress={handleCropConfirm}
             disabled={cropping}
-            className="w-full py-3.5 bg-primary rounded-2xl items-center flex-row justify-center"
+            style={{ backgroundColor: primary }}
+            className="w-full py-3.5 rounded-2xl items-center flex-row justify-center"
           >
             {cropping ? (
               <ActivityIndicator color="white" />
