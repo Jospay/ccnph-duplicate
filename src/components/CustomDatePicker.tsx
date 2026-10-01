@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, {
@@ -31,7 +32,6 @@ interface CustomDatePickerProps {
 const ITEM_HEIGHT = 48;
 const VISIBLE_ITEMS = 5;
 const LOOP_COUNT = 30;
-const PRIMARY_COLOR = "#3E4093";
 
 const formatDisplayDate = (dateString: string) => {
   if (!dateString) return "";
@@ -104,7 +104,7 @@ interface WheelPickerProps {
   onSelect: (index: number) => void;
   width?: number;
   loop?: boolean;
-  activeColor?: string;
+  activeColor: string;
 }
 
 const WheelPicker = React.memo(
@@ -114,7 +114,7 @@ const WheelPicker = React.memo(
     onSelect,
     width,
     loop = false,
-    activeColor = PRIMARY_COLOR,
+    activeColor,
   }: WheelPickerProps) => {
     // Strongly typing FlatList fixes the TypeScript red line error
     const listRef = useRef<FlatList<string | number>>(null);
@@ -296,10 +296,14 @@ export const CustomDatePicker = ({
   disabled = false,
   labelColor,
 }: CustomDatePickerProps) => {
+  // Cooperative brand color (falls back to the default blue)
+  const { primary } = useCoopTheme();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(parseDateString(value));
 
-  const activeColor = labelColor ?? PRIMARY_COLOR;
+  // A labelColor passed by the screen still wins over the brand color
+  const activeColor = labelColor ?? primary;
 
   const years = useMemo(
     () => createYearList(minimumDate, maximumDate),
@@ -373,7 +377,7 @@ export const CustomDatePicker = ({
     <View className="mb-5">
       <Text
         className="mb-2 ml-2 font-medium text-xs uppercase"
-        style={labelColor ? { color: labelColor } : { color: PRIMARY_COLOR }}
+        style={{ color: labelColor ?? primary }}
       >
         {label}
       </Text>
@@ -461,7 +465,8 @@ export const CustomDatePicker = ({
                   {/* Done Button */}
                   <TouchableOpacity
                     onPress={handleConfirm}
-                    className="w-full bg-primary py-3.5 rounded-2xl items-center mt-4"
+                    style={{ backgroundColor: primary }}
+                    className="w-full py-3.5 rounded-2xl items-center mt-4"
                   >
                     <Text className="text-white font-bold text-base">Done</Text>
                   </TouchableOpacity>
@@ -513,7 +518,8 @@ export const CustomDatePicker = ({
                       onChange(toDateString(tempDate));
                       setModalVisible(false);
                     }}
-                    className="w-full bg-primary py-3.5 rounded-2xl items-center mt-4"
+                    style={{ backgroundColor: primary }}
+                    className="w-full py-3.5 rounded-2xl items-center mt-4"
                   >
                     <Text className="text-white font-bold text-base">Done</Text>
                   </TouchableOpacity>
