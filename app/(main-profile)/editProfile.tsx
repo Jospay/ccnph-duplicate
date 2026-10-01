@@ -1,6 +1,7 @@
 import { CustomAlert } from "@/components/CustomAlert";
 import { CustomDatePicker } from "@/components/CustomDatePicker";
 import { CustomPicker } from "@/components/CustomPicker";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { profileService } from "@/services/profileService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,6 +34,10 @@ import Animated, {
 
 const MAX_ID_IMAGE_MB = 10;
 const MAX_ID_IMAGE_BYTES = MAX_ID_IMAGE_MB * 1024 * 1024;
+
+// Same as Tailwind's "border-primary/20": adds ~20% alpha to a #RRGGBB color.
+const withAlpha = (hex: string, alpha = "33") =>
+  /^#[0-9a-fA-F]{6}$/.test(hex) ? `${hex}${alpha}` : hex;
 
 const NCR_REGION_CODE = "130000000";
 
@@ -74,6 +79,7 @@ const VALID_ID_TYPE_OPTIONS = [
 
 export default function EditProfileScreen() {
   const params = useLocalSearchParams();
+  const { primary } = useCoopTheme();
   const { user } = useAuthStore();
 
   const hasNoParams = Object.keys(params).length === 0;
@@ -478,7 +484,7 @@ export default function EditProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#3E4093" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -486,8 +492,7 @@ export default function EditProfileScreen() {
   // STYLES
   const CARD_STYLE =
     "bg-white p-5 rounded-3xl mb-4 shadow-sm border border-gray-100";
-  const LABEL_STYLE =
-    "mb-1 font-semibold text-[10px] text-primary uppercase tracking-wider";
+  const LABEL_STYLE = "mb-1 font-semibold text-[10px] uppercase tracking-wider";
   const VALUE_STYLE = "text-gray-800 font-bold text-base mb-4";
   const INPUT_STYLE =
     "border border-gray-200 bg-white p-4 rounded-2xl mb-4 text-gray-800 font-medium";
@@ -536,14 +541,14 @@ export default function EditProfileScreen() {
 
           <TouchableOpacity
             onPress={() => setIsEditing(!isEditing)}
-            className={`px-4 py-2 rounded-full ${
-              isEditing ? "bg-[#FEF2F2]" : "bg-blue"
-            }`}
+            className="px-4 py-2 rounded-full"
+            style={{
+              backgroundColor: isEditing ? "#FEF2F2" : withAlpha(primary),
+            }}
           >
             <Text
-              className={`font-bold ${
-                isEditing ? "text-[#D70127]" : "text-primary"
-              }`}
+              className="font-bold"
+              style={{ color: isEditing ? "#D70127" : primary }}
             >
               {isEditing ? "Cancel" : "Edit Details"}
             </Text>
@@ -560,7 +565,7 @@ export default function EditProfileScreen() {
               <Ionicons
                 name="person-circle-outline"
                 size={24}
-                color="#3E4093"
+                color={primary}
               />
               <Text className="text-lg font-bold ml-2 text-gray-800">
                 Basic Information
@@ -568,7 +573,9 @@ export default function EditProfileScreen() {
             </View>
 
             {/* NAME */}
-            <Text className={LABEL_STYLE}>Full Name (Locked)</Text>
+            <Text className={LABEL_STYLE} style={{ color: primary }}>
+              Full Name (Locked)
+            </Text>
 
             {isEditing ? (
               <TextInput
@@ -581,7 +588,9 @@ export default function EditProfileScreen() {
             )}
 
             {/* PHONE */}
-            <Text className={LABEL_STYLE}>Phone Number (Locked)</Text>
+            <Text className={LABEL_STYLE} style={{ color: primary }}>
+              Phone Number (Locked)
+            </Text>
 
             {isEditing ? (
               <TextInput
@@ -594,7 +603,9 @@ export default function EditProfileScreen() {
             )}
 
             {/* EMAIL */}
-            <Text className={LABEL_STYLE}>Email Address</Text>
+            <Text className={LABEL_STYLE} style={{ color: primary }}>
+              Email Address
+            </Text>
 
             {isEditing ? (
               <TextInput
@@ -633,7 +644,9 @@ export default function EditProfileScreen() {
               />
             ) : (
               <>
-                <Text className={LABEL_STYLE}>Gender</Text>
+                <Text className={LABEL_STYLE} style={{ color: primary }}>
+                  Gender
+                </Text>
                 <Text className={VALUE_STYLE}>{form.gender || "---"}</Text>
               </>
             )}
@@ -654,7 +667,9 @@ export default function EditProfileScreen() {
               />
             ) : (
               <>
-                <Text className={LABEL_STYLE}>Birthdate</Text>
+                <Text className={LABEL_STYLE} style={{ color: primary }}>
+                  Birthdate
+                </Text>
                 <Text className={VALUE_STYLE}>
                   {form.birthdate
                     ? new Date(form.birthdate).toLocaleDateString("en-US", {
@@ -676,7 +691,7 @@ export default function EditProfileScreen() {
         {showLocation && (
           <View className={CARD_STYLE}>
             <View className="flex-row items-center mb-4">
-              <Ionicons name="location-outline" size={24} color="#3E4093" />
+              <Ionicons name="location-outline" size={24} color={primary} />
               <Text className="text-lg font-bold ml-2 text-gray-800">
                 Address Details
               </Text>
@@ -693,7 +708,9 @@ export default function EditProfileScreen() {
               />
             ) : (
               <>
-                <Text className={LABEL_STYLE}>Region</Text>
+                <Text className={LABEL_STYLE} style={{ color: primary }}>
+                  Region
+                </Text>
                 <Text className={VALUE_STYLE}>
                   {regions.find((r) => r.code === form.region)?.name || "---"}
                 </Text>
@@ -730,7 +747,9 @@ export default function EditProfileScreen() {
               />
             ) : (
               <>
-                <Text className={LABEL_STYLE}>Province</Text>
+                <Text className={LABEL_STYLE} style={{ color: primary }}>
+                  Province
+                </Text>
                 <Text className={VALUE_STYLE}>
                   {isNCRSelected
                     ? "N/A (NCR)"
@@ -765,7 +784,9 @@ export default function EditProfileScreen() {
               />
             ) : (
               <>
-                <Text className={LABEL_STYLE}>City / Municipality</Text>
+                <Text className={LABEL_STYLE} style={{ color: primary }}>
+                  City / Municipality
+                </Text>
                 <Text className={VALUE_STYLE}>
                   {cities.find((c) => c.code === form.city)?.name || "---"}
                 </Text>
@@ -788,7 +809,9 @@ export default function EditProfileScreen() {
               />
             ) : (
               <>
-                <Text className={LABEL_STYLE}>Barangay</Text>
+                <Text className={LABEL_STYLE} style={{ color: primary }}>
+                  Barangay
+                </Text>
                 <Text className={VALUE_STYLE}>
                   {barangays.find((b) => b.code === form.barangay)?.name ||
                     "---"}
@@ -797,7 +820,9 @@ export default function EditProfileScreen() {
             )}
 
             {/* STREET */}
-            <Text className={LABEL_STYLE}>Street / House No.</Text>
+            <Text className={LABEL_STYLE} style={{ color: primary }}>
+              Street / House No.
+            </Text>
 
             {isEditing ? (
               <TextInput
@@ -821,7 +846,9 @@ export default function EditProfileScreen() {
             )}
 
             {/* POSTAL CODE */}
-            <Text className={LABEL_STYLE}>Postal Code</Text>
+            <Text className={LABEL_STYLE} style={{ color: primary }}>
+              Postal Code
+            </Text>
 
             {isEditing ? (
               <TextInput
@@ -852,7 +879,7 @@ export default function EditProfileScreen() {
         {showID && (
           <View className={CARD_STYLE}>
             <View className="flex-row items-center mb-4">
-              <Ionicons name="card-outline" size={24} color="#3E4093" />
+              <Ionicons name="card-outline" size={24} color={primary} />
               <Text className="text-lg font-bold ml-2 text-gray-800">
                 Identity Verification
               </Text>
@@ -874,7 +901,9 @@ export default function EditProfileScreen() {
               />
             ) : (
               <>
-                <Text className={LABEL_STYLE}>Valid ID Type</Text>
+                <Text className={LABEL_STYLE} style={{ color: primary }}>
+                  Valid ID Type
+                </Text>
                 <Text className={VALUE_STYLE}>
                   {form.valid_id_type || "---"}
                 </Text>
@@ -882,7 +911,9 @@ export default function EditProfileScreen() {
             )}
 
             {/* ID NUMBER */}
-            <Text className={LABEL_STYLE}>ID Number</Text>
+            <Text className={LABEL_STYLE} style={{ color: primary }}>
+              ID Number
+            </Text>
 
             {isEditing ? (
               <TextInput
@@ -908,7 +939,9 @@ export default function EditProfileScreen() {
             )}
 
             {/* ID IMAGES */}
-            <Text className={LABEL_STYLE}>Valid ID Images</Text>
+            <Text className={LABEL_STYLE} style={{ color: primary }}>
+              Valid ID Images
+            </Text>
 
             <View className="flex-row justify-between mt-2">
               {/* FRONT */}
@@ -917,7 +950,7 @@ export default function EditProfileScreen() {
                 className="w-[48%] bg-gray-50 h-32 rounded-3xl items-center justify-center overflow-hidden border border-gray-200"
               >
                 {processingId === "front_valid_id_picture" ? (
-                  <ActivityIndicator color="#3E4093" />
+                  <ActivityIndicator color={primary} />
                 ) : form.front_valid_id_picture?.uri ? (
                   <Image
                     source={{
@@ -948,7 +981,7 @@ export default function EditProfileScreen() {
                 className="w-[48%] bg-gray-50 h-32 rounded-3xl items-center justify-center overflow-hidden border border-gray-200"
               >
                 {processingId === "back_valid_id_picture" ? (
-                  <ActivityIndicator color="#3E4093" />
+                  <ActivityIndicator color={primary} />
                 ) : form.back_valid_id_picture?.uri ? (
                   <Image
                     source={{
@@ -992,8 +1025,9 @@ export default function EditProfileScreen() {
           <TouchableOpacity
             onPress={handleUpdate}
             disabled={saving || !isFormComplete()}
-            className="h-16 rounded-2xl justify-center items-center bg-primary"
+            className="h-16 rounded-2xl justify-center items-center"
             style={{
+              backgroundColor: primary,
               opacity: saving || !isFormComplete() ? 0.5 : 1,
             }}
           >
@@ -1021,7 +1055,7 @@ export default function EditProfileScreen() {
         <View className="flex-1 bg-black/40 justify-center items-center px-5">
           <View className="bg-white p-8 rounded-[40px] items-center w-full max-w-[380px] shadow-2xl">
             <View className="w-16 h-16 bg-blue rounded-full items-center justify-center mb-4">
-              <Ionicons name="card" size={32} color="#3E4093" />
+              <Ionicons name="card" size={32} color={primary} />
             </View>
             <Text className="text-xl font-bold text-[#333] mb-2 text-center">
               {idOptionsField ? idFieldLabel(idOptionsField) : ""} Photo
@@ -1036,7 +1070,7 @@ export default function EditProfileScreen() {
                   }}
                   className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
                 >
-                  <Ionicons name="eye-outline" size={20} color="#3E4093" />
+                  <Ionicons name="eye-outline" size={20} color={primary} />
                   <Text className="ml-3 font-bold text-gray-700">
                     View Photo
                   </Text>
@@ -1052,7 +1086,7 @@ export default function EditProfileScreen() {
                     }
                     className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
                   >
-                    <Ionicons name="camera-outline" size={20} color="#3E4093" />
+                    <Ionicons name="camera-outline" size={20} color={primary} />
                     <Text className="ml-3 font-bold text-gray-700">
                       Take Photo
                     </Text>
@@ -1068,9 +1102,9 @@ export default function EditProfileScreen() {
                     <Ionicons
                       name="cloud-upload-outline"
                       size={20}
-                      color="#3E4093"
+                      color={primary}
                     />
-                    <Text className="ml-3 font-bold text-primary">
+                    <Text style={{ color: primary }} className="ml-3 font-bold">
                       Upload New
                     </Text>
                   </TouchableOpacity>
@@ -1188,6 +1222,7 @@ function IdCropScreen({
   onCancel: () => void;
   onDone: (croppedUri: string) => void;
 }) {
+  const { primary } = useCoopTheme();
   const [cropping, setCropping] = useState(false);
   const [zoomDisplay, setZoomDisplay] = useState(MIN_ZOOM);
   const [orientation, setOrientation] = useState<IdOrientation>("landscape");
@@ -1378,10 +1413,10 @@ function IdCropScreen({
             onPress={() => setOrientation("landscape")}
             style={{
               backgroundColor:
-                orientation === "landscape" ? "#3E4093" : "transparent",
+                orientation === "landscape" ? "primary" : "transparent",
               borderColor:
                 orientation === "landscape"
-                  ? "#3E4093"
+                  ? "primary"
                   : "rgba(255,255,255,0.3)",
             }}
             className="px-5 py-2 rounded-full border-2 flex-row items-center gap-x-2"
@@ -1400,10 +1435,10 @@ function IdCropScreen({
             onPress={() => setOrientation("portrait")}
             style={{
               backgroundColor:
-                orientation === "portrait" ? "#3E4093" : "transparent",
+                orientation === "portrait" ? "primary" : "transparent",
               borderColor:
                 orientation === "portrait"
-                  ? "#3E4093"
+                  ? "primary"
                   : "rgba(255,255,255,0.3)",
             }}
             className="px-5 py-2 rounded-full border-2 flex-row items-center gap-x-2"
@@ -1423,7 +1458,8 @@ function IdCropScreen({
           <TouchableOpacity
             onPress={handleCropConfirm}
             disabled={cropping}
-            className="w-full py-3.5 rounded-2xl items-center bg-primary flex-row justify-center"
+            style={{ backgroundColor: primary }}
+            className="w-full py-3.5 rounded-2xl items-center flex-row justify-center"
           >
             {cropping ? (
               <ActivityIndicator color="white" />
