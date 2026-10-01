@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -24,6 +25,10 @@ interface CustomPickerProps {
   labelColor?: string;
 }
 
+// Same as Tailwind's "bg-primary/10": adds ~10% alpha to a #RRGGBB color.
+const withAlpha = (hex: string, alpha = "1A") =>
+  /^#[0-9a-fA-F]{6}$/.test(hex) ? `${hex}${alpha}` : hex;
+
 export const CustomPicker = ({
   label,
   options,
@@ -33,6 +38,12 @@ export const CustomPicker = ({
   disabled = false,
   labelColor,
 }: CustomPickerProps) => {
+  // Cooperative brand color (falls back to the default blue)
+  const { primary } = useCoopTheme();
+
+  // A labelColor passed by the screen still wins over the brand color
+  const labelTint = labelColor ?? primary;
+
   const [modalVisible, setModalVisible] = useState(false);
 
   const selectedItem = options.find(
@@ -46,7 +57,10 @@ export const CustomPicker = ({
 
   return (
     <View className="mb-5">
-      <Text className="mb-1 font-semibold text-[10px] text-primary uppercase tracking-wider">
+      <Text
+        className="mb-1 font-semibold text-[10px] uppercase tracking-wider"
+        style={{ color: labelTint }}
+      >
         {label}
       </Text>
 
@@ -106,14 +120,20 @@ export const CustomPicker = ({
                     return (
                       <TouchableOpacity
                         onPress={() => handleSelect(item.value)}
+                        style={
+                          isSelected
+                            ? { backgroundColor: withAlpha(primary) }
+                            : undefined
+                        }
                         className={`p-4 rounded-xl my-1 flex-row justify-between items-center ${
-                          isSelected ? "bg-primary/10" : "active:bg-slate-50"
+                          isSelected ? "" : "active:bg-slate-50"
                         }`}
                       >
                         <Text
+                          style={isSelected ? { color: primary } : undefined}
                           className={`text-base ${
                             isSelected
-                              ? "font-semibold text-primary"
+                              ? "font-semibold"
                               : "text-slate-700 font-normal"
                           }`}
                         >
