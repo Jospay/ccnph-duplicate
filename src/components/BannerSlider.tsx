@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { AdItem } from "@/services/adService";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -22,6 +23,9 @@ interface BannerSliderProps {
 
 export const BannerSlider: React.FC<BannerSliderProps> = ({ ads, loading }) => {
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Cooperative brand color
+  const { primary } = useCoopTheme();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAd, setSelectedAd] = useState<AdItem | null>(null);
@@ -225,7 +229,7 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ ads, loading }) => {
             <View
               key={index}
               style={{
-                backgroundColor: currentIndex === index ? "#3E4093" : "#cbd5e1",
+                backgroundColor: currentIndex === index ? primary : "#cbd5e1",
                 width: currentIndex === index ? 16 : 6,
               }}
               className="h-1.5 rounded-full"
@@ -264,7 +268,8 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ ads, loading }) => {
             <View className="w-full gap-y-3">
               <TouchableOpacity
                 onPress={handleConfirmLink}
-                className="w-full py-3.5 rounded-xl bg-primary active:opacity-90"
+                style={{ backgroundColor: primary }}
+                className="w-full py-3.5 rounded-xl active:opacity-90"
               >
                 <Text className="text-white text-center font-bold text-base">
                   Continue to Website
