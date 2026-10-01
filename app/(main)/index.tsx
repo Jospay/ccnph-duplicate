@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { useUIStore } from "@/store/useUIStore";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -49,6 +50,7 @@ const { width } = Dimensions.get("window");
 export default function DashboardPage() {
   const { user, setUser } = useAuthStore();
   const { handleComingSoon } = useUIStore();
+  const { primary } = useCoopTheme(); // cooperative brand color
   const router = useRouter();
   const [pageLoading, setPageLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -243,34 +245,57 @@ export default function DashboardPage() {
     // {
     //   label: "Intellectual Property Assistant",
     //   href: "/(intellectual)/",
-    //   source: Intellectual,
+    //   iconFamily: Ionicons,
+    //   iconName: "bulb-outline",
     // },
     // {
     //   label: "Loan Assistance",
     //   href: "/(loan)/",
-    //   source: Loan,
+    //   iconFamily: FontAwesome,
+    //   iconName: "bank",
     // },
     // {
     //   label: "Funding & Invest Opportunities",
-    //   href: "/(auth)/login",
-    //   source: Funding,
+    //   href: "/(funding-investment-opportunities)/",
+    //   iconFamily: Ionicons,
+    //   iconName: "trending-up-outline",
     // },
     // {
     //   label: "Licensing & Permit Assistance",
-    //   href: "/(business)/",
-    //   source: Licensing,
+    //   href: "/(licensing-permit-assistance)/",
+    //   iconFamily: Ionicons,
+    //   iconName: "document-text-outline",
     // },
-    // { label: "R & D Collaboration", href: "/", source: RD },
-    // { label: "Ask an Expert Assistance", href: "/", source: Ask },
     // {
-    //   label: "FISMPC Online Store",
-    //   href: "/(store)/",
-    //   source: FISMPC,
+    //   label: "R & D Collaboration",
+    //   href: "/(rnd-collaboration)/",
+    //   iconFamily: Ionicons,
+    //   iconName: "flask-outline",
     // },
-    // { label: "Product Validation Services", href: "/", source: Product },
-    // { label: "Lost & Found", href: "/", source: Lost },
-    // { label: "Suggest a Service", href: "/", source: Suggest },
-
+    // {
+    //   label: "CCNPH Online Store",
+    //   href: "/(store)/",
+    //   iconFamily: Ionicons,
+    //   iconName: "cart-outline",
+    // },
+    // {
+    //   label: "Product Validation Services",
+    //   href: "/(product-validation-services)/",
+    //   iconFamily: Ionicons,
+    //   iconName: "checkmark-done-circle-outline",
+    // },
+    // {
+    //   label: "Lost & Found",
+    //   href: "/(lost-and-found)/",
+    //   iconFamily: Ionicons,
+    //   iconName: "search-outline",
+    // },
+    // {
+    //   label: "Suggest a Service",
+    //   href: "/",
+    //   iconFamily: Ionicons,
+    //   iconName: "chatbox-ellipses-outline",
+    // },
     {
       label: "Coop Membership",
       href: "/(coop)/",
@@ -303,6 +328,7 @@ export default function DashboardPage() {
         // iconBg: "bg-[#C6890F]",
         textColor: "text-[#C6890F]",
         route: "/profile/setupProfile",
+        useBrand: false,
         // icon: <Ionicons name="warning" size={32} color="white" />,
       };
     }
@@ -319,10 +345,12 @@ export default function DashboardPage() {
           </>
         ),
         buttonText: "View Profile",
-        buttonColor: "bg-primary",
+        // brand color is applied through inline style (useBrand)
+        buttonColor: "",
         // iconBg: "bg-primary",
-        textColor: "text-primary",
+        textColor: "",
         route: "/profile",
+        useBrand: true,
         // icon: <Ionicons name="time" size={32} color="white" />,
       };
     }
@@ -344,6 +372,7 @@ export default function DashboardPage() {
         // iconBg: "bg-green-600",
         textColor: "text-green-700",
         route: "/profile/membership",
+        useBrand: false,
         // icon: (
         //   <MaterialIcons
         //     name="account-balance-wallet"
@@ -370,6 +399,7 @@ export default function DashboardPage() {
         buttonColor: "bg-[#D70127]",
         textColor: "text-[#D70127]",
         route: "/(intellectual-chat)/",
+        useBrand: false,
       };
     }
 
@@ -377,10 +407,11 @@ export default function DashboardPage() {
       title: "Account Required",
       message: "Please complete your account setup.",
       buttonText: "View Profile",
-      buttonColor: "bg-primary",
+      buttonColor: "",
       iconBg: "bg-primary",
-      textColor: "text-primary",
+      textColor: "",
       route: "/profile",
+      useBrand: true,
       icon: <Ionicons name="person" size={32} color="white" />,
     };
   };
@@ -396,8 +427,8 @@ export default function DashboardPage() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["#3E4093"]}
-          tintColor="#3E4093"
+          colors={[primary]}
+          tintColor={primary}
         />
       }
     >
@@ -424,7 +455,10 @@ export default function DashboardPage() {
 
         {/* 2. WALLET SECTION */}
         {isMember && !pageLoading && (
-          <View className="bg-primary p-3 rounded-2xl shadow-lg mb-2">
+          <View
+            style={{ backgroundColor: primary }}
+            className="p-3 rounded-2xl shadow-lg mb-2"
+          >
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center gap-3">
                 <Text className="text-white text-2xl font-bold">
@@ -449,14 +483,14 @@ export default function DashboardPage() {
                   // onPress={handleComingSoon}
                   className="bg-white h-10 w-10 flex justify-center items-center rounded-lg"
                 >
-                  <FontAwesome name="plus" size={22} color="#3E4093" />
+                  <FontAwesome name="plus" size={22} color={primary} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => router.push("/(transper)/")}
                   // onPress={handleComingSoon}
                   className="bg-white h-10 w-10 flex justify-center items-center rounded-lg"
                 >
-                  <FontAwesome name="send" size={20} color="#3E4093" />
+                  <FontAwesome name="send" size={20} color={primary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -487,7 +521,7 @@ export default function DashboardPage() {
                       <IconComponent
                         name={item.iconName as any}
                         size={42}
-                        color={"#3E4093"}
+                        color={primary}
                       />
                     </View>
                     <Text className="text-center text-sm font-medium text-slate-700">
@@ -529,6 +563,7 @@ export default function DashboardPage() {
 
               <Text
                 className={`text-xl font-bold text-center mb-3 ${popupContent.textColor}`}
+                style={popupContent.useBrand ? { color: primary } : undefined}
               >
                 {popupContent.title}
               </Text>
@@ -547,6 +582,11 @@ export default function DashboardPage() {
                     router.push(popupContent.route as any);
                   }}
                   className={`${popupContent.buttonColor} w-full py-4 rounded-2xl active:opacity-90`}
+                  style={
+                    popupContent.useBrand
+                      ? { backgroundColor: primary }
+                      : undefined
+                  }
                 >
                   <Text className="text-white text-center font-bold text-lg">
                     {popupContent.buttonText}
