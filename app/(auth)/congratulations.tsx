@@ -21,9 +21,10 @@ export default function CongratulationsPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
-  const { token, user } = useLocalSearchParams<{
+  const { token, user, cooperative } = useLocalSearchParams<{
     token: string;
     user: string;
+    cooperative?: string;
   }>();
 
   const isProcessing = useRef(false);
@@ -47,7 +48,19 @@ export default function CongratulationsPage() {
       if (token && user) {
         const userData = typeof user === "string" ? JSON.parse(user) : user;
 
-        await setAuth(token, userData);
+        // Branding is optional: a parse problem must never block entry.
+        let coopData = null;
+        try {
+          coopData =
+            typeof cooperative === "string" && cooperative !== "null"
+              ? JSON.parse(cooperative)
+              : null;
+        } catch {
+          coopData = null;
+        }
+
+        // setAuth saves the token, user and branding, and prefetches the logo
+        await setAuth(token, userData, coopData);
 
         router.dismissAll();
 
