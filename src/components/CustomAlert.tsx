@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import * as NavigationBar from "expo-navigation-bar";
 import React, { useEffect } from "react";
 import {
@@ -39,6 +40,9 @@ export const CustomAlert = ({
   onConfirm,
   confirmText = "Confirm",
 }: CustomAlertProps) => {
+  // Cooperative brand color (falls back to the default blue)
+  const { primary } = useCoopTheme();
+
   useEffect(() => {
     if (Platform.OS === "android") {
       if (visible) {
@@ -82,7 +86,10 @@ export const CustomAlert = ({
           className="bg-white w-full max-w-[400px] mx-auto rounded-[35px] p-6"
           style={MODAL_SHADOW}
         >
-          <Text className="text-primary text-2xl font-bold text-center mb-3">
+          <Text
+            style={{ color: primary }}
+            className="text-2xl font-bold text-center mb-3"
+          >
             {title}
           </Text>
 
@@ -104,7 +111,8 @@ export const CustomAlert = ({
 
               <TouchableOpacity
                 onPress={onConfirm}
-                className="flex-1 p-4 bg-primary rounded-2xl"
+                style={{ backgroundColor: primary }}
+                className="flex-1 p-4 rounded-2xl"
                 activeOpacity={0.8}
               >
                 <Text className="text-white text-center font-bold text-base">
@@ -116,7 +124,8 @@ export const CustomAlert = ({
             <TouchableOpacity
               onPress={onClose}
               activeOpacity={0.8}
-              className="bg-primary p-4 rounded-2xl"
+              style={{ backgroundColor: primary }}
+              className="p-4 rounded-2xl"
             >
               <Text className="text-white text-center font-bold text-base">
                 Okay
