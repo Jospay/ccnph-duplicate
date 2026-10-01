@@ -1,7 +1,9 @@
+import { normalizeColor, useCoopTheme } from "@/hooks/useCoopTheme";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUIStore } from "@/store/useUIStore";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Image as ExpoImage } from "expo-image";
 import * as NavigationBar from "expo-navigation-bar";
 import { Redirect, Stack, usePathname, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -35,9 +37,28 @@ import "../../global.css";
 
 const queryClient = new QueryClient();
 
+// Same as Tailwind's "border-primary/20": adds ~20% alpha to a #RRGGBB color.
+const withAlpha = (hex: string, alpha = "33") =>
+  /^#[0-9a-fA-F]{6}$/.test(hex) ? `${hex}${alpha}` : hex;
+
 export default function MainLayout() {
-  const { token, isLoading, user } = useAuthStore();
+  const { token, isLoading, user, cooperative } = useAuthStore();
   const { comingSoonVisible, setComingSoonVisible } = useUIStore();
+
+  // Cooperative branding (falls back to the default blue when not set)
+  const { primary, logo: coopLogo } = useCoopTheme();
+
+  // Secondary color is optional. When the cooperative has none,
+  // keep the ORIGINAL design colors for the footer line and camera ring.
+  const accent = normalizeColor(cooperative?.secondary_color) || "#F7EF8A"; // camera ring
+  const footerLine = normalizeColor(cooperative?.secondary_color) || "#CCE8D5"; // footer top border
+
+  // If the cooperative logo URL can't be loaded, fall back to the default logo
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  useEffect(() => {
+    setLogoFailed(false);
+  }, [coopLogo]);
 
   const CENTER_LOGO_HEIGHT = 74;
 
@@ -295,7 +316,7 @@ export default function MainLayout() {
           backgroundColor: "#ffffff",
         }}
       >
-        <ActivityIndicator size="large" color="#3E4093" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -341,7 +362,10 @@ export default function MainLayout() {
               alignItems: "center",
             }}
           >
-            <Text className="text-xl font-bold text-center mb-3 text-primary">
+            <Text
+              className="text-xl font-bold text-center mb-3"
+              style={{ color: primary }}
+            >
               Coming Soon
             </Text>
 
@@ -354,7 +378,8 @@ export default function MainLayout() {
 
             <TouchableOpacity
               onPress={() => setComingSoonVisible(false)}
-              className="bg-primary w-full py-4 rounded-2xl active:opacity-90"
+              style={{ backgroundColor: primary }}
+              className="w-full py-4 rounded-2xl active:opacity-90"
             >
               <Text className="text-white text-center font-bold text-lg">
                 Okay
@@ -394,7 +419,7 @@ export default function MainLayout() {
             }}
           >
             <View className="bg-[#0084FF]/10 w-10 h-10 rounded-full items-center justify-center mr-3">
-              <Ionicons name="chatbubble-ellipses" size={20} color="#3E4093" />
+              <Ionicons name="chatbubble-ellipses" size={20} color={primary} />
             </View>
 
             <View className="flex-1">
@@ -435,7 +460,10 @@ export default function MainLayout() {
               ============================================================ */}
 
           {isWelcomePage ? null : isMainIndex ? (
-            <View className="bg-primary mb-12 z-10 w-full h-28 items-center justify-between pt-8">
+            <View
+              style={{ backgroundColor: primary }}
+              className="mb-12 z-10 w-full h-28 items-center justify-between pt-8"
+            >
               {/* Information Icon */}
               <View
                 style={{ elevation: 8 }}
@@ -445,40 +473,44 @@ export default function MainLayout() {
                   // onPress={handleComingSoon}
                   onPress={() => router.push("/info" as any)}
                 >
-                  <View className="bg-white rounded-full border border-primary/20 p-2">
+                  <View
+                    style={{ borderColor: withAlpha(primary) }}
+                    className="bg-white rounded-full border p-2"
+                  >
                     <Ionicons
                       name="information-circle"
                       size={35}
-                      color="#3E4093"
+                      color={primary}
                     />
                   </View>
                 </TouchableOpacity>
               </View>
 
-              {/* <View
-                style={{ elevation: 6 }}
-                className="absolute bottom-[-43px] bg-white rounded-full"
-              >
-                <Image
-                  source={logo}
-                  style={{
-                    width: 96,
-                    height: 96,
-                  }}
-                  resizeMode="contain"
-                />
-              </View> */}
-
-              {/* Centered Image */}
+              {/* Centered Image (cooperative logo, default logo as fallback) */}
               <View className="absolute bottom-0 z-1 left-0 right-0 items-center">
-                <Image
-                  source={logo}
-                  style={{
-                    height: CENTER_LOGO_HEIGHT,
-                    bottom: -CENTER_LOGO_HEIGHT / 2,
-                  }}
-                  resizeMode="contain"
-                />
+                {coopLogo && !logoFailed ? (
+                  <ExpoImage
+                    source={{ uri: coopLogo }}
+                    cachePolicy="disk"
+                    contentFit="contain"
+                    transition={0}
+                    onError={() => setLogoFailed(true)}
+                    style={{
+                      width: CENTER_LOGO_HEIGHT,
+                      height: CENTER_LOGO_HEIGHT,
+                      bottom: -CENTER_LOGO_HEIGHT / 2,
+                    }}
+                  />
+                ) : (
+                  <Image
+                    source={logo}
+                    style={{
+                      height: CENTER_LOGO_HEIGHT,
+                      bottom: -CENTER_LOGO_HEIGHT / 2,
+                    }}
+                    resizeMode="contain"
+                  />
+                )}
               </View>
 
               {/* Chat Support Action Icon */}
@@ -492,8 +524,11 @@ export default function MainLayout() {
                   className="relative"
                   activeOpacity={0.7}
                 >
-                  <View className="bg-white rounded-full border border-primary/20 p-2">
-                    <Entypo name="message" size={35} color="#3E4093" />
+                  <View
+                    style={{ borderColor: withAlpha(primary) }}
+                    className="bg-white rounded-full border p-2"
+                  >
+                    <Entypo name="message" size={35} color={primary} />
                   </View>
 
                   {/* Unread badge */}
@@ -508,7 +543,10 @@ export default function MainLayout() {
               </View>
             </View>
           ) : isCameraQr || isInfo || isPaymentSuccess ? null : (
-            <View className="bg-primary w-full items-center rounded-b-2xl pt-14 pb-4">
+            <View
+              style={{ backgroundColor: primary }}
+              className="w-full items-center rounded-b-2xl pt-14 pb-4"
+            >
               <View className="flex-row justify-between items-center w-full px-6">
                 <TouchableOpacity
                   onPress={() => router.back()}
@@ -589,7 +627,7 @@ export default function MainLayout() {
             <View
               style={{
                 borderTopWidth: 5,
-                borderTopColor: "#CCE8D5",
+                borderTopColor: footerLine,
                 width: "100%",
                 paddingBottom: insets.bottom,
                 zIndex: 99,
@@ -599,8 +637,9 @@ export default function MainLayout() {
               <View
                 style={{
                   height: 80,
+                  backgroundColor: primary,
                 }}
-                className="flex-row w-full bg-primary max-w-[600px] px-4 items-center"
+                className="flex-row w-full max-w-[600px] px-4 items-center"
               >
                 {/* Home */}
                 <TouchableOpacity
@@ -655,13 +694,13 @@ export default function MainLayout() {
                       borderRadius: 45,
                       backgroundColor: "white",
                       borderWidth: 3,
-                      borderColor: "#F7EF8A",
+                      borderColor: accent,
                       alignItems: "center",
                       justifyContent: "center",
                       elevation: 10,
                     }}
                   >
-                    <Entypo name="camera" size={50} color="#3E4093" />
+                    <Entypo name="camera" size={50} color={primary} />
                   </TouchableOpacity>
                 </View>
 
