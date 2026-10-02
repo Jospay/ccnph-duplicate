@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { trainingService } from "@/services/trainingService";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -6,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function CategoryPage() {
-  // 1. Destructure typeIcon from params
+  const { primary } = useCoopTheme();
   const { typeSlug, typeName, typeIcon } = useLocalSearchParams();
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,10 +32,16 @@ export default function CategoryPage() {
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         {/* HEADER SECTION WITH ICON */}
         <View className="pt-10 pb-5 items-center">
-          <Text className="text-2xl text-center font-extrabold pt-4 pb-1 text-primary tracking-tight">
+          <Text
+            style={{ color: primary }}
+            className="text-2xl text-center font-extrabold pt-4 pb-1 tracking-tight"
+          >
             Choose Specific Business
           </Text>
-          <Text className="text-2xl text-center font-extrabold py-2 text-primary tracking-tight">
+          <Text
+            style={{ color: primary }}
+            className="text-2xl text-center font-extrabold py-2 tracking-tight"
+          >
             {typeName || "Business"}
           </Text>
 
@@ -47,7 +54,7 @@ export default function CategoryPage() {
                 resizeMode="contain"
               />
             ) : (
-              <Ionicons name="business" size={72} color="#3E4093" />
+              <Ionicons name="business" size={72} color={primary} />
             )}
           </View>
         </View>
@@ -86,13 +93,13 @@ export default function CategoryPage() {
               </View>
 
               <View className="bg-slate-50 w-10 h-10 rounded-full items-center justify-center">
-                <Ionicons name="chevron-forward" size={18} color="#007AFF" />
+                <Ionicons name="chevron-forward" size={18} color={primary} />
               </View>
             </TouchableOpacity>
           ))
         ) : (
           <View className="items-center py-20">
-            <Ionicons name="folder-open-outline" size={48} color="#CBD5E1" />
+            <Ionicons name="folder-open-outline" size={48} color={primary} />
             <Text className="text-slate-400 mt-4 text-center">
               No categories found for this business type.
             </Text>

@@ -3,6 +3,7 @@ import {
   TransferVerification,
   TransferVerifyModal,
 } from "@/components/TransferVerifyModal";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { createTransfer, getWalletBalance } from "@/services/walletService";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -28,6 +29,7 @@ const formatCurrency = (value: number): string => {
 
 export default function ReviewTransferPage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const insets = useSafeAreaInsets();
 
   const params = useLocalSearchParams<{
@@ -232,9 +234,8 @@ export default function ReviewTransferPage() {
       <Text className="text-slate-500 text-sm">{label}</Text>
 
       <Text
-        className={`text-sm ${
-          bold ? "font-bold text-primary" : "font-bold text-slate-800"
-        }`}
+        className={`text-sm ${bold ? "font-bold" : "font-bold text-slate-800"}`}
+        style={bold ? { color: primary } : undefined}
       >
         {value}
       </Text>
@@ -293,7 +294,7 @@ export default function ReviewTransferPage() {
               <View className="flex-row justify-between">
                 <Text className="text-slate-700 font-bold">Total Deducted</Text>
 
-                <Text className="text-primary font-bold text-lg">
+                <Text style={{ color: primary }} className="font-bold text-lg">
                   {formatCurrency(total)}
                 </Text>
               </View>
@@ -328,10 +329,13 @@ export default function ReviewTransferPage() {
         >
           <View
             className={`w-6 h-6 rounded-sm border items-center justify-center mr-3 ${
-              isConfirmed
-                ? "bg-primary border-primary"
-                : "border-primary border-2 bg-white"
+              isConfirmed ? "" : "border-2 bg-white"
             }`}
+            style={
+              isConfirmed
+                ? { backgroundColor: primary, borderColor: primary }
+                : { borderColor: primary }
+            }
           >
             {isConfirmed && (
               <Ionicons name="checkmark" size={16} color="white" />
@@ -347,10 +351,13 @@ export default function ReviewTransferPage() {
           onPress={handleOpenVerify}
           disabled={!isConfirmed || isProcessing || isTampered}
           className={`h-14 rounded-xl justify-center items-center ${
-            !isConfirmed || isProcessing || isTampered
-              ? "bg-slate-300"
-              : "bg-primary"
+            !isConfirmed || isProcessing || isTampered ? "bg-slate-300" : ""
           }`}
+          style={
+            !isConfirmed || isProcessing || isTampered
+              ? undefined
+              : { backgroundColor: primary }
+          }
         >
           {isProcessing ? (
             <ActivityIndicator color="white" />

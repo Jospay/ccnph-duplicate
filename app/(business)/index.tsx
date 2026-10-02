@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { trainingService } from "@/services/trainingService";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -6,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function BusinessTypesPage() {
+  const { primary } = useCoopTheme();
   const [types, setTypes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +26,10 @@ export default function BusinessTypesPage() {
         showsVerticalScrollIndicator={false}
       >
         <View className="px-6 py-12">
-          <Text className="text-2xl text-center font-extrabold text-primary tracking-tight">
+          <Text
+            style={{ color: primary }}
+            className="text-2xl text-center font-extrabold tracking-tight"
+          >
             Choose Your Business Type
           </Text>
           <Text className="text-sm text-center text-slate-500 mt-1">
@@ -70,7 +75,7 @@ export default function BusinessTypesPage() {
                           resizeMode="contain"
                         />
                       ) : (
-                        <Ionicons name="business" size={24} color="#3E4093" />
+                        <Ionicons name="business" size={24} color={primary} />
                       )}
                     </View>
 
@@ -86,7 +91,7 @@ export default function BusinessTypesPage() {
                     <Ionicons
                       name="chevron-forward"
                       size={20}
-                      color="#CBD5E1"
+                      color={primary}
                     />
                   </TouchableOpacity>
                 </Link>
@@ -94,7 +99,7 @@ export default function BusinessTypesPage() {
             })
           ) : (
             <View className="items-center py-20">
-              <Ionicons name="search-outline" size={48} color="#CBD5E1" />
+              <Ionicons name="search-outline" size={48} color={primary} />
               <Text className="text-slate-400 mt-4 text-lg">
                 No business types found
               </Text>

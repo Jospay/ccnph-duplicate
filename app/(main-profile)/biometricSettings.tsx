@@ -1,5 +1,6 @@
 import { CustomAlert } from "@/components/CustomAlert";
 import { PasswordPromptModal } from "@/components/PasswordPromptModal";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { biometricService } from "@/services/biometricService";
 import { profileService } from "@/services/profileService";
 import { Ionicons } from "@expo/vector-icons";
@@ -41,6 +42,7 @@ type PasswordModalMode = "enable" | "remove" | null;
 
 export default function BiometricSettingsScreen() {
   const router = useRouter();
+  const { primary, secondary } = useCoopTheme();
   const isMounted = useRef(true);
 
   // Prevent state updates after unmount
@@ -429,7 +431,7 @@ export default function BiometricSettingsScreen() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" color="#3E4093" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -443,8 +445,8 @@ export default function BiometricSettingsScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["#3E4093"]}
-          tintColor="#3E4093"
+          colors={[primary]}
+          tintColor={primary}
         />
       }
     >
@@ -513,8 +515,11 @@ export default function BiometricSettingsScreen() {
           style={CARD_SHADOW}
         >
           <View className="flex-row items-center flex-1 mr-3">
-            <View className="bg-blue-50 p-3 rounded-xl">
-              <Ionicons name="finger-print-outline" size={24} color="#3E4093" />
+            <View
+              style={{ backgroundColor: secondary }}
+              className="p-3 rounded-xl"
+            >
+              <Ionicons name="finger-print-outline" size={24} color={primary} />
             </View>
 
             <View className="ml-3 flex-1">
@@ -529,7 +534,7 @@ export default function BiometricSettingsScreen() {
           </View>
 
           {processing ? (
-            <ActivityIndicator color="#3E4093" />
+            <ActivityIndicator color={primary} />
           ) : (
             <Switch
               value={isCurrentDeviceEnabled}
@@ -537,7 +542,7 @@ export default function BiometricSettingsScreen() {
               disabled={!isSupported || processing}
               trackColor={{
                 false: "#CBD5E1",
-                true: "#3E4093",
+                true: primary,
               }}
               thumbColor="#FFFFFF"
             />
@@ -600,8 +605,14 @@ export default function BiometricSettingsScreen() {
                         </Text>
 
                         {isThisDevice && (
-                          <View className="ml-2 bg-blue-100 px-2 py-0.5 rounded-full">
-                            <Text className="text-primary text-[10px] font-bold">
+                          <View
+                            style={{ backgroundColor: secondary }}
+                            className="ml-2 px-2 py-0.5 rounded-full"
+                          >
+                            <Text
+                              style={{ color: primary }}
+                              className="text-[10px] font-bold"
+                            >
                               This Device
                             </Text>
                           </View>

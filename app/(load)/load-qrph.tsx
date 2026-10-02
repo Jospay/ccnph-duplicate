@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { checkPaymentStatus } from "@/services/walletService";
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system/legacy";
@@ -19,6 +20,7 @@ export default function WalletLoadQRPage() {
     useLocalSearchParams();
 
   const router = useRouter();
+  const { primary } = useCoopTheme();
 
   const pollingInterval = useRef<NodeJS.Timeout | null>(null);
   const hasShownSuccess = useRef(false);
@@ -174,7 +176,7 @@ export default function WalletLoadQRPage() {
         <Text className="text-xl font-bold mb-2">Scan to Load Wallet</Text>
 
         {/* AMOUNT TO BE CREDITED */}
-        <Text className="text-primary text-3xl font-bold mb-1">
+        <Text style={{ color: primary }} className="text-3xl font-bold mb-1">
           ₱ {formattedAmount}
         </Text>
         <Text className="text-slate-400 text-xs mb-4">
@@ -221,7 +223,8 @@ export default function WalletLoadQRPage() {
             <TouchableOpacity
               onPress={handleSaveQR}
               disabled={saving}
-              className="flex-row items-center bg-primary/10 px-6 py-3 rounded-full mb-6"
+              style={{ backgroundColor: `${primary}1A` }}
+              className="flex-row items-center px-6 py-3 rounded-full mb-6"
             >
               {saving ? (
                 <ActivityIndicator size="small" color="#000" />
@@ -229,7 +232,7 @@ export default function WalletLoadQRPage() {
                 <Ionicons name="download-outline" size={20} color="#000" />
               )}
 
-              <Text className="text-primary font-bold ml-2">
+              <Text style={{ color: primary }} className="font-bold ml-2">
                 {saving ? "Saving..." : "Save or Share QR"}
               </Text>
             </TouchableOpacity>

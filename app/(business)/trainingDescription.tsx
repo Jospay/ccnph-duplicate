@@ -1,10 +1,12 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { trainingService } from "@/services/trainingService";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function DescriptionPage() {
+  const { primary } = useCoopTheme();
   const { categorySlug, categoryName, typeSlug } = useLocalSearchParams();
   const [categoryAttributes, setCategoryAttributes] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,10 @@ export default function DescriptionPage() {
         showsVerticalScrollIndicator={false}
       >
         <View className="px-6 pt-10 pb-5">
-          <Text className="text-2xl text-center font-extrabold text-primary tracking-tight">
+          <Text
+            style={{ color: primary }}
+            className="text-2xl text-center font-extrabold tracking-tight"
+          >
             {categoryName || "Training"}
           </Text>
         </View>
@@ -80,8 +85,9 @@ export default function DescriptionPage() {
             });
           }}
           className={`h-16 rounded-2xl justify-center items-center ${
-            loading ? "bg-slate-400" : "bg-primary"
+            loading ? "bg-slate-400" : ""
           }`}
+          style={loading ? undefined : { backgroundColor: primary }}
         >
           <Text className="text-white font-bold text-lg mr-2">
             Start Training

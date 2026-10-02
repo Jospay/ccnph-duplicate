@@ -742,8 +742,8 @@ export default function MainLayout() {
                 >
                   <View
                     style={{
-                      width: 31,
-                      height: 31,
+                      width: 32,
+                      height: 32,
                     }}
                   >
                     {user?.avatar ? (
@@ -751,6 +751,7 @@ export default function MainLayout() {
                         source={{
                           uri: user.avatar,
                         }}
+                        className="border-2 border-white"
                         style={{
                           width: "100%",
                           height: "100%",

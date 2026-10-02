@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { getNews, NewsItem } from "@/services/newsService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,6 +24,7 @@ const SNAP_INTERVAL = CARD_WIDTH + SPACING;
 
 export default function NewsIndex() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
 
   const [news, setNews] = useState<NewsItem[]>([]);
   const [latestNews, setLatestNews] = useState<NewsItem[]>([]);
@@ -35,6 +37,14 @@ export default function NewsIndex() {
   const [activeSlide, setActiveSlide] = useState(0);
 
   const sliderRef = useRef<FlatList>(null);
+
+  const hexToRgba = (hex: string, alpha: number) => {
+    const cleanHex = hex.replace("#", "");
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
 
   const loadNews = async (pageNumber = 1, append = false) => {
     try {
@@ -135,14 +145,19 @@ export default function NewsIndex() {
           {/* ================= HEADER ================= */}
 
           <View className="px-4 pt-2 flex-row items-center bg-white justify-between">
-            <Text className="text-3xl font-bold text-primary py-4">News</Text>
+            <Text
+              style={{ color: primary }}
+              className="text-3xl font-bold py-4"
+            >
+              News
+            </Text>
 
             <TouchableOpacity
               activeOpacity={0.9}
               onPress={() => router.push("/(news)/search")}
               className="p-2"
             >
-              <Ionicons name="search" size={24} color="#3E4093" />
+              <Ionicons name="search" size={24} color={primary} />
             </TouchableOpacity>
           </View>
 
@@ -150,7 +165,7 @@ export default function NewsIndex() {
 
           {latestNews.length > 0 && (
             <View className="px-4 mb-3">
-              <Text className="text-lg font-bold text-primary">
+              <Text style={{ color: primary }} className="text-lg font-bold">
                 Latest News
               </Text>
             </View>
@@ -200,14 +215,14 @@ export default function NewsIndex() {
                   />
 
                   <LinearGradient
-                    colors={["rgba(3,65,148,0.4)", "transparent"]}
+                    colors={[hexToRgba(primary, 0.4), "transparent"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 0, y: 1 }}
                     className="absolute top-0 left-0 right-0 h-20"
                   />
 
                   <LinearGradient
-                    colors={["transparent", "rgba(3,65,148,0.9)"]}
+                    colors={["transparent", hexToRgba(primary, 0.9)]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 0, y: 1 }}
                     className="absolute bottom-0 left-0 right-0 h-44"
@@ -245,10 +260,13 @@ export default function NewsIndex() {
                 activeOpacity={0.8}
                 onPress={() => scrollToSlide(index)}
                 className={`mx-1 rounded-full ${
-                  activeSlide === index
-                    ? "bg-primary w-6 h-2"
-                    : "bg-slate-300 w-2 h-2"
+                  activeSlide === index ? "w-6 h-2" : "bg-slate-300 w-2 h-2"
                 }`}
+                style={
+                  activeSlide === index
+                    ? { backgroundColor: primary }
+                    : undefined
+                }
               />
             ))}
           </View>

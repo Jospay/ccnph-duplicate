@@ -7,6 +7,7 @@ import TransactionDetails, {
   getTotal,
 } from "@/components/TransactionDetails";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   getWalletTransactions,
   WalletTransaction,
@@ -25,6 +26,7 @@ type Filter = "all" | "today" | "week" | "month";
 
 export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
+  const { primary } = useCoopTheme();
   const [refreshing, setRefreshing] = useState(false);
 
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
@@ -89,11 +91,15 @@ export default function HistoryPage() {
     return (
       <TouchableOpacity
         onPress={() => setFilter(value)}
+        style={active ? { backgroundColor: primary } : undefined}
         className={`px-4 py-2 rounded-full mr-2 ${
-          active ? "bg-primary" : "bg-white border border-slate-200"
+          active ? "" : "bg-white border border-slate-200"
         }`}
       >
         <Text
+          style={
+            active ? undefined : undefined /* text color handled via Tailwind */
+          }
           className={`text-sm font-medium ${
             active ? "text-white" : "text-slate-600"
           }`}
@@ -142,8 +148,8 @@ export default function HistoryPage() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={["#3E4093"]}
-              tintColor="#3E4093"
+              colors={[primary]}
+              tintColor={primary}
             />
           }
           ListEmptyComponent={

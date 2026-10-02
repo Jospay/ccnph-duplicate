@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -5,6 +6,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
 
   return (
     <View className="flex-1 bg-white p-6 items-center justify-center">
@@ -23,7 +25,8 @@ export default function PaymentSuccessPage() {
 
       <TouchableOpacity
         onPress={() => router.replace("../(main)/")}
-        className="bg-primary w-full p-5 rounded-2xl"
+        style={{ backgroundColor: primary }}
+        className="w-full p-5 rounded-2xl"
       >
         <Text className="text-white text-center font-bold text-lg">
           Back to Home

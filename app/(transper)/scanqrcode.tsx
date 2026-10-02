@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { parseInstapayQr } from "@/utils/emvQr";
 import { Ionicons } from "@expo/vector-icons";
 import { Buffer } from "buffer";
@@ -22,6 +23,7 @@ const PNG = require("pngjs/browser").PNG;
 
 export default function ScanQrCodePage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const insets = useSafeAreaInsets();
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -241,7 +243,8 @@ export default function ScanQrCodePage() {
 
         <TouchableOpacity
           onPress={requestPermission}
-          className="bg-primary px-6 py-3 rounded-xl mb-3"
+          style={{ backgroundColor: primary }}
+          className="px-6 py-3 rounded-xl mb-3"
           disabled={resolvingQr}
         >
           <Text className="text-white font-bold">Grant Permission</Text>

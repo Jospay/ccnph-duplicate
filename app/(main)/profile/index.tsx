@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { profileService } from "@/services/profileService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -40,6 +41,7 @@ const MAX_ZOOM = 4;
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { primary, secondary } = useCoopTheme();
 
   const { clearAuth, user, setUser } = useAuthStore();
 
@@ -384,7 +386,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" color="#3E4093" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -397,7 +399,7 @@ export default function ProfileScreen() {
           refreshing={refreshing}
           onRefresh={onRefresh}
           colors={["#3E4093"]}
-          tintColor="#3E4093"
+          tintColor={primary}
         />
       }
     >
@@ -445,12 +447,22 @@ export default function ProfileScreen() {
           activeOpacity={0.8}
           className="relative"
         >
-          <View className="w-24 h-24 rounded-full bg-blue items-center justify-center border-4 border-primary overflow-hidden">
+          <View
+            style={{
+              borderWidth: 4,
+              borderColor: primary,
+              backgroundColor: secondary,
+            }}
+            className="w-24 h-24 rounded-full items-center justify-center overflow-hidden"
+          >
             {uploading ? (
               <View className="items-center">
-                <ActivityIndicator color="#3E4093" />
+                <ActivityIndicator color={primary} />
 
-                <Text className="text-[10px] text-primary font-bold mt-1">
+                <Text
+                  style={{ color: primary }}
+                  className="text-[10px] font-bold mt-1"
+                >
                   {uploadProgress}%
                 </Text>
               </View>
@@ -462,16 +474,19 @@ export default function ProfileScreen() {
                 className="w-full h-full"
               />
             ) : (
-              <Ionicons name="person" size={50} color="#3E4093" />
+              <Ionicons name="person" size={50} color={primary} />
             )}
           </View>
 
-          <View className="absolute bottom-0 right-0 bg-primary p-1.5 rounded-full border-2 border-white shadow-sm">
+          <View
+            style={{ backgroundColor: primary }}
+            className="absolute bottom-0 right-0 p-1.5 rounded-full border-2 border-white shadow-sm"
+          >
             <Ionicons name="camera" size={14} color="white" />
           </View>
         </TouchableOpacity>
 
-        <Text className="text-2xl font-bold mt-4 text-primary">
+        <Text style={{ color: primary }} className="text-2xl font-bold mt-4">
           {user?.name || "Member"}
         </Text>
 
@@ -524,20 +539,30 @@ export default function ProfileScreen() {
       {/* FOR APPROVAL */}
       {isBasic && isForApproval && (
         <View className="mt-6 px-4">
-          <View className="bg-blue border border-primary p-5 rounded-[30px]">
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: primary,
+              backgroundColor: secondary,
+            }}
+            className="p-5 rounded-[30px]"
+          >
             <View className="flex-row items-center">
-              <View className="bg-primary p-2 rounded-full">
+              <View
+                style={{ backgroundColor: primary }}
+                className="p-2 rounded-full"
+              >
                 <Ionicons name="time" size={20} color="white" />
               </View>
 
               <View className="flex-1 ml-4">
-                <Text className="text-primary font-bold text-lg">
+                <Text style={{ color: primary }} className="font-bold text-lg">
                   Review in Progress
                 </Text>
               </View>
             </View>
 
-            <Text className="text-primary text-sm mt-2 leading-5">
+            <Text style={{ color: primary }} className="text-sm mt-2 leading-5">
               Your account details have been completed. Please wait 2-3 days for
               approval. Updates will be sent to your email.
             </Text>
@@ -686,7 +711,7 @@ export default function ProfileScreen() {
                 className="flex-row items-center justify-between p-4"
               >
                 <View className="flex-row items-center">
-                  <Ionicons name="settings-outline" size={22} color="#3E4093" />
+                  <Ionicons name="settings-outline" size={22} color={primary} />
                   <Text className="text-gray-800 font-bold ml-3 text-base">
                     Account Management
                   </Text>
@@ -727,8 +752,11 @@ export default function ProfileScreen() {
       >
         <View className="flex-1 bg-black/40 justify-center items-center px-5">
           <View className="bg-white p-8 rounded-[40px] items-center w-full max-w-[380px] shadow-2xl">
-            <View className="w-16 h-16 bg-blue rounded-full items-center justify-center mb-4">
-              <Ionicons name="image" size={32} color="#3E4093" />
+            <View
+              style={{ backgroundColor: secondary }}
+              className="w-16 h-16 rounded-full items-center justify-center mb-4"
+            >
+              <Ionicons name="image" size={32} color={primary} />
             </View>
 
             <Text className="text-xl font-bold text-[#333] mb-2 text-center">
@@ -745,7 +773,7 @@ export default function ProfileScreen() {
                   }}
                   className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
                 >
-                  <Ionicons name="eye-outline" size={20} color="#3E4093" />
+                  <Ionicons name="eye-outline" size={20} color={primary} />
 
                   <Text className="ml-3 font-bold text-gray-700">
                     View Photo
@@ -758,7 +786,7 @@ export default function ProfileScreen() {
                 onPress={() => openImageSource("camera")}
                 className="w-full flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
               >
-                <Ionicons name="camera-outline" size={20} color="#3E4093" />
+                <Ionicons name="camera-outline" size={20} color={primary} />
 
                 <Text className="ml-3 font-bold text-gray-700">Take Photo</Text>
               </TouchableOpacity>
@@ -766,15 +794,18 @@ export default function ProfileScreen() {
               {/* UPLOAD NEW */}
               <TouchableOpacity
                 onPress={() => openImageSource("library")}
-                className="w-full flex-row items-center p-4 bg-blue rounded-2xl border border-[#DBEAFE]"
+                style={{ backgroundColor: secondary }}
+                className="w-full flex-row items-center p-4 rounded-2xl border border-[#DBEAFE]"
               >
                 <Ionicons
                   name="cloud-upload-outline"
                   size={20}
-                  color="#3E4093"
+                  color={primary}
                 />
 
-                <Text className="ml-3 font-bold text-primary">Upload New</Text>
+                <Text style={{ color: primary }} className="ml-3 font-bold">
+                  Upload New
+                </Text>
               </TouchableOpacity>
 
               {/* DELETE PHOTO - ONLY IF AVATAR EXISTS */}
@@ -847,7 +878,13 @@ export default function ProfileScreen() {
             </Text>
 
             {previewUri && (
-              <View className="w-56 h-56 rounded-full overflow-hidden border-4 border-primary mb-6">
+              <View
+                style={{
+                  borderWidth: 4,
+                  borderColor: primary,
+                }}
+                className="w-56 h-56 rounded-full overflow-hidden mb-6"
+              >
                 <Image
                   source={{
                     uri: previewUri,
@@ -861,7 +898,8 @@ export default function ProfileScreen() {
             <View className="w-full gap-y-3">
               <TouchableOpacity
                 onPress={confirmAndUpload}
-                className="w-full py-3.5 bg-primary rounded-2xl items-center flex-row justify-center"
+                style={{ backgroundColor: primary }}
+                className="w-full py-3.5 rounded-2xl items-center flex-row justify-center"
               >
                 <Ionicons
                   name="checkmark-circle-outline"
@@ -940,6 +978,7 @@ function CropScreen({
   onCancel: () => void;
   onDone: (croppedUri: string) => void;
 }) {
+  const { primary, secondary } = useCoopTheme();
   const [cropping, setCropping] = useState(false);
 
   const [zoomDisplay, setZoomDisplay] = useState(MIN_ZOOM);
@@ -1181,7 +1220,8 @@ function CropScreen({
           <TouchableOpacity
             onPress={handleCropConfirm}
             disabled={cropping}
-            className="w-full py-3.5 bg-primary rounded-2xl items-center flex-row justify-center"
+            style={{ backgroundColor: primary }}
+            className="w-full py-3.5 rounded-2xl items-center flex-row justify-center"
           >
             {cropping ? (
               <ActivityIndicator color="white" />
@@ -1218,6 +1258,7 @@ function CropScreen({
 /* -------------------------------------------------------------------------- */
 
 function ProfileMenuItem({ icon, title, onPress, isLast }: any) {
+  const { primary, secondary } = useCoopTheme();
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -1226,8 +1267,8 @@ function ProfileMenuItem({ icon, title, onPress, isLast }: any) {
       }`}
     >
       <View className="flex-row items-center">
-        <View className="bg-blue p-2 rounded-lg">
-          <Ionicons name={icon} size={22} color="#3E4093" />
+        <View style={{ backgroundColor: secondary }} className="p-2 rounded-lg">
+          <Ionicons name={icon} size={22} color={primary} />
         </View>
 
         <Text className="text-[#333] font-semibold text-base ml-3">

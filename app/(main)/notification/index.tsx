@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   getNotifications,
   markAllNotificationsAsRead,
@@ -20,6 +21,7 @@ const notificationTabs = ["All", "Unread"];
 
 export default function NotificationsPage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const [selectedTab, setSelectedTab] = useState("All");
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -148,7 +150,7 @@ export default function NotificationsPage() {
   if (loading && !refreshing) {
     return (
       <View className="flex-1 bg-slate-100 justify-center items-center">
-        <ActivityIndicator size="large" color="#3E4093" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -162,8 +164,11 @@ export default function NotificationsPage() {
             <TouchableOpacity
               key={tab}
               onPress={() => setSelectedTab(tab)}
+              style={
+                selectedTab === tab ? { backgroundColor: primary } : undefined
+              }
               className={`px-4 py-2 rounded-full mr-2 flex-row items-center ${
-                selectedTab === tab ? "bg-primary" : "bg-slate-100"
+                selectedTab === tab ? "" : "bg-slate-100"
               }`}
             >
               <Text
@@ -175,15 +180,16 @@ export default function NotificationsPage() {
               </Text>
               {tab === "Unread" && unreadCount > 0 && (
                 <View
+                  style={
+                    selectedTab === tab
+                      ? undefined
+                      : { backgroundColor: primary }
+                  }
                   className={`ml-1.5 rounded-full px-1.5 py-0.5 ${
-                    selectedTab === tab ? "bg-white/25" : "bg-primary"
+                    selectedTab === tab ? "bg-white/25" : ""
                   }`}
                 >
-                  <Text
-                    className={`text-[10px] font-bold ${
-                      selectedTab === tab ? "text-white" : "text-white"
-                    }`}
-                  >
+                  <Text className="text-[10px] font-bold text-white">
                     {unreadCount}
                   </Text>
                 </View>
@@ -199,9 +205,12 @@ export default function NotificationsPage() {
             className="px-3 py-1.5"
           >
             {markingAll ? (
-              <ActivityIndicator size="small" color="#3E4093" />
+              <ActivityIndicator size="small" color={primary} />
             ) : (
-              <Text className="text-xs font-semibold text-primary">
+              <Text
+                style={{ color: primary }}
+                className="text-xs font-semibold"
+              >
                 Mark all read
               </Text>
             )}
@@ -265,7 +274,10 @@ export default function NotificationsPage() {
               </View>
 
               {!item.isRead && (
-                <View className="w-2 h-2 rounded-full bg-primary self-center ml-1" />
+                <View
+                  style={{ backgroundColor: primary }}
+                  className="w-2 h-2 rounded-full self-center ml-1"
+                />
               )}
             </TouchableOpacity>
           );

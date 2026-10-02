@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { accountDeletionService } from "@/services/accountDeletionService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,6 +15,7 @@ import {
 
 export default function DeleteAccountScreen() {
   const router = useRouter();
+  const { primary, secondary } = useCoopTheme();
   const { user } = useAuthStore();
   const [deleteAccountConfirm, setDeleteAccountConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -111,9 +113,9 @@ export default function DeleteAccountScreen() {
         <View className="flex-row items-start mb-4">
           <View
             className="p-2 rounded-xl mr-3"
-            style={{ backgroundColor: "#EFF6FF" }}
+            style={{ backgroundColor: secondary }}
           >
-            <Ionicons name="time-outline" size={20} color="#3E4093" />
+            <Ionicons name="time-outline" size={20} color={primary} />
           </View>
           <View className="flex-1">
             <Text className="font-bold text-gray-800 text-sm">

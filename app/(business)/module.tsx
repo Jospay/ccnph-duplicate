@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { trainingService } from "@/services/trainingService";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import {
 export default function ModulePage() {
   const { categorySlug, module } = useLocalSearchParams();
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const scrollRef = useRef<ScrollView>(null);
 
   const [data, setData] = useState<any>(null);
@@ -78,8 +80,13 @@ export default function ModulePage() {
         {/* TITLE */}
         {item.title && (
           <View className="flex-row items-center mb-3">
-            <View className="w-8 h-8 bg-primary/10 rounded-full items-center justify-center mr-3">
-              <Text className="text-primary font-bold">{index + 1}</Text>
+            <View
+              className="w-8 h-8 rounded-full items-center justify-center mr-3"
+              style={{ backgroundColor: `${primary}1A` }}
+            >
+              <Text style={{ color: primary }} className="font-bold">
+                {index + 1}
+              </Text>
             </View>
             <Text className="flex-1 text-xl font-bold text-slate-800">
               {item.title}
@@ -189,15 +196,15 @@ export default function ModulePage() {
           <Text className="text-slate-400 font-bold text-xs uppercase">
             Module {meta?.current_module ?? 0} of {meta?.total_modules ?? 0}
           </Text>
-          <Text className="text-primary font-bold text-xs">
+          <Text style={{ color: primary }} className="font-bold text-xs">
             {Math.round(progress)}% Complete
           </Text>
         </View>
 
         <View className="h-2 bg-slate-100 rounded-full overflow-hidden">
           <View
-            className="h-full bg-primary"
-            style={{ width: `${progress}%` }}
+            className="h-full"
+            style={{ width: `${progress}%`, backgroundColor: primary }}
           />
         </View>
       </View>
@@ -233,8 +240,9 @@ export default function ModulePage() {
           onPress={handleNext}
           disabled={loading}
           className={`flex-[2] h-16 rounded-2xl items-center justify-center ${
-            loading ? "bg-slate-400" : "bg-primary"
+            loading ? "bg-slate-400" : ""
           }`}
+          style={loading ? undefined : { backgroundColor: primary }}
         >
           {loading ? (
             <ActivityIndicator color="white" />

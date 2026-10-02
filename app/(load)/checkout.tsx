@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   calculateLoadFee,
   getLoadConfig,
@@ -22,6 +23,7 @@ import { WebView } from "react-native-webview";
 export default function CheckoutPage() {
   const { amount, type } = useLocalSearchParams();
   const router = useRouter();
+  const { primary } = useCoopTheme();
 
   const [loading, setLoading] = useState(false);
   const [isTampered, setIsTampered] = useState(false);
@@ -417,7 +419,7 @@ export default function CheckoutPage() {
             Wallet Funds Recharge
           </Text>
 
-          <Text className="text-primary text-3xl font-black mt-1">
+          <Text style={{ color: primary }} className="text-3xl font-black mt-1">
             ₱{formatAmount(safeAmount)}
           </Text>
 
@@ -452,16 +454,14 @@ export default function CheckoutPage() {
               key={m.id}
               disabled={loading || navigating || isTampered}
               onPress={() => setSelectedMethod(m)}
+              style={active ? { borderColor: primary } : undefined}
               className={`p-4 mb-3 rounded-xl border ${
-                active
-                  ? "border-primary bg-blue-50/60"
-                  : "border-gray-200 bg-white"
+                active ? "bg-blue-50/60" : "border-gray-200 bg-white"
               }`}
             >
               <Text
-                className={`font-semibold ${
-                  active ? "text-primary" : "text-slate-800"
-                }`}
+                style={active ? { color: primary } : undefined}
+                className={`font-semibold ${active ? "" : "text-slate-800"}`}
               >
                 {m.name}
               </Text>
@@ -479,8 +479,13 @@ export default function CheckoutPage() {
         <TouchableOpacity
           onPress={handleProceed}
           disabled={loading || navigating || isTampered}
+          style={
+            loading || navigating || isTampered
+              ? undefined
+              : { backgroundColor: primary }
+          }
           className={`h-16 rounded-2xl justify-center items-center ${
-            loading || navigating || isTampered ? "bg-slate-300" : "bg-primary"
+            loading || navigating || isTampered ? "bg-slate-300" : ""
           }`}
         >
           {loading ? (

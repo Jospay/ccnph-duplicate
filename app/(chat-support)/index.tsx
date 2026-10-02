@@ -1,4 +1,5 @@
 // app/(chat-support)/index.tsx
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
@@ -60,6 +61,7 @@ function resolveUserId(payload: any): string | number | null {
 
 function ChatSupportPageInner() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const insets = useSafeAreaInsets();
 
   const [phase, setPhase] = useState<Phase>("checking");
@@ -588,14 +590,14 @@ function ChatSupportPageInner() {
           {isDownloadingThis ? (
             <ActivityIndicator
               size="small"
-              color={isMe ? COLORS.bubbleOutText : COLORS.brand}
+              color={isMe ? COLORS.bubbleOutText : primary}
               style={{ marginRight: 8 }}
             />
           ) : (
             <Feather
               name="download-cloud"
               size={18}
-              color={isMe ? COLORS.bubbleOutText : COLORS.brand}
+              color={isMe ? COLORS.bubbleOutText : primary}
               style={{ marginRight: 8 }}
             />
           )}
@@ -682,7 +684,13 @@ function ChatSupportPageInner() {
               <View
                 style={[
                   styles.bubble,
-                  isMe ? styles.bubbleOut : styles.bubbleIn,
+                  isMe
+                    ? {
+                        backgroundColor: primary,
+                        borderColor: primary,
+                        borderBottomRightRadius: 4,
+                      }
+                    : styles.bubbleIn,
                 ]}
               >
                 {item.attachments && item.attachments.length > 0
@@ -710,7 +718,7 @@ function ChatSupportPageInner() {
                   <Feather
                     name={isTemp ? "clock" : "check"}
                     size={12}
-                    color={isTemp ? COLORS.inkFaint : COLORS.brand}
+                    color={isTemp ? COLORS.inkFaint : primary}
                     style={{ marginRight: 4, marginLeft: isTemp ? 4 : 4 }}
                   />
                 )}
@@ -740,7 +748,7 @@ function ChatSupportPageInner() {
           { paddingTop: insets.top, paddingBottom: insets.bottom },
         ]}
       >
-        <ActivityIndicator size="large" color={COLORS.brand} />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -789,7 +797,7 @@ function ChatSupportPageInner() {
               width: 72,
               height: 72,
               borderRadius: 36,
-              backgroundColor: COLORS.brand,
+              backgroundColor: primary,
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 20,
@@ -828,7 +836,7 @@ function ChatSupportPageInner() {
             disabled={phase === "starting"}
             activeOpacity={0.8}
             style={{
-              backgroundColor: COLORS.brand,
+              backgroundColor: primary,
               paddingVertical: 14,
               paddingHorizontal: 40,
               borderRadius: 12,
@@ -897,7 +905,7 @@ function ChatSupportPageInner() {
             />
           </TouchableOpacity>
 
-          <View style={styles.avatarMain}>
+          <View style={[styles.avatarMain, { backgroundColor: primary }]}>
             <Text style={styles.avatarMainText}>SP</Text>
             <View style={styles.avatarDot} />
           </View>
@@ -907,15 +915,17 @@ function ChatSupportPageInner() {
               Chat Support
             </Text>
             <View style={styles.headStatusRow}>
-              <View style={styles.pulseDot} />
-              <Text style={styles.headStatus}>online — active channel</Text>
+              <View style={[styles.pulseDot, { backgroundColor: primary }]} />
+              <Text style={[styles.headStatus, { color: primary }]}>
+                online — active channel
+              </Text>
             </View>
           </View>
         </View>
 
         {isLoadingMore && (
           <View style={{ padding: 12, alignItems: "center" }}>
-            <ActivityIndicator size="small" color={COLORS.brand} />
+            <ActivityIndicator size="small" color={primary} />
           </View>
         )}
 
@@ -973,6 +983,7 @@ function ChatSupportPageInner() {
           <TouchableOpacity
             style={[
               styles.sendBtn,
+              { backgroundColor: primary },
               (!draft.trim() || sending) && { backgroundColor: COLORS.rail },
             ]}
             onPress={handleSend}

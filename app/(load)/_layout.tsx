@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -53,13 +54,14 @@ function NavigationBarWrapper({ children }: { children: React.ReactNode }) {
 // --- MAIN BUSINESS LAYOUT ---
 export default function BusinessLayout() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const { token, isLoading } = useAuthStore(); // Access auth state
 
   // 1. LOADING GATE: Wait for SecureStore check
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#3E4093" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     );
   }
@@ -80,7 +82,10 @@ export default function BusinessLayout() {
             className="flex-1"
           >
             {/* --- GLOBAL HEADER --- */}
-            <View className="bg-primary w-full items-center rounded-b-2xl pt-14 pb-4">
+            <View
+              style={{ backgroundColor: primary }}
+              className="w-full items-center rounded-b-2xl pt-14 pb-4"
+            >
               <View className="flex-row justify-between items-center w-full px-6">
                 <TouchableOpacity
                   onPress={() => router.back()}

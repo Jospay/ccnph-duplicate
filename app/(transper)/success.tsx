@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useMemo, useRef, useState } from "react";
@@ -14,6 +15,7 @@ import "../../global.css";
 
 export default function TransferSuccessPage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const params = useLocalSearchParams<{
     amount?: string;
     channelName?: string;
@@ -101,7 +103,10 @@ export default function TransferSuccessPage() {
                     : "Your funds are on their way"}
                 </Text>
 
-                <Text className="text-primary text-4xl font-bold mb-8">
+                <Text
+                  style={{ color: primary }}
+                  className="text-4xl font-bold mb-8"
+                >
                   ₱
                   {amount.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -178,12 +183,13 @@ export default function TransferSuccessPage() {
         <TouchableOpacity
           onPress={handleSaveReceipt}
           disabled={isSaving}
-          className="h-14 rounded-xl justify-center items-center border border-primary bg-white"
+          className="h-14 rounded-xl justify-center items-center border bg-white"
+          style={{ borderColor: primary }}
         >
           {isSaving ? (
-            <ActivityIndicator color="#3E4093" />
+            <ActivityIndicator color={primary} />
           ) : (
-            <Text className="text-primary font-bold text-lg">
+            <Text style={{ color: primary }} className="font-bold text-lg">
               Save or Share Receipt
             </Text>
           )}
@@ -191,7 +197,8 @@ export default function TransferSuccessPage() {
 
         <TouchableOpacity
           onPress={() => router.replace("/(main)")}
-          className="h-14 rounded-xl justify-center items-center bg-primary"
+          className="h-14 rounded-xl justify-center items-center"
+          style={{ backgroundColor: primary }}
         >
           <Text className="text-white font-bold text-lg">Back to Home</Text>
         </TouchableOpacity>

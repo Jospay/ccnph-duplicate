@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   AllocationBreakdown,
   CooperativeServiceOption,
@@ -185,6 +186,7 @@ function renderAllocationBadge(allocation: AllocationBreakdown) {
 
 export default function CooperativeMembershipPage() {
   const router = useRouter();
+  const { primary, secondary } = useCoopTheme();
   const { user, setUser } = useAuthStore();
 
   const [loading, setLoading] = useState(true);
@@ -327,7 +329,7 @@ export default function CooperativeMembershipPage() {
         }
       >
         <View className="px-6 py-10">
-          <Text className="text-primary text-3xl font-bold">
+          <Text style={{ color: primary }} className="text-3xl font-bold">
             Cooperative Transparency
           </Text>
 
@@ -370,19 +372,31 @@ export default function CooperativeMembershipPage() {
 
           {/* --- GATE: BASIC & FOR APPROVAL --- */}
           {isBasic && isForApproval && (
-            <View className="bg-blue border border-primary p-5 rounded-[30px] mb-8">
+            <View
+              className="border p-5 rounded-[30px] mb-8"
+              style={{ borderColor: primary, backgroundColor: secondary }}
+            >
               <View className="flex-row items-center">
-                <View className="bg-primary p-2 rounded-full">
+                <View
+                  className="p-2 rounded-full"
+                  style={{ backgroundColor: primary }}
+                >
                   <Ionicons name="time" size={20} color="white" />
                 </View>
                 <View className="flex-1 ml-4">
-                  <Text className="text-primary font-bold text-lg">
+                  <Text
+                    style={{ color: primary }}
+                    className="font-bold text-lg"
+                  >
                     Review in Progress
                   </Text>
                 </View>
               </View>
 
-              <Text className="text-primary text-sm mt-2 leading-5">
+              <Text
+                style={{ color: primary }}
+                className="text-sm mt-2 leading-5"
+              >
                 Your account details have been submitted. Please wait 2-3 days
                 for approval before cooperative transparency becomes available.
               </Text>
@@ -476,7 +490,8 @@ export default function CooperativeMembershipPage() {
                       selectedYear &&
                       fetchSummary(selectedYear, selectedService.slug)
                     }
-                    className="bg-primary mt-4 px-6 py-3 rounded-xl"
+                    style={{ backgroundColor: primary }}
+                    className="mt-4 px-6 py-3 rounded-xl"
                   >
                     <Text className="text-white font-bold">Try Again</Text>
                   </TouchableOpacity>
@@ -529,7 +544,10 @@ export default function CooperativeMembershipPage() {
                             <Text className="font-bold text-lg text-slate-800 flex-1 mr-2">
                               {service.name}
                             </Text>
-                            <Text className="font-black text-primary">
+                            <Text
+                              style={{ color: primary }}
+                              className="font-black"
+                            >
                               {peso(service.total)}
                             </Text>
                           </View>
@@ -557,9 +575,6 @@ export default function CooperativeMembershipPage() {
                                       <Text className="font-bold text-slate-700 flex-1 mr-2">
                                         {allocation.name}
                                       </Text>
-                                      {/* <Text className="font-black text-primary">
-                                        {badge}
-                                      </Text> */}
                                     </View>
                                     <Text className="text-slate-500 text-sm mt-1">
                                       {allocation.description}
@@ -603,7 +618,10 @@ export default function CooperativeMembershipPage() {
                         <Text className="text-slate-500 mt-2">
                           {item.description}
                         </Text>
-                        <Text className="font-black text-primary mt-3">
+                        <Text
+                          style={{ color: primary }}
+                          className="font-black mt-3"
+                        >
                           {peso(item.amount)}
                         </Text>
                       </View>
@@ -613,7 +631,10 @@ export default function CooperativeMembershipPage() {
                   {/* ADD-ALL TOTAL LINE */}
                   <View className="flex-row justify-between items-center border-t border-slate-200 mt-6 pt-5">
                     <Text className="font-bold text-lg">Total</Text>
-                    <Text className="font-black text-xl text-primary">
+                    <Text
+                      style={{ color: primary }}
+                      className="font-black text-xl"
+                    >
                       {peso(summary.total_fund)}
                     </Text>
                   </View>

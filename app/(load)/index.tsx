@@ -1,5 +1,6 @@
 import { CustomAlert } from "@/components/CustomAlert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   calculateLoadFee,
   getLoadConfig,
@@ -23,7 +24,7 @@ const DEFAULT_MIN = 1.0;
 
 export default function WalletPage() {
   const router = useRouter();
-
+  const { primary } = useCoopTheme();
   // STATES
   const [pageLoading, setPageLoading] = useState(true);
   const [amount, setAmount] = useState("");
@@ -160,7 +161,7 @@ export default function WalletPage() {
               <Text className="text-slate-500 text-xs uppercase mb-2">
                 Current Wallet Balance
               </Text>
-              <Text className="text-primary text-3xl font-bold">
+              <Text style={{ color: primary }} className="text-3xl font-bold">
                 ₱
                 {walletBalance.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
@@ -170,14 +171,23 @@ export default function WalletPage() {
             </View>
 
             {/* INPUT AMOUNT */}
-            <View className="flex-row items-center border-b-2 border-primary w-full py-2 justify-center">
-              <Text className="text-primary text-3xl font-bold mr-2">₱</Text>
+            <View
+              style={{ borderColor: primary }}
+              className="flex-row items-center border-b-2 w-full py-2 justify-center"
+            >
+              <Text
+                style={{ color: primary }}
+                className="text-3xl font-bold mr-2"
+              >
+                ₱
+              </Text>
               <TextInput
                 value={amount}
                 onChangeText={handleChange}
                 keyboardType="numeric"
                 placeholder="Enter load amount"
-                className="text-primary text-3xl font-bold flex-1"
+                style={{ color: primary }}
+                className="text-3xl font-bold flex-1"
               />
             </View>
 
@@ -192,7 +202,7 @@ export default function WalletPage() {
 
               <View className="flex-row justify-between mb-2">
                 <Text className="text-slate-600">Load Amount</Text>
-                <Text className="font-bold text-primary">
+                <Text style={{ color: primary }} className="font-bold">
                   ₱
                   {cleanAmount.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -247,8 +257,11 @@ export default function WalletPage() {
         <TouchableOpacity
           onPress={handleProceed}
           disabled={!isValid || isProcessing}
+          style={
+            !isValid || isProcessing ? undefined : { backgroundColor: primary }
+          }
           className={`h-16 rounded-2xl justify-center items-center ${
-            !isValid || isProcessing ? "bg-slate-300" : "bg-primary"
+            !isValid || isProcessing ? "bg-slate-300" : ""
           }`}
         >
           {isProcessing ? (

@@ -1,5 +1,6 @@
 import { CustomAlert } from "@/components/CustomAlert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   calculateTransferFee,
   getTransferConfig,
@@ -79,6 +80,7 @@ const toggleStyles = StyleSheet.create({
 
 export default function TransferPage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const insets = useSafeAreaInsets();
 
   const params = useLocalSearchParams<{
@@ -325,7 +327,7 @@ export default function TransferPage() {
               <Text className="text-slate-500 text-xs uppercase mb-1">
                 Available Balance
               </Text>
-              <Text className="text-primary text-3xl font-bold">
+              <Text style={{ color: primary }} className="text-3xl font-bold">
                 ₱
                 {walletBalance.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
@@ -350,7 +352,7 @@ export default function TransferPage() {
                       style={[
                         toggleStyles.labelBase,
                         isActive
-                          ? toggleStyles.labelActive
+                          ? [toggleStyles.labelActive, { color: primary }]
                           : toggleStyles.labelInactive,
                       ]}
                     >
@@ -415,7 +417,10 @@ export default function TransferPage() {
                     disabled={isTampered}
                     className="items-center py-2"
                   >
-                    <Text className="text-primary text-xs font-bold">
+                    <Text
+                      style={{ color: primary }}
+                      className="text-xs font-bold"
+                    >
                       Scan a different QR code
                     </Text>
                   </Pressable>
@@ -431,7 +436,8 @@ export default function TransferPage() {
                   <Pressable
                     onPress={() => router.push("./scanqrcode")}
                     disabled={isTampered}
-                    className="bg-primary px-6 py-3 rounded-xl"
+                    style={{ backgroundColor: primary }}
+                    className="px-6 py-3 rounded-xl"
                   >
                     <Text className="text-white font-bold">
                       Open Camera / Scan
@@ -497,7 +503,12 @@ export default function TransferPage() {
                 Amount
               </Text>
               <View className="flex-row items-center border border-slate-200 rounded-xl px-4 bg-white">
-                <Text className="text-primary text-xl font-bold mr-2">₱</Text>
+                <Text
+                  style={{ color: primary }}
+                  className="text-xl font-bold mr-2"
+                >
+                  ₱
+                </Text>
                 <TextInput
                   value={amount}
                   onChangeText={handleAmountChange}
@@ -562,8 +573,9 @@ export default function TransferPage() {
         <Pressable
           onPress={handleContinue}
           disabled={!isValid}
+          style={isValid ? { backgroundColor: primary } : undefined}
           className={`h-14 rounded-xl justify-center items-center ${
-            !isValid ? "bg-slate-300" : "bg-primary"
+            !isValid ? "bg-slate-300" : ""
           }`}
         >
           <Text className="text-white font-bold text-lg">Continue</Text>

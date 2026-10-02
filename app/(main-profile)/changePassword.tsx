@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { profileService } from "@/services/profileService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -58,6 +59,7 @@ const PasswordInput = ({
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<any>({});
 
@@ -125,7 +127,9 @@ export default function ChangePasswordScreen() {
       bottomOffset={20}
     >
       <View className="p-6">
-        <Text className="text-2xl font-bold text-primary mb-2">Security</Text>
+        <Text style={{ color: primary }} className="text-2xl font-bold mb-2">
+          Security
+        </Text>
         <Text className="text-gray-500 mb-8">
           Update your password to keep your account secure.
         </Text>
@@ -168,8 +172,8 @@ export default function ChangePasswordScreen() {
         <TouchableOpacity
           onPress={handleChangePassword}
           disabled={loading}
-          className="bg-primary py-5 rounded-3xl mt-6 shadow-lg shadow-primary/20 flex-row justify-center"
-          style={{ opacity: loading ? 0.7 : 1 }}
+          className="py-5 rounded-3xl mt-6 shadow-lg flex-row justify-center"
+          style={{ backgroundColor: primary, opacity: loading ? 0.7 : 1 }}
         >
           {loading ? (
             <ActivityIndicator color="white" />

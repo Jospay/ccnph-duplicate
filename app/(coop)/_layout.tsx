@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as NavigationBar from "expo-navigation-bar";
@@ -55,6 +56,7 @@ function NavigationBarWrapper({ children }: { children: React.ReactNode }) {
 // --- CUSTOM HEADER COMPONENT ---
 function CustomHeader() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const pathname = usePathname();
   const params = useLocalSearchParams();
   const insets = useSafeAreaInsets();
@@ -131,7 +133,10 @@ function CustomHeader() {
       <StatusBar hidden={true} />
 
       {/* --- GLOBAL HEADER --- */}
-      <View className="bg-primary w-full items-center rounded-b-2xl pt-14 pb-4">
+      <View
+        style={{ backgroundColor: primary }}
+        className="w-full items-center rounded-b-2xl pt-14 pb-4"
+      >
         <View className="flex-row justify-between items-center w-full px-6">
           <TouchableOpacity
             onPress={handleBackPress}

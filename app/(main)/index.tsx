@@ -50,7 +50,7 @@ const { width } = Dimensions.get("window");
 export default function DashboardPage() {
   const { user, setUser } = useAuthStore();
   const { handleComingSoon } = useUIStore();
-  const { primary } = useCoopTheme(); // cooperative brand color
+  const { primary } = useCoopTheme();
   const router = useRouter();
   const [pageLoading, setPageLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

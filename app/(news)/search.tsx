@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { getNews, NewsItem } from "@/services/newsService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -20,6 +21,7 @@ import {
 
 export default function SearchScreen() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const inputRef = useRef<TextInput>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -198,7 +200,7 @@ export default function SearchScreen() {
                 returnKeyType="search"
                 autoCorrect={false}
                 autoCapitalize="none"
-                selectionColor="#3E4093"
+                selectionColor={primary}
                 onSubmitEditing={() => executeSearch()}
                 className="flex-1 text-sm ml-3 text-slate-800"
               />
@@ -262,11 +264,11 @@ export default function SearchScreen() {
                               >
                                 {item.PostTitle}
                               </Text>
-                              {item.CategoryName ? (
+                              {/* {item.CategoryName ? (
                                 <Text className="text-[11px] text-slate-400 mt-0.5">
                                   {item.CategoryName}
                                 </Text>
-                              ) : null}
+                              ) : null} */}
                             </View>
                             <Ionicons
                               name="arrow-forward"
@@ -328,13 +330,13 @@ export default function SearchScreen() {
                             className="w-32 h-full bg-slate-100"
                             resizeMode="cover"
                           />
-                          {item.CategoryName ? (
+                          {/* {item.CategoryName ? (
                             <View className="bg-white px-3 py-1 absolute top-1.5 left-1.5 rounded-full">
                               <Text className="text-[10px] font-bold text-slate-700">
                                 {item.CategoryName}
                               </Text>
                             </View>
-                          ) : null}
+                          ) : null} */}
                         </View>
 
                         <View className="flex-1 p-4 justify-between">
@@ -383,7 +385,7 @@ export default function SearchScreen() {
                     ListFooterComponent={
                       loadingMore ? (
                         <View className="py-4 items-center justify-center">
-                          <ActivityIndicator size="small" color="#3E4093" />
+                          <ActivityIndicator size="small" color={primary} />
                         </View>
                       ) : null
                     }

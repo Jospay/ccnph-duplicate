@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -14,6 +15,7 @@ import "../../global.css";
 
 export default function CongratulationPage() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
   const isProcessing = useRef(false);
 
   // States
@@ -68,7 +70,10 @@ export default function CongratulationPage() {
                 </View>
               ) : (
                 <>
-                  <Text className="text-center font-bold text-primary text-3xl">
+                  <Text
+                    style={{ color: primary }}
+                    className="text-center font-bold text-3xl"
+                  >
                     Congratulations!
                   </Text>
 
@@ -95,10 +100,11 @@ export default function CongratulationPage() {
             disabled={navigating}
             activeOpacity={0.85}
             className={`h-16 rounded-2xl justify-center items-center ${
-              navigating ? "bg-slate-400" : "bg-primary"
+              navigating ? "bg-slate-400" : ""
             }`}
             style={{
               elevation: navigating ? 0 : 4,
+              ...(navigating ? {} : { backgroundColor: primary }),
             }}
           >
             {navigating ? (
