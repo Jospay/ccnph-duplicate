@@ -144,7 +144,7 @@ export default function ReactivateOtpPage() {
                 <>
                   <TitleAuth
                     title="Reactivate Your Account"
-                    description={`Your account is scheduled for deletion. Enter the code sent to +${phone} to reactivate it.`}
+                    description={`Your account is scheduled for deletion. Enter the code sent to ${phone} to reactivate it.`}
                   />
 
                   <View ref={otpContainerRef}>
