@@ -84,21 +84,13 @@ export default function NewsDetails() {
             <Skeleton className="h-4 w-full rounded-full mb-4" />
 
             <Skeleton className="h-4 w-full rounded-full mb-4" />
-
             <Skeleton className="h-4 w-10/12 rounded-full mb-4" />
-
             <Skeleton className="h-4 w-full rounded-full mb-4" />
-
             <Skeleton className="h-4 w-11/12 rounded-full mb-4" />
-
             <Skeleton className="h-4 w-9/12 rounded-full mb-4" />
-
             <Skeleton className="h-4 w-full rounded-full mb-4" />
-
             <Skeleton className="h-4 w-8/12 rounded-full mb-4" />
-
             <Skeleton className="h-4 w-full rounded-full mb-4" />
-
             <Skeleton className="h-4 w-10/12 rounded-full mb-4" />
           </View>
         </ScrollView>
