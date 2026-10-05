@@ -209,6 +209,9 @@ export default function CooperativeMembershipPage() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
+  // Cooperative name (fallback used before/without a summary)
+  const [coopName, setCoopName] = useState<string | null>(null);
+
   // --- MEMBERSHIP / STATUS FLAGS ---
   const userTypeName = user?.user_type?.name?.toUpperCase() || "";
   const statusName = user?.status?.name?.toLowerCase() || "";
@@ -221,6 +224,9 @@ export default function CooperativeMembershipPage() {
 
   // Only fully active Members can view cooperative transparency
   const hasAccess = isMember && isActive;
+
+  // Prefer the name returned by the summary, fall back to the profile one
+  const displayCoopName = summary?.cooperative?.name ?? coopName;
 
   const canAccessCooperative = (profile: any) => {
     const type = profile?.user_type?.name?.toUpperCase() || "";
@@ -245,13 +251,15 @@ export default function CooperativeMembershipPage() {
 
   const fetchFilters = async () => {
     try {
-      const [yearList, serviceList] = await Promise.all([
+      const [yearList, serviceList, myCoop] = await Promise.all([
         cooperativeService.getYears(),
         cooperativeService.getServices(),
+        cooperativeService.getMyCooperative(),
       ]);
 
       setYears(yearList);
       setServices([ALL_SERVICES_OPTION, ...serviceList]);
+      setCoopName(myCoop?.name ?? null);
 
       if (yearList.length > 0) {
         setSelectedYear((prev) => prev ?? yearList[0]);
@@ -268,9 +276,13 @@ export default function CooperativeMembershipPage() {
       try {
         const data = await cooperativeService.getSummary(year, serviceSlug);
         setSummary(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Cooperative Summary Fetch Error:", error);
-        setSummaryError("Unable to load cooperative fund data right now.");
+        setSummaryError(
+          error?.response?.status === 403
+            ? "Your account is not linked to a cooperative."
+            : "Unable to load cooperative fund data right now.",
+        );
       } finally {
         setSummaryLoading(false);
       }
@@ -500,7 +512,15 @@ export default function CooperativeMembershipPage() {
                 <>
                   {/* TOTAL FUND */}
                   <View className="bg-slate-50 border border-slate-200 rounded-2xl p-6 items-center mb-8">
-                    <Text className="text-slate-500">
+                    {displayCoopName ? (
+                      <Text
+                        style={{ color: primary }}
+                        className="font-bold text-base mb-1 text-center"
+                      >
+                        {displayCoopName}
+                      </Text>
+                    ) : null}
+                    <Text className="text-slate-500 text-center">
                       TOTAL COOPERATIVE FUND {summary.year}
                       {selectedService.slug !== "all"
                         ? ` · ${selectedService.name}`
