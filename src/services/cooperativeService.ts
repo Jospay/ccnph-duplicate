@@ -42,10 +42,18 @@ export interface AllocationSummary {
   name: string;
   slug: string;
   description: string | null;
+  type?: "PERCENTAGE" | "PHP";
   amount: number;
 }
 
+// The member's own cooperative, returned with every summary
+export interface SummaryCooperative {
+  id: number;
+  name: string | null;
+}
+
 export interface CooperativeSummary {
+  cooperative: SummaryCooperative;
   year: number;
   service_filter: string;
   total_fund: number;
