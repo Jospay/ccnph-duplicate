@@ -72,7 +72,7 @@ export default function ReactivateOtpPage() {
 
     onSuccess: async (data) => {
       setNavigating(true);
-      await setAuth(data.token, data.user);
+      await setAuth(data.token, data.user, data.cooperative);
       router.replace("/(main)");
     },
 
