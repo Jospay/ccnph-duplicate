@@ -21,6 +21,39 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 import "../../global.css";
 
+// ==========================================
+// PASSWORD STRENGTH RULES
+// ==========================================
+
+const PASSWORD_RULES: {
+  key: string;
+  label: string;
+  test: (v: string) => boolean;
+}[] = [
+  {
+    key: "length",
+    label: "12 or more characters",
+    test: (v) => v.length >= 12,
+  },
+  { key: "lower", label: "A small letter (a-z)", test: (v) => /[a-z]/.test(v) },
+  {
+    key: "upper",
+    label: "A capital letter (A-Z)",
+    test: (v) => /[A-Z]/.test(v),
+  },
+  { key: "number", label: "A number (0-9)", test: (v) => /[0-9]/.test(v) },
+  {
+    key: "symbol",
+    label: "A symbol (like ! @ # $ %)",
+    test: (v) => /[^A-Za-z0-9]/.test(v),
+  },
+];
+
+const getPasswordErrors = (value: string): string[] =>
+  PASSWORD_RULES.filter((rule) => !rule.test(value)).map(
+    (rule) => `• ${rule.label}`,
+  );
+
 export default function CreatePasswordPage() {
   const router = useRouter();
 
@@ -200,10 +233,12 @@ export default function CreatePasswordPage() {
       return showAlert("Required", "Please fill in both password fields.");
     }
 
-    if (password.length < 8) {
+    const passwordErrors = getPasswordErrors(password);
+
+    if (passwordErrors.length > 0) {
       return showAlert(
-        "Security",
-        "Password must be at least 8 characters long.",
+        "Weak Password",
+        `Your password must have:\n${passwordErrors.join("\n")}`,
       );
     }
 
@@ -262,7 +297,7 @@ export default function CreatePasswordPage() {
                   {/* PASSWORD */}
                   <AuthInput
                     label="Password"
-                    placeholder="Minimum 8 characters"
+                    placeholder="Minimum 12 characters"
                     value={password}
                     onChangeText={setPassword}
                     editable={!mutation.isPending}
@@ -270,6 +305,42 @@ export default function CreatePasswordPage() {
                     showPassword={showPassword}
                     onTogglePassword={() => setShowPassword(!showPassword)}
                   />
+
+                  {/* LIVE PASSWORD STRENGTH */}
+                  {password.length > 0 &&
+                    PASSWORD_RULES.some((rule) => !rule.test(password)) && (
+                      <View className="mb-3">
+                        <View className="flex-row gap-x-2">
+                          {PASSWORD_RULES.map((rule) => (
+                            <View
+                              key={rule.key}
+                              className={`flex-1 h-1 rounded-full ${
+                                rule.test(password)
+                                  ? "bg-green-600"
+                                  : "bg-slate-200"
+                              }`}
+                            />
+                          ))}
+                        </View>
+
+                        <View className="mt-2">
+                          <Text className="text-slate-600 text-xs font-semibold mb-1">
+                            Your password still needs:
+                          </Text>
+
+                          {PASSWORD_RULES.filter(
+                            (rule) => !rule.test(password),
+                          ).map((rule) => (
+                            <Text
+                              key={rule.key}
+                              className="text-red-500 text-xs"
+                            >
+                              • {rule.label}
+                            </Text>
+                          ))}
+                        </View>
+                      </View>
+                    )}
 
                   {/* CONFIRM PASSWORD */}
                   <AuthInput
