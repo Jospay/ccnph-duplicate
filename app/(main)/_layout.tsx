@@ -464,21 +464,23 @@ export default function MainLayout() {
               style={{ backgroundColor: primary }}
               className="mb-12 z-10 w-full h-28 items-center justify-between pt-8"
             >
-              {/* Logo */}
-              <View className="absolute top-0 start-0">
-                <View className="flex-row items-center gap-2 ps-2 pt-4">
-                  <Text className="text-white">Powered by:</Text>
+              {/* Logo (Hidden when coopLogo is 'ccnph.png') */}
+              {coopLogo?.split("/").pop() !== "ccnph.png" && (
+                <View className="absolute top-0 start-0">
+                  <View className="flex-row items-center gap-2 ps-2 pt-4">
+                    <Text className="text-white">Powered by:</Text>
 
-                  <Image
-                    source={logo}
-                    style={{
-                      width: 40,
-                      height: 40,
-                    }}
-                    resizeMode="contain"
-                  />
+                    <Image
+                      source={logo}
+                      style={{
+                        width: 40,
+                        height: 40,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
                 </View>
-              </View>
+              )}
               {/* Information Icon */}
               <View
                 style={{ elevation: 8 }}
@@ -511,7 +513,7 @@ export default function MainLayout() {
                     transition={0}
                     onError={() => setLogoFailed(true)}
                     style={{
-                      width: CENTER_LOGO_HEIGHT,
+                      width: 100,
                       height: CENTER_LOGO_HEIGHT,
                       bottom: -CENTER_LOGO_HEIGHT / 2,
                     }}
