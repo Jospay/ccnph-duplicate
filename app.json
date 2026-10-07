@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CCNPH",
-    "slug": "CCNPH",
+    "slug": "ccnph",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/applogoicon.jpg",
@@ -85,7 +85,7 @@
 
     "extra": {
       "eas": {
-        "projectId": "ef4a234f-3fe7-42e5-995a-7ca344dad038"
+        "projectId": "d687c677-58b6-4c19-9f15-6c1b784d98da"
       }
     }
   }
