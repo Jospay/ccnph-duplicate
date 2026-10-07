@@ -12,7 +12,7 @@ const isSecure = BASE_URL.startsWith("https");
 
 // Production (HTTPS) uses standard SSL port 443 via Nginx proxy.
 // Development uses port 8080.
-const REVERB_KEY = "yiejtpea0wwzggex5w53";
+const REVERB_KEY = "yiejtpea0wwzggex5w52";
 
 let echo: Echo<any> | null = null;
 

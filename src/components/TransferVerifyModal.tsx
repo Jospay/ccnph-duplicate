@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { biometricService } from "@/services/biometricService";
 import { profileService } from "@/services/profileService";
 import { Ionicons } from "@expo/vector-icons";
@@ -49,6 +50,7 @@ export function TransferVerifyModal({
   onVerify,
 }: TransferVerifyModalProps) {
   const router = useRouter();
+  const { primary, secondary } = useCoopTheme();
 
   const [viewMode, setViewMode] = useState<ViewMode>("checking");
   const [isSupported, setIsSupported] = useState(false);
@@ -213,7 +215,10 @@ export function TransferVerifyModal({
             className="bg-white w-full max-w-[400px] mx-auto rounded-[35px] p-6"
             style={MODAL_SHADOW}
           >
-            <Text className="text-primary text-2xl font-bold text-center mb-3">
+            <Text
+              style={{ color: primary }}
+              className="text-2xl font-bold text-center mb-3"
+            >
               Verify Transfer
             </Text>
 
@@ -223,7 +228,7 @@ export function TransferVerifyModal({
 
             {viewMode === "checking" && (
               <View className="items-center py-6">
-                <ActivityIndicator color="#3E4093" />
+                <ActivityIndicator color={primary} />
               </View>
             )}
 
@@ -234,7 +239,7 @@ export function TransferVerifyModal({
                     value={password}
                     onChangeText={handlePasswordChange}
                     placeholder="Enter your account password"
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={primary}
                     secureTextEntry={!showPassword}
                     autoCapitalize="none"
                     editable={!loading}
@@ -277,7 +282,10 @@ export function TransferVerifyModal({
                         disabled={loading}
                         className="self-start"
                       >
-                        <Text className="text-primary text-sm font-bold">
+                        <Text
+                          style={{ color: primary }}
+                          className="text-sm font-bold"
+                        >
                           Set it up now →
                         </Text>
                       </TouchableOpacity>
@@ -297,7 +305,10 @@ export function TransferVerifyModal({
                     disabled={loading}
                     className="items-center py-2 mt-1"
                   >
-                    <Text className="text-primary underline text-sm font-medium">
+                    <Text
+                      style={{ color: primary }}
+                      className="underline text-sm font-medium"
+                    >
                       Use {biometryLabel} instead
                     </Text>
                   </TouchableOpacity>
@@ -332,7 +343,7 @@ export function TransferVerifyModal({
                     </Text>
                   </View>
 
-                  <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+                  <Ionicons name="chevron-forward" size={18} color={primary} />
                 </TouchableOpacity>
 
                 <View className="flex-row items-center mb-4">
@@ -346,19 +357,26 @@ export function TransferVerifyModal({
                   onPress={handleUseBiometric}
                   disabled={loading}
                   activeOpacity={0.8}
-                  className="flex-row items-center bg-primary/10 border border-primary rounded-2xl p-4"
-                  style={{ opacity: loading ? 0.6 : 1 }}
+                  className="flex-row items-center border rounded-2xl p-4"
+                  style={{
+                    backgroundColor: secondary,
+                    borderColor: primary,
+                    opacity: loading ? 0.6 : 1,
+                  }}
                 >
                   <View className="bg-white p-2.5 rounded-xl mr-3">
                     <Ionicons
                       name="finger-print-outline"
                       size={22}
-                      color="#3E4093"
+                      color={primary}
                     />
                   </View>
 
                   <View className="flex-1">
-                    <Text className="text-primary font-medium text-base">
+                    <Text
+                      style={{ color: primary }}
+                      className="font-medium text-base"
+                    >
                       Use {biometryLabel}
                     </Text>
                     <Text className="text-slate-500 text-xs mt-0.5">
@@ -366,7 +384,7 @@ export function TransferVerifyModal({
                     </Text>
                   </View>
 
-                  <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+                  <Ionicons name="chevron-forward" size={18} color={primary} />
                 </TouchableOpacity>
               </View>
             )}
@@ -395,8 +413,11 @@ export function TransferVerifyModal({
                   onPress={handleSubmitPassword}
                   disabled={loading || !password}
                   activeOpacity={0.8}
-                  className="flex-1 p-4 bg-primary rounded-2xl items-center justify-center"
-                  style={{ opacity: loading || !password ? 0.6 : 1 }}
+                  className="flex-1 p-4 rounded-2xl items-center justify-center"
+                  style={{
+                    backgroundColor: primary,
+                    opacity: loading || !password ? 0.6 : 1,
+                  }}
                 >
                   {loading ? (
                     <ActivityIndicator color="#fff" size="small" />

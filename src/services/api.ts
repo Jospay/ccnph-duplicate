@@ -4,12 +4,12 @@ import axios from "axios";
 // 1. Define base constants
 // local api
 // export const devIP = "eligibly-recant-outweigh.ngrok-free.dev";
-export const devIP = "192.168.1.120:8000";
-export const BASE_URL = `http://${devIP}`;
+// export const devIP = "192.168.1.120:8000";
+// export const BASE_URL = `http://${devIP}`;
 
 // online api
-// export const devIP = "fismulticoop.org";
-// export const BASE_URL = `https://${devIP}`;
+export const devIP = "ccnph.org";
+export const BASE_URL = `https://${devIP}`;
 
 export const ICON_PATH = `${BASE_URL}/storage/`;
 
@@ -40,10 +40,10 @@ api.interceptors.response.use(
       console.warn("Unauthorized request - Clearing local session.");
 
       // local api
-      await useAuthStore.getState().clearAuth();
+      // await useAuthStore.getState().clearAuth();
 
       // online api
-      // useAuthStore.getState().clearAuth();
+      useAuthStore.getState().clearAuth();
     }
     return Promise.reject(error);
   },

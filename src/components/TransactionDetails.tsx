@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { WalletTransaction } from "@/services/walletService";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
@@ -140,6 +141,7 @@ const CLOSE_VELOCITY = 0.8;
 export default function TransactionDetails({ transaction, onClose }: Props) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const { primary } = useCoopTheme();
 
   const translateY = useRef(new Animated.Value(height)).current;
   const scrollY = useRef(0);
@@ -392,7 +394,8 @@ export default function TransactionDetails({ transaction, onClose }: Props) {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={dismiss}
-              className="bg-primary rounded-2xl h-14 justify-center items-center"
+              style={{ backgroundColor: primary }}
+              className="rounded-2xl h-14 justify-center items-center"
             >
               <Text className="text-white text-center font-bold">Close</Text>
             </TouchableOpacity>
