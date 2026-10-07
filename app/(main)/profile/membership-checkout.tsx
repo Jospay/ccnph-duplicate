@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   calculateMembershipFee,
   getMembershipConfig,
@@ -22,6 +23,7 @@ import { WebView } from "react-native-webview";
 export default function MembershipCheckoutPage() {
   const { scheduleId, amount } = useLocalSearchParams();
   const router = useRouter();
+  const { primary, secondary } = useCoopTheme();
 
   const [loading, setLoading] = useState(false);
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -337,7 +339,7 @@ export default function MembershipCheckoutPage() {
             Membership Payment
           </Text>
 
-          <Text className="text-primary text-3xl font-black mt-1">
+          <Text style={{ color: primary }} className="text-3xl font-black mt-1">
             ₱{formatAmount(safeAmount)}
           </Text>
 
@@ -372,16 +374,17 @@ export default function MembershipCheckoutPage() {
               key={m.id}
               disabled={loading || navigating}
               onPress={() => setSelectedMethod(m)}
-              className={`p-4 mb-3 rounded-xl border ${
-                active
-                  ? "border-primary bg-blue-50/60"
-                  : "border-gray-200 bg-white"
-              }`}
+              className="p-4 mb-3 rounded-xl border"
+              style={{
+                borderColor: active ? primary : "#E5E7EB",
+                backgroundColor: active ? secondary : "#FFFFFF",
+              }}
             >
               <Text
-                className={`font-semibold ${
-                  active ? "text-primary" : "text-slate-800"
-                }`}
+                className="font-semibold"
+                style={{
+                  color: active ? primary : "#1E293B",
+                }}
               >
                 {m.name}
               </Text>
@@ -399,9 +402,10 @@ export default function MembershipCheckoutPage() {
         <TouchableOpacity
           onPress={handleProceed}
           disabled={loading || navigating}
-          className={`h-16 rounded-2xl justify-center items-center ${
-            loading || navigating ? "bg-slate-300" : "bg-primary"
-          }`}
+          className="h-16 rounded-2xl justify-center items-center"
+          style={{
+            backgroundColor: loading || navigating ? "#CBD5E1" : primary,
+          }}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />

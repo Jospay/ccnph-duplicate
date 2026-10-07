@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { getMembership } from "@/services/membershipService";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -13,6 +14,7 @@ import {
 
 export default function MembershipBreakdown() {
   const router = useRouter();
+  const { primary } = useCoopTheme();
 
   const [schedules, setSchedules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -202,7 +204,10 @@ export default function MembershipBreakdown() {
                 {isSinglePayment ? "Membership Fee" : "Outstanding Balance"}
               </Text>
 
-              <Text className="text-primary text-3xl font-black mt-1">
+              <Text
+                style={{ color: primary }}
+                className="text-3xl font-black mt-1"
+              >
                 ₱{formatMoney(outstanding)}
               </Text>
             </>
@@ -272,7 +277,10 @@ export default function MembershipBreakdown() {
                       </View>
                     </View>
 
-                    <Text className="font-black text-primary text-base">
+                    <Text
+                      style={{ color: primary }}
+                      className="font-black text-base"
+                    >
                       ₱{formatMoney(item.amount)}
                     </Text>
                   </View>
@@ -302,11 +310,16 @@ export default function MembershipBreakdown() {
             loading || checkingPayment || schedules.length === 0 || isFullyPaid
           }
           onPress={handlePay}
-          className={`h-16 rounded-2xl justify-center items-center ${
-            loading || checkingPayment || schedules.length === 0 || isFullyPaid
-              ? "bg-slate-300"
-              : "bg-primary"
-          }`}
+          className="h-16 rounded-2xl justify-center items-center"
+          style={{
+            backgroundColor:
+              loading ||
+              checkingPayment ||
+              schedules.length === 0 ||
+              isFullyPaid
+                ? "#CBD5E1"
+                : primary,
+          }}
         >
           {loading || checkingPayment ? (
             <ActivityIndicator color="white" />

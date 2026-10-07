@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import {
   applyMembership,
   getMembership,
@@ -16,7 +17,7 @@ import {
 
 export default function MembershipPage() {
   const router = useRouter();
-
+  const { primary, secondary } = useCoopTheme();
   // States
   const [checking, setChecking] = useState(true); // Start as true
   const [loading, setLoading] = useState(true);
@@ -160,9 +161,11 @@ export default function MembershipPage() {
   return (
     <View className="flex-1 bg-white pt-12">
       <ScrollView className="px-5">
-        <Text className="text-2xl font-bold text-primary mb-3">Membership</Text>
+        <Text style={{ color: primary }} className="text-2xl font-bold mb-3">
+          Membership
+        </Text>
         <Text className="text-slate-500">Share Capital Amount</Text>
-        <Text className="text-3xl font-black text-primary mb-6">
+        <Text style={{ color: primary }} className="text-3xl font-black mb-6">
           ₱{(amount / 100).toFixed(2)}
         </Text>
 
@@ -170,11 +173,17 @@ export default function MembershipPage() {
           <TouchableOpacity
             key={i}
             onPress={() => setSelectedOption(opt)}
-            className={`p-4 mb-3 border rounded-2xl flex-row justify-between items-center ${
-              selectedOption?.term_months === opt.term_months
-                ? "border-primary bg-blue"
-                : "border-gray-200"
-            }`}
+            className="p-4 mb-3 border rounded-2xl flex-row justify-between items-center"
+            style={{
+              borderColor:
+                selectedOption?.term_months === opt.term_months
+                  ? primary
+                  : "#E5E7EB",
+              backgroundColor:
+                selectedOption?.term_months === opt.term_months
+                  ? secondary
+                  : "#FFFFFF",
+            }}
           >
             <View>
               <Text className="font-bold">{opt.label}</Text>
@@ -182,12 +191,17 @@ export default function MembershipPage() {
                 ₱{(opt.amount_per_term / 100).toFixed(2)} / month
               </Text>
             </View>
+
             <View
-              className={`w-5 h-5 rounded-full border ${
-                selectedOption?.term_months === opt.term_months
-                  ? "border-4 border-primary"
-                  : "border-gray-400"
-              }`}
+              className="w-5 h-5 rounded-full border"
+              style={{
+                borderWidth:
+                  selectedOption?.term_months === opt.term_months ? 4 : 1,
+                borderColor:
+                  selectedOption?.term_months === opt.term_months
+                    ? primary
+                    : "#9CA3AF",
+              }}
             />
           </TouchableOpacity>
         ))}
@@ -197,9 +211,11 @@ export default function MembershipPage() {
         <TouchableOpacity
           onPress={handleSubmit}
           disabled={!selectedOption || submitting}
-          className={`h-14 rounded-xl justify-center items-center ${
-            !selectedOption || submitting ? "bg-gray-400" : "bg-primary"
-          }`}
+          className="h-14 rounded-xl justify-center items-center"
+          style={{
+            backgroundColor:
+              !selectedOption || submitting ? "#9CA3AF" : primary,
+          }}
         >
           {submitting ? (
             <ActivityIndicator color="#fff" />

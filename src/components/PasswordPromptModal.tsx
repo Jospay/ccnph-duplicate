@@ -1,3 +1,4 @@
+import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Ionicons } from "@expo/vector-icons";
 import * as NavigationBar from "expo-navigation-bar";
 import React, { useEffect, useState } from "react";
@@ -45,6 +46,7 @@ export function PasswordPromptModal({
   onSubmit,
 }: PasswordPromptModalProps) {
   const [password, setPassword] = useState("");
+  const { primary } = useCoopTheme();
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -127,7 +129,10 @@ export function PasswordPromptModal({
             className="bg-white w-full max-w-[400px] mx-auto rounded-[35px] p-6"
             style={MODAL_SHADOW}
           >
-            <Text className="text-primary text-2xl font-bold text-center mb-3">
+            <Text
+              className="text-2xl font-bold text-center mb-3"
+              style={{ color: primary }}
+            >
               {title}
             </Text>
 
@@ -190,8 +195,11 @@ export function PasswordPromptModal({
                 onPress={handleSubmit}
                 disabled={loading || !password}
                 activeOpacity={0.8}
-                className="flex-1 p-4 bg-primary rounded-2xl items-center justify-center"
-                style={{ opacity: loading || !password ? 0.6 : 1 }}
+                className="flex-1 p-4 rounded-2xl items-center justify-center"
+                style={{
+                  backgroundColor: primary,
+                  opacity: loading || !password ? 0.6 : 1,
+                }}
               >
                 {loading ? (
                   <ActivityIndicator color="#fff" size="small" />
