@@ -5,6 +5,7 @@ import {
   Category,
   getStoreHome,
   Product,
+  ProductScope,
   toggleCollection,
 } from "@/services/productService";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,12 +25,40 @@ import {
 
 import image from "../../assets/images/vector/FISMPC.png";
 
+// LOCAL / NATIONAL FILTER OPTIONS
+const SCOPE_OPTIONS: {
+  key: ProductScope;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { key: "all", label: "All", icon: "apps-outline" },
+  { key: "local", label: "Local", icon: "location-outline" },
+  { key: "national", label: "National", icon: "globe-outline" },
+];
+
+// LOCAL / NATIONAL BADGE LOOK (used by Top Deals cards)
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
+
 export default function HomePage() {
   const router = useRouter();
 
   const [selectedCategory, setSelectedCategory] = useState<string | number>(
     "All",
   );
+
+  // Local / National filter state
+  const [selectedScope, setSelectedScope] = useState<ProductScope>("all");
 
   // --- SMOOTH ANIMATION CONFIGURATION ---
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -57,6 +86,7 @@ export default function HomePage() {
     catId: string | number = "All",
     targetPage = 1,
     isInitialLoad = true,
+    scope: ProductScope = "all",
   ) => {
     if (isInitialLoad && targetPage === 1) {
       setLoading(true);
@@ -65,7 +95,7 @@ export default function HomePage() {
     }
 
     try {
-      const response = await getStoreHome(catId, targetPage);
+      const response = await getStoreHome(catId, targetPage, scope);
 
       console.log("STORE RESPONSE:", response);
 
@@ -130,7 +160,7 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    fetchProducts("All", 1, true);
+    fetchProducts("All", 1, true, "all");
   }, []);
 
   useFocusEffect(
@@ -142,20 +172,27 @@ export default function HomePage() {
   const handleCategoryPress = (catId: string | number) => {
     setSelectedCategory(catId);
     setPage(1);
-    fetchProducts(catId, 1, true);
+    fetchProducts(catId, 1, true, selectedScope);
+  };
+
+  const handleScopePress = (scope: ProductScope) => {
+    if (scope === selectedScope) return;
+    setSelectedScope(scope);
+    setPage(1);
+    fetchProducts(selectedCategory, 1, true, scope);
   };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setPage(1);
-    fetchProducts(selectedCategory, 1, false);
+    fetchProducts(selectedCategory, 1, false, selectedScope);
     fetchCartCountOnly();
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedScope]);
 
   const loadMoreProducts = () => {
     if (!loadingMore && hasMore) {
       const nextPage = page + 1;
-      fetchProducts(selectedCategory, nextPage, false);
+      fetchProducts(selectedCategory, nextPage, false, selectedScope);
     }
   };
 
@@ -220,6 +257,7 @@ export default function HomePage() {
               rating: item.rating,
               stock: item.stock,
               category: "",
+              scope: item.cooperative_scope,
               isLiked: item.is_liked,
             }}
             onPress={() => handleProductPress(item.slug)}
@@ -283,6 +321,38 @@ export default function HomePage() {
                   </View>
                 )}
               </TouchableOpacity>
+            </View>
+
+            {/* LOCAL / NATIONAL FILTER */}
+            <View className="flex-row bg-white rounded-2xl p-1 mb-3 border border-slate-200">
+              {SCOPE_OPTIONS.map((opt) => {
+                const active = selectedScope === opt.key;
+                return (
+                  <TouchableOpacity
+                    key={opt.key}
+                    activeOpacity={0.8}
+                    onPress={() => handleScopePress(opt.key)}
+                    className={`flex-1 flex-row items-center justify-center py-2 rounded-xl ${
+                      active ? "bg-primary" : "bg-transparent"
+                    }`}
+                  >
+                    <Ionicons
+                      name={opt.icon}
+                      size={16}
+                      color={active ? "#ffffff" : "#64748b"}
+                    />
+                    <Text
+                      className={`ml-1.5 text-sm ${
+                        active
+                          ? "text-white font-semibold"
+                          : "text-slate-600 font-medium"
+                      }`}
+                    >
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
 
             {/* BANNER & DYNAMIC CATEGORIES NAVBAR */}
@@ -384,74 +454,98 @@ export default function HomePage() {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{ gap: 12 }}
                 >
-                  {topDeals.map((item) => (
-                    <View
-                      key={item.id}
-                      className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm w-44 relative"
-                    >
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={() => handleProductPress(item.slug)}
-                      >
-                        <View className="relative">
-                          <Image
-                            source={{ uri: item.image ?? "" }}
-                            className="w-full h-36"
-                            resizeMode="cover"
-                          />
-                          <View className="absolute top-2 left-2 bg-[#D70127] px-2 py-1 rounded-full">
-                            <Text className="text-white text-xs font-bold">
-                              DEAL
-                            </Text>
-                          </View>
-                        </View>
-                      </TouchableOpacity>
+                  {topDeals.map((item) => {
+                    const badge = item.cooperative_scope
+                      ? SCOPE_BADGE[item.cooperative_scope]
+                      : null;
 
-                      <TouchableOpacity
-                        onPress={() => handleToggleFavorite(item.id, item.slug)}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                        className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full shadow-sm z-20"
+                    return (
+                      <View
+                        key={item.id}
+                        className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm w-44 relative"
                       >
-                        <Ionicons
-                          name={item.is_liked ? "heart" : "heart-outline"}
-                          size={16}
-                          color={item.is_liked ? "#D70127" : "#64748b"}
-                        />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={() => handleProductPress(item.slug)}
-                        className="p-3"
-                      >
-                        <Text
-                          numberOfLines={2}
-                          className="text-sm font-semibold text-slate-800"
+                        <TouchableOpacity
+                          activeOpacity={0.8}
+                          onPress={() => handleProductPress(item.slug)}
                         >
-                          {item.name}
-                        </Text>
-                        <View className="flex-row items-center mt-2">
-                          <Text className="text-primary font-bold text-base">
-                            ₱
-                            {Number(item.price).toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
+                          <View className="relative">
+                            <Image
+                              source={{ uri: item.image ?? "" }}
+                              className="w-full h-36"
+                              resizeMode="cover"
+                            />
+                            <View className="absolute top-2 left-2 bg-[#D70127] px-2 py-1 rounded-full">
+                              <Text className="text-white text-xs font-bold">
+                                DEAL
+                              </Text>
+                            </View>
+
+                            {/* LOCAL / NATIONAL LABEL */}
+                            {badge && (
+                              <View
+                                className={`absolute bottom-2 left-2 flex-row items-center px-2 py-1 rounded-full ${badge.bg}`}
+                              >
+                                <Ionicons
+                                  name={badge.icon}
+                                  size={10}
+                                  color="#ffffff"
+                                />
+                                <Text className="text-white text-[10px] font-bold ml-1">
+                                  {badge.label}
+                                </Text>
+                              </View>
+                            )}
+                          </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          onPress={() =>
+                            handleToggleFavorite(item.id, item.slug)
+                          }
+                          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                          className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full shadow-sm z-20"
+                        >
+                          <Ionicons
+                            name={item.is_liked ? "heart" : "heart-outline"}
+                            size={16}
+                            color={item.is_liked ? "#D70127" : "#64748b"}
+                          />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          activeOpacity={0.8}
+                          onPress={() => handleProductPress(item.slug)}
+                          className="p-3"
+                        >
+                          <Text
+                            numberOfLines={2}
+                            className="text-sm font-semibold text-slate-800"
+                          >
+                            {item.name}
                           </Text>
-                          <Text className="text-xs text-slate-400 line-through ml-2">
-                            ₱
-                            {Number(item.compare_price).toLocaleString(
-                              undefined,
-                              {
+                          <View className="flex-row items-center mt-2">
+                            <Text className="text-primary font-bold text-base">
+                              ₱
+                              {Number(item.price).toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              },
-                            )}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
+                              })}
+                            </Text>
+                            <Text className="text-xs text-slate-400 line-through ml-2">
+                              ₱
+                              {Number(item.compare_price).toLocaleString(
+                                undefined,
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                },
+                              )}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
                 </ScrollView>
               </View>
             )}
