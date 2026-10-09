@@ -16,6 +16,9 @@ export interface Product {
   // location: string;
   category: string;
 
+  // Cooperative scope label (Local / National)
+  scope?: "local" | "national";
+
   // Favorite / Collection
   isLiked?: boolean;
   isOnSale?: boolean;
@@ -32,8 +35,24 @@ interface ProductCardProps {
   onFavoritePress?: () => void;
 }
 
+// Badge look for each scope
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
+
 export const ProductCard = React.memo(
   ({ item, onPress, onFavoritePress }: ProductCardProps) => {
+    const badge = item.scope ? SCOPE_BADGE[item.scope] : null;
+
     return (
       <View
         className="bg-white rounded-2xl p-2 border border-slate-100 mb-2 shadow overflow-hidden relative"
@@ -43,19 +62,32 @@ export const ProductCard = React.memo(
       >
         {/* Main Product Action Zone (Image & Details) */}
         <TouchableOpacity activeOpacity={0.85} onPress={onPress}>
-          {/* Product Image */}
-          <Image
-            source={{
-              uri: item.image,
-            }}
-            className="rounded-xl"
-            style={{
-              width: "100%",
-              height: 150,
-            }}
-          />
+          {/* Product Image + Scope Label */}
+          <View className="relative">
+            <Image
+              source={{
+                uri: item.image,
+              }}
+              className="rounded-xl"
+              style={{
+                width: "100%",
+                height: 150,
+              }}
+            />
 
-          <View className="pt-3 pt-0.5">
+            {badge && (
+              <View
+                className={`absolute top-2 left-2 flex-row items-center px-2 py-1 rounded-full ${badge.bg}`}
+              >
+                <Ionicons name={badge.icon} size={10} color="#ffffff" />
+                <Text className="text-white text-[10px] font-bold ml-1">
+                  {badge.label}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View className="pt-3">
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
