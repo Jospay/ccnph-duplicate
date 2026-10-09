@@ -8,6 +8,8 @@ export interface Category {
   image?: string | null;
 }
 
+export type ProductScope = "all" | "local" | "national";
+
 export interface Product {
   id: number;
   name: string;
@@ -19,6 +21,8 @@ export interface Product {
   compare_price: number | null;
   stock: number;
   is_liked: boolean;
+  cooperative_id?: number | null;
+  cooperative_scope?: "local" | "national";
 }
 
 export interface Pagination {
@@ -187,15 +191,32 @@ export interface ToggleFollowResponse {
 
 /**
  * STORE HOME
+ * - scope:  all | local | national
+ * - search: optional product name keyword (handled server-side)
  */
 export const getStoreHome = async (
   categoryId?: string | number,
   page: number = 1,
+  scope: ProductScope = "all",
+  search?: string,
 ): Promise<StoreHomeResponse> => {
-  const params: { category_id?: string | number; page: number } = { page };
+  const params: {
+    category_id?: string | number;
+    page: number;
+    scope?: ProductScope;
+    search?: string;
+  } = { page };
 
   if (categoryId && categoryId !== "All") {
     params.category_id = categoryId;
+  }
+
+  if (scope !== "all") {
+    params.scope = scope;
+  }
+
+  if (search && search.trim()) {
+    params.search = search.trim();
   }
 
   const response = await api.get("/store/home", { params });
