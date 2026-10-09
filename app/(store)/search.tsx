@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   getStoreHome,
   Product,
+  ProductScope,
   toggleCollection,
 } from "@/services/productService";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,11 +23,44 @@ import {
   View,
 } from "react-native";
 
+// LOCAL / NATIONAL FILTER OPTIONS
+const SCOPE_OPTIONS: {
+  key: ProductScope;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { key: "all", label: "All", icon: "apps-outline" },
+  { key: "local", label: "Local", icon: "location-outline" },
+  { key: "national", label: "National", icon: "globe-outline" },
+];
+
+// LOCAL / NATIONAL BADGE LOOK (used by suggestion rows)
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
+
 export default function SearchPage() {
   const router = useRouter();
   const inputRef = useRef<TextInput>(null);
 
+  // Used to ignore slow/stale responses when the user types or filters quickly
+  const searchRequestRef = useRef(0);
+  const suggestionRequestRef = useRef(0);
+
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeQuery, setActiveQuery] = useState(""); // last executed search
+  const [hasSearched, setHasSearched] = useState(false);
+  const [selectedScope, setSelectedScope] = useState<ProductScope>("all");
+
   const [products, setProducts] = useState<Product[]>([]);
   const [recommendations, setRecommendations] = useState<Product[]>([]);
 
@@ -42,66 +76,76 @@ export default function SearchPage() {
 
   // ================= LIVE RECOMMENDATIONS / SUGGESTIONS =================
   useEffect(() => {
-    if (searchQuery.trim().length < 2) {
+    const term = searchQuery.trim();
+
+    if (term.length < 2) {
+      suggestionRequestRef.current += 1;
       setRecommendations([]);
       setLoadingSuggestions(false);
       return;
     }
 
     const fetchSuggestions = async () => {
+      const requestId = ++suggestionRequestRef.current;
       setLoadingSuggestions(true);
       try {
-        // Fetch base data using existing pagination method
-        const response = await getStoreHome("All", 1);
-        const rawProducts: Product[] = response?.data?.productsDiscover ?? [];
+        // Server-side search so suggestions cover the whole catalog
+        const response = await getStoreHome("All", 1, selectedScope, term);
+        if (requestId !== suggestionRequestRef.current) return;
 
-        // Dynamic local filtering for instant dropdown suggestion
-        const filtered = rawProducts.filter(
-          (product) =>
-            product?.name &&
-            product.name.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-        setRecommendations(filtered.slice(0, 8)); // Top 8 suggestions limit
+        const rawProducts: Product[] = response?.data?.productsDiscover ?? [];
+        setRecommendations(rawProducts.slice(0, 8)); // Top 8 suggestions limit
       } catch (err) {
         console.log("Suggestions Error:", err);
+        if (requestId === suggestionRequestRef.current) setRecommendations([]);
       } finally {
-        setLoadingSuggestions(false);
+        if (requestId === suggestionRequestRef.current) {
+          setLoadingSuggestions(false);
+        }
       }
     };
 
     const debounce = setTimeout(() => {
       fetchSuggestions();
-    }, 250);
+    }, 300);
 
     return () => clearTimeout(debounce);
-  }, [searchQuery]);
+  }, [searchQuery, selectedScope]);
 
   // ================= EXECUTE DETAILED SEARCH RESULT =================
   const executeSearch = async (
     targetWord = searchQuery,
     targetPage = 1,
     isInitial = true,
+    scope: ProductScope = selectedScope,
   ) => {
-    if (!targetWord.trim()) return;
+    const word = targetWord.trim();
+    if (!word) return;
 
     Keyboard.dismiss();
     setIsSearching(false);
 
-    if (isInitial) setLoading(true);
-    else setLoadingMore(true);
+    const requestId = ++searchRequestRef.current;
+
+    if (isInitial) {
+      setLoading(true);
+      setActiveQuery(word);
+      setHasSearched(true);
+    } else {
+      setLoadingMore(true);
+    }
 
     try {
-      const response = await getStoreHome("All", targetPage);
-      const rawProducts: Product[] = response?.data?.productsDiscover ?? [];
+      // Server-side search + scope filter (backend handles visibility rules)
+      const response = await getStoreHome("All", targetPage, scope, word);
+      if (requestId !== searchRequestRef.current) return;
 
-      const searchFiltered = rawProducts.filter((product) =>
-        product.name.toLowerCase().includes(targetWord.toLowerCase()),
-      );
+      const results: Product[] = response?.data?.productsDiscover ?? [];
 
       if (targetPage === 1) {
-        setProducts(searchFiltered);
+        setProducts(results);
       } else {
-        setProducts((prev) => [...prev, ...searchFiltered]);
+        setProducts((prev) => [...prev, ...results]);
       }
 
       const pagination = response?.data?.pagination;
@@ -113,17 +157,21 @@ export default function SearchPage() {
       }
     } catch (error) {
       console.error("Error matching query search results:", error);
-      if (targetPage === 1) setProducts([]);
+      if (requestId === searchRequestRef.current && targetPage === 1) {
+        setProducts([]);
+        setHasMore(false);
+      }
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (requestId === searchRequestRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 
   const handleLoadMore = () => {
-    if (!loadingMore && hasMore && searchQuery.trim() && !isSearching) {
-      const nextPage = page + 1;
-      executeSearch(searchQuery, nextPage, false);
+    if (!loadingMore && !loading && hasMore && activeQuery && !isSearching) {
+      executeSearch(activeQuery, page + 1, false, selectedScope);
     }
   };
 
@@ -134,13 +182,29 @@ export default function SearchPage() {
     setIsSearching(false);
 
     // Immediately execute fully filled search query selection
-    executeSearch(item.name, 1, true);
+    executeSearch(item.name, 1, true, selectedScope);
+  };
+
+  const handleScopePress = (scope: ProductScope) => {
+    if (scope === selectedScope) return;
+    setSelectedScope(scope);
+
+    // Re-run the confirmed search with the new filter
+    if (hasSearched && activeQuery && !isSearching) {
+      executeSearch(activeQuery, 1, true, scope);
+    }
   };
 
   const clearSearch = () => {
+    searchRequestRef.current += 1; // cancel any in-flight search
     setSearchQuery("");
+    setActiveQuery("");
+    setHasSearched(false);
     setProducts([]);
     setRecommendations([]);
+    setHasMore(false);
+    setLoading(false);
+    setLoadingMore(false);
     setIsSearching(false);
     inputRef.current?.focus();
   };
@@ -175,6 +239,13 @@ export default function SearchPage() {
     }
   };
 
+  const scopeLabel =
+    selectedScope === "local"
+      ? "local"
+      : selectedScope === "national"
+        ? "national"
+        : "";
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View className="flex-1 bg-white">
@@ -193,7 +264,7 @@ export default function SearchPage() {
                 autoFocus
                 value={searchQuery}
                 onFocus={() => {
-                  if (searchQuery.length >= 2) {
+                  if (searchQuery.trim().length >= 2) {
                     setIsSearching(true);
                   }
                 }}
@@ -212,19 +283,56 @@ export default function SearchPage() {
               />
 
               {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={clearSearch}>
+                <TouchableOpacity
+                  onPress={clearSearch}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
                   <Ionicons name="close-circle" size={18} color="#94a3b8" />
                 </TouchableOpacity>
               )}
             </View>
           </View>
 
+          {/* ================= LOCAL / NATIONAL FILTER ================= */}
+          <View className="px-2 py-2 bg-white border-b border-slate-100 flex-row">
+            {SCOPE_OPTIONS.map((opt) => {
+              const active = selectedScope === opt.key;
+              return (
+                <TouchableOpacity
+                  key={opt.key}
+                  activeOpacity={0.8}
+                  onPress={() => handleScopePress(opt.key)}
+                  className={`flex-row items-center px-3 py-1.5 rounded-full mr-2 border ${
+                    active
+                      ? "bg-primary border-primary"
+                      : "bg-white border-slate-200"
+                  }`}
+                >
+                  <Ionicons
+                    name={opt.icon}
+                    size={14}
+                    color={active ? "#ffffff" : "#64748b"}
+                  />
+                  <Text
+                    className={`ml-1.5 text-xs ${
+                      active
+                        ? "text-white font-semibold"
+                        : "text-slate-600 font-medium"
+                    }`}
+                  >
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
           {/* ================= SCREEN VIEW CONTEXT ================= */}
           <View className="flex-1 bg-slate-50">
             {/* ================= DROP-DOWN INLINE RECOMMENDATIONS ================= */}
-            {isSearching && searchQuery.length >= 2 && (
+            {isSearching && searchQuery.trim().length >= 2 && (
               <View className="px-4 absolute top-0 left-0 right-0 z-50 bg-slate-50 pb-5 max-h-[80%] shadow-sm">
-                <View className="bg-white rounded-3xl border border-slate-100 overflow-hidden mt-2">
+                <View className="bg-white rounded-3xl border border-slate-100 overflow-hidden mt-2 ">
                   {loadingSuggestions ? (
                     <View>
                       <View className="px-4 py-3 border-b border-slate-100">
@@ -252,35 +360,59 @@ export default function SearchPage() {
                         keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
                         onScrollBeginDrag={() => Keyboard.dismiss()}
-                        renderItem={({ item, index }) => (
-                          <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => handleSelectRecommendation(item)}
-                            className={`p-4 flex-row items-center justify-between ${
-                              index !== recommendations.length - 1
-                                ? "border-b border-slate-100"
-                                : ""
-                            }`}
-                          >
-                            <Text
-                              numberOfLines={1}
-                              className="text-sm font-semibold text-slate-800 flex-1 pr-2"
+                        renderItem={({ item, index }) => {
+                          const badge = item.cooperative_scope
+                            ? SCOPE_BADGE[item.cooperative_scope]
+                            : null;
+
+                          return (
+                            <TouchableOpacity
+                              activeOpacity={0.7}
+                              onPress={() => handleSelectRecommendation(item)}
+                              className={`p-4 flex-row items-center justify-between ${
+                                index !== recommendations.length - 1
+                                  ? "border-b border-slate-100"
+                                  : ""
+                              }`}
                             >
-                              {item.name}
-                            </Text>
-                            <Ionicons
-                              name="arrow-forward"
-                              size={14}
-                              color="#cbd5e1"
-                            />
-                          </TouchableOpacity>
-                        )}
+                              <Text
+                                numberOfLines={1}
+                                className="text-sm font-semibold text-slate-800 flex-1 pr-2"
+                              >
+                                {item.name}
+                              </Text>
+
+                              {badge && (
+                                <View
+                                  className={`flex-row items-center px-2 py-0.5 rounded-full mr-2 ${badge.bg}`}
+                                >
+                                  <Ionicons
+                                    name={badge.icon}
+                                    size={9}
+                                    color="#ffffff"
+                                  />
+                                  <Text className="text-white text-[9px] font-bold ml-1">
+                                    {badge.label}
+                                  </Text>
+                                </View>
+                              )}
+
+                              <Ionicons
+                                name="arrow-forward"
+                                size={14}
+                                color="#cbd5e1"
+                              />
+                            </TouchableOpacity>
+                          );
+                        }}
                       />
                     </>
                   ) : (
                     <View className="py-10 items-center">
                       <Text className="text-slate-400 text-sm">
-                        No product recommendations found
+                        {scopeLabel
+                          ? `No ${scopeLabel} product recommendations found`
+                          : "No product recommendations found"}
                       </Text>
                     </View>
                   )}
@@ -322,6 +454,7 @@ export default function SearchPage() {
                           rating: item.rating,
                           stock: item.stock,
                           category: "",
+                          scope: item.cooperative_scope,
                           isLiked: item.is_liked,
                         }}
                         onPress={() => handleProductPress(item.slug)}
@@ -340,27 +473,42 @@ export default function SearchPage() {
                         : undefined
                     }
                     className="p-2"
+                    // Extra space at the bottom so the last row isn't cut off
+                    contentContainerStyle={{ paddingBottom: 48 }}
                     onEndReached={handleLoadMore}
                     onEndReachedThreshold={0.3}
                     keyboardShouldPersistTaps="handled"
                     onScrollBeginDrag={() => Keyboard.dismiss()}
+                    ListHeaderComponent={
+                      hasSearched && products.length > 0 ? (
+                        <Text className="text-sm text-slate-500 px-1 mb-2">
+                          Results for{" "}
+                          <Text className="font-semibold text-slate-800">
+                            {'"'}
+                            {activeQuery}
+                            {'"'}
+                          </Text>
+                          {scopeLabel ? ` · ${scopeLabel} only` : ""}
+                        </Text>
+                      ) : null
+                    }
                     ListEmptyComponent={
                       <View className="items-center justify-center py-20 px-4">
                         <Ionicons
                           name={
-                            searchQuery ? "search-outline" : "basket-outline"
+                            hasSearched ? "search-outline" : "basket-outline"
                           }
                           size={56}
                           color="#cbd5e1"
                         />
                         <Text className="text-slate-600 font-semibold mt-4 text-base text-center">
-                          {searchQuery
+                          {hasSearched
                             ? "No matching catalog results"
                             : "Begin searching items"}
                         </Text>
                         <Text className="text-slate-400 text-xs mt-1 text-center max-w-[260px]">
-                          {searchQuery
-                            ? `We couldn't locate active products for "${searchQuery}". Check spelling variants.`
+                          {hasSearched
+                            ? `We couldn't find ${scopeLabel ? `${scopeLabel} ` : "active "}products for "${activeQuery}". Check the spelling or try another filter.`
                             : "Input your requirements into the lookup query engine above."}
                         </Text>
                       </View>
