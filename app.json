@@ -5,22 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/applogoicon.jpg",
-
     "splash": {
       "image": "./assets/images/AppLogo.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
-
     "scheme": "ccnph",
     "userInterfaceStyle": "light",
-
-    "androidStatusBar": {
-      "barStyle": "dark-content",
-      "backgroundColor": "#00000000",
-      "translucent": true
-    },
-
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.ccnph",
@@ -31,7 +22,6 @@
         "NSFaceIDUsageDescription": "Allow CCNPH to use Face ID for secure authentication."
       }
     },
-
     "android": {
       "package": "com.BB88ADVERTISINGANDDIGITALSOLUTIONS.ccnph",
       "versionCode": 1,
@@ -44,7 +34,6 @@
       "permissions": ["USE_BIOMETRIC", "USE_FINGERPRINT"],
       "softwareKeyboardLayoutMode": "resize"
     },
-
     "plugins": [
       "expo-router",
       "expo-font",
@@ -72,17 +61,24 @@
           "cameraPermission": "Allow CCNPH to access your camera to scan QR codes."
         }
       ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
       "expo-sharing",
       "expo-video",
       "./plugins/withDisableForceDark.js"
     ],
-
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true,
       "tsconfigPaths": true
     },
-
     "extra": {
       "eas": {
         "projectId": "d687c677-58b6-4c19-9f15-6c1b784d98da"
