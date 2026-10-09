@@ -272,12 +272,12 @@ export default function DashboardPage() {
     //   iconFamily: Ionicons,
     //   iconName: "flask-outline",
     // },
-    // {
-    //   label: "CCNPH Online Store",
-    //   href: "/(store)/",
-    //   iconFamily: Ionicons,
-    //   iconName: "cart-outline",
-    // },
+    {
+      label: "CCNPH Online Store",
+      href: "/(store)/",
+      iconFamily: Ionicons,
+      iconName: "cart-outline",
+    },
     // {
     //   label: "Product Validation Services",
     //   href: "/(product-validation-services)/",
