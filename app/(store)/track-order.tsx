@@ -332,7 +332,7 @@ export default function TrackOrder() {
                 uri:
                   item.product_image && item.product_image.startsWith("http")
                     ? item.product_image
-                    : `http://192.168.1.53:8000${item.product_image || ""}`,
+                    : `http://192.168.1.120:8000${item.product_image || ""}`,
               }}
               style={{
                 width: 50,

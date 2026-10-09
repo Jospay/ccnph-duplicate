@@ -349,7 +349,7 @@ export default function Checkout() {
 
                 const cleanImgUrl = item.product.image?.startsWith("http")
                   ? item.product.image
-                  : `http://192.168.1.53:8000${item.product.image || ""}`;
+                  : `http://192.168.1.120:8000${item.product.image || ""}`;
 
                 return (
                   <View key={item.id} className="flex-row mb-4">

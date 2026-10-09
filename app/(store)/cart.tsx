@@ -248,7 +248,7 @@ export default function CartPage() {
 
                     <Image
                       source={{
-                        uri: `http://192.168.1.53:8000${variantImage}`,
+                        uri: `http://192.168.1.120:8000${variantImage}`,
                       }}
                       style={{
                         width: 85,

@@ -374,7 +374,7 @@ export default function Products() {
 
   const formatImageUrl = (url: string | null) => {
     if (!url) return "";
-    return url.startsWith("http") ? url : `http://192.168.1.53:8000${url}`;
+    return url.startsWith("http") ? url : `http://192.168.1.120:8000${url}`;
   };
 
   if (loading) {

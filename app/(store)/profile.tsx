@@ -333,7 +333,7 @@ export default function BuyerProfile() {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={async () => {
-              const url = "http://192.168.42.10:8000/login";
+              const url = "http://192.168.1.120:8000/login";
               const supported = await Linking.canOpenURL(url);
               if (supported) {
                 await Linking.openURL(url);
