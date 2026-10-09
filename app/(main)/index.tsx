@@ -398,7 +398,7 @@ export default function DashboardPage() {
         buttonText: "Chat with Support",
         buttonColor: "bg-[#D70127]",
         textColor: "text-[#D70127]",
-        route: "/(intellectual-chat)/",
+        route: "/(chat-support)/",
         useBrand: false,
       };
     }

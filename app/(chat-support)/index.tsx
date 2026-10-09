@@ -1,4 +1,3 @@
-// app/(chat-support)/index.tsx
 import { useCoopTheme } from "@/hooks/useCoopTheme";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";

@@ -633,7 +633,7 @@ export default function ProfileScreen() {
             </Text>
 
             <TouchableOpacity
-              onPress={() => router.push("/(intellectual-chat)/")}
+              onPress={() => router.push("/(chat-support)/")}
               className="bg-[#D70127] mt-4 py-3 rounded-2xl items-center flex-row justify-center"
             >
               <Ionicons
