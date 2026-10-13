@@ -9,6 +9,8 @@ export interface OrderItem {
   variant_name: string | null;
   price: number;
   quantity: number;
+  cooperative_id?: number | null;
+  cooperative_scope?: "local" | "national" | null;
 }
 
 export interface OrderTracking {
@@ -120,9 +122,12 @@ export interface ReviewData {
 export interface RateItem {
   id: number;
   order_id: number;
+  product_id?: number | null;
   product_name: string;
   product_image: string | null;
   variant_name: string | null;
+  cooperative_id?: number | null;
+  cooperative_scope?: "local" | "national" | null;
   review?: ReviewData | null;
 }
 
@@ -211,9 +216,11 @@ export const fetchOrderForRatingAPI = async (
 };
 
 // Submit rating multipart Form Data
+// onUploadProgress receives a 0-100 percentage so the UI can show upload progress.
 export const submitOrderRatingAPI = async (
   orderId: number | string,
   ratings: ProductRatingPayload[],
+  onUploadProgress?: (percent: number) => void,
 ) => {
   const formData = new FormData();
 
@@ -255,6 +262,13 @@ export const submitOrderRatingAPI = async (
   const response = await api.post(`/store/orders/${orderId}/rate`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
+    },
+    // Uploads with media can take longer than a normal request
+    timeout: 180000,
+    onUploadProgress: (event) => {
+      if (onUploadProgress && event.total) {
+        onUploadProgress(Math.round((event.loaded * 100) / event.total));
+      }
     },
   });
 

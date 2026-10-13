@@ -20,6 +20,20 @@ interface TimelineStep {
   isCurrent: boolean;
 }
 
+// LOCAL / NATIONAL BADGE LOOK
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
+
 export default function TrackOrder() {
   const router = useRouter();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
@@ -325,38 +339,59 @@ export default function TrackOrder() {
         <Text className="font-bold text-slate-800 text-sm mb-3">
           Order Items ({order.items?.length || 0})
         </Text>
-        {order.items?.map((item: any, i: number) => (
-          <View key={i} className="flex-row items-center mb-3">
-            <Image
-              source={{
-                uri:
-                  item.product_image && item.product_image.startsWith("http")
-                    ? item.product_image
-                    : `http://192.168.1.120:8000${item.product_image || ""}`,
-              }}
-              style={{
-                width: 50,
-                height: 50,
-                borderRadius: 8,
-                backgroundColor: "#f1f5f9",
-              }}
-            />
-            <View className="flex-1 ml-3">
-              <Text
-                numberOfLines={1}
-                className="text-xs font-semibold text-slate-800"
-              >
-                {item.product_name}
-              </Text>
-              <Text className="text-[10px] text-slate-400 mt-0.5">
-                Qty: {item.quantity}
+        {order.items?.map((item: any, i: number) => {
+          // LOCAL / NATIONAL LABEL
+          const scope = item.cooperative_scope as
+            | "local"
+            | "national"
+            | null
+            | undefined;
+          const badge = scope ? SCOPE_BADGE[scope] : null;
+
+          return (
+            <View key={i} className="flex-row items-center mb-3">
+              <Image
+                source={{
+                  uri:
+                    item.product_image && item.product_image.startsWith("http")
+                      ? item.product_image
+                      : `http://192.168.1.120:8000${item.product_image || ""}`,
+                }}
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 8,
+                  backgroundColor: "#f1f5f9",
+                }}
+              />
+              <View className="flex-1 ml-3">
+                {badge && (
+                  <View
+                    className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
+                  >
+                    <Ionicons name={badge.icon} size={9} color="#ffffff" />
+                    <Text className="text-white text-[9px] font-bold ml-1">
+                      {badge.label}
+                    </Text>
+                  </View>
+                )}
+
+                <Text
+                  numberOfLines={1}
+                  className="text-xs font-semibold text-slate-800"
+                >
+                  {item.product_name}
+                </Text>
+                <Text className="text-[10px] text-slate-400 mt-0.5">
+                  Qty: {item.quantity}
+                </Text>
+              </View>
+              <Text className="text-xs font-bold text-primary">
+                ₱{item.price}
               </Text>
             </View>
-            <Text className="text-xs font-bold text-primary">
-              ₱{item.price}
-            </Text>
-          </View>
-        ))}
+          );
+        })}
       </View>
     </ScrollView>
   );

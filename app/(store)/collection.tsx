@@ -199,6 +199,8 @@ export default function FavoritesPage() {
                 rating: productRating,
                 stock: productStock,
                 category: "",
+                // LOCAL / NATIONAL LABEL
+                scope: product.cooperative_scope,
                 isLiked: true,
               }}
               onPress={() => handleProductPress(product.slug)}
@@ -217,7 +219,7 @@ export default function FavoritesPage() {
             ? { justifyContent: "space-between" }
             : undefined
         }
-        contentContainerStyle={{ padding: 7, paddingBottom: 20 }}
+        contentContainerStyle={{ padding: 7, paddingBottom: 48 }}
         ListHeaderComponent={
           <>
             {loading && (

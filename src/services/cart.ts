@@ -20,6 +20,8 @@ export interface CartProduct {
   name: string;
   slug: string;
   seller: string;
+  cooperative_id?: number | null;
+  cooperative_scope?: "local" | "national";
 }
 
 export interface CartItem {

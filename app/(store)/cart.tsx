@@ -21,6 +21,20 @@ interface UIItems extends CartItem {
   selected: boolean;
 }
 
+// LOCAL / NATIONAL BADGE LOOK
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
+
 export default function CartPage() {
   const router = useRouter();
   const [cartItems, setCartItems] = useState<UIItems[]>([]);
@@ -164,6 +178,18 @@ export default function CartPage() {
     });
   };
 
+  const slugify = (text: string): string => {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/[\s_]+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "");
+  };
+
   if (loading) {
     return (
       <View className="flex-1 bg-slate-100 items-center justify-center">
@@ -230,6 +256,10 @@ export default function CartPage() {
                   ?.map((attr) => `${attr.name}: ${attr.value}`)
                   .join(" • ");
 
+                // LOCAL / NATIONAL LABEL
+                const scope = item.product?.cooperative_scope;
+                const badge = scope ? SCOPE_BADGE[scope] : null;
+
                 return (
                   <View
                     key={item.id}
@@ -246,43 +276,78 @@ export default function CartPage() {
                       />
                     </TouchableOpacity>
 
-                    <Image
-                      source={{
-                        uri: `http://192.168.1.120:8000${variantImage}`,
+                    <TouchableOpacity
+                      onPress={() => {
+                        const productSlug = slugify(item.product.name);
+                        router.push({
+                          pathname: "/products/[slug]",
+                          params: { slug: productSlug },
+                        });
                       }}
-                      style={{
-                        width: 85,
-                        height: 85,
-                        borderRadius: 12,
-                      }}
-                    />
+                    >
+                      <Image
+                        source={{
+                          uri: `http://192.168.1.120:8000${variantImage}`,
+                        }}
+                        style={{
+                          width: 85,
+                          height: 85,
+                          borderRadius: 12,
+                        }}
+                      />
+                    </TouchableOpacity>
 
                     <View className="flex-1 ml-3">
-                      <Text
-                        numberOfLines={2}
-                        className="font-medium text-slate-800"
+                      <TouchableOpacity
+                        onPress={() => {
+                          const productSlug = slugify(item.product.name);
+                          router.push({
+                            pathname: "/products/[slug]",
+                            params: { slug: productSlug },
+                          });
+                        }}
                       >
-                        {item.product.name}
-                      </Text>
+                        {badge && (
+                          <View
+                            className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
+                          >
+                            <Ionicons
+                              name={badge.icon}
+                              size={9}
+                              color="#ffffff"
+                            />
+                            <Text className="text-white text-[9px] font-bold ml-1">
+                              {badge.label}
+                            </Text>
+                          </View>
+                        )}
 
-                      {attributesString ? (
-                        <Text className="text-xs text-slate-500 mt-1">
-                          {attributesString}
+                        <Text
+                          numberOfLines={2}
+                          className="font-semibold text-primary"
+                        >
+                          {item.product.name}
                         </Text>
-                      ) : null}
 
-                      <View className="flex-row items-center mt-2">
-                        {item.variant.compare_price &&
-                        item.variant.compare_price > item.variant.price ? (
-                          <Text className="text-xs text-slate-400 line-through mr-2">
-                            ₱{item.variant.compare_price}
+                        {attributesString ? (
+                          <Text className="text-xs text-slate-500 mt-1">
+                            {attributesString}
                           </Text>
                         ) : null}
 
-                        <Text className="text-primary font-bold text-lg">
-                          ₱{item.variant.price}
-                        </Text>
-                      </View>
+                        <View className="flex-row items-center mt-2">
+                          {item.variant.compare_price &&
+                          item.variant.compare_price > item.variant.price ? (
+                            <Text className="text-xs text-slate-400 line-through mr-2">
+                              ₱{item.variant.compare_price}
+                            </Text>
+                          ) : null}
+
+                          <Text className="text-primary font-bold text-lg">
+                            ₱{item.variant.price}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
 
                       <View className="flex-row justify-between mt-3">
                         <TouchableOpacity

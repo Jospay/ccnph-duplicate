@@ -21,12 +21,24 @@ import {
   View,
 } from "react-native";
 
+// LOCAL / NATIONAL BADGE LOOK
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
+
 export default function Checkout() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const isFocused = useIsFocused(); // Tracks whether the screen is active/focused
-
-  console.log("🔍 [CHECKOUT MOUNT/UPDATE] Raw Route Params:", params);
 
   const mode = params.mode === "direct" ? "direct" : "cart";
   const rawCartItemIds = params.cart_item_ids;
@@ -83,10 +95,6 @@ export default function Checkout() {
   // Compute clean numeric array from route params if mode is cart
   const cartItemIds = useMemo<number[]>(() => {
     if (mode === "direct") return [];
-    if (!rawCartItemIds) {
-      console.log("⚠️ [PARSING] No rawCartItemIds found in parameters.");
-      return [];
-    }
 
     let parsed: number[] = [];
     if (Array.isArray(rawCartItemIds)) {
@@ -94,8 +102,6 @@ export default function Checkout() {
     } else {
       parsed = String(rawCartItemIds).split(",").map(Number).filter(Boolean);
     }
-
-    console.log("✅ [PARSING] Successfully parsed Item IDs array:", parsed);
     return parsed;
   }, [rawCartItemIds, mode]);
 
@@ -113,14 +119,7 @@ export default function Checkout() {
     // If the screen is hidden/blurred, stop processing execution.
     if (!isFocused) return;
 
-    console.log(
-      `🚀 [EFFECT TRIGGER] Screen Focused. Checking configs. Mode: ${mode}, Cart Items: ${cartItemIds.length}, Direct Variant: ${productVariantId}`,
-    );
-
     if (mode === "cart" && cartItemIds.length === 0) {
-      console.log(
-        "🛑 [EFFECT HALT] Blocking fetch, cartItemIds list is completely empty.",
-      );
       showAlert("Error", "No items selected for checkout.", () =>
         router.back(),
       );
@@ -128,9 +127,6 @@ export default function Checkout() {
     }
 
     if (mode === "direct" && !productVariantId) {
-      console.log(
-        "🛑 [EFFECT HALT] Blocking fetch, direct buy variant is missing.",
-      );
       showAlert("Error", "Invalid checkout options configuration.", () =>
         router.back(),
       );
@@ -143,22 +139,16 @@ export default function Checkout() {
         let response;
 
         if (mode === "direct" && productVariantId) {
-          console.log("📡 [API REQUEST] Dispatching direct fetch details...");
           response = await fetchCheckoutDetails({
             mode: "direct",
             product_variant_id: productVariantId,
             quantity: quantity,
           });
         } else {
-          console.log(
-            "📡 [API REQUEST] Dispatching cart array fetch details...",
-          );
           response = await fetchCheckoutDetails({
             cart_item_ids: cartItemIds,
           });
         }
-
-        console.log("📥 [API RESPONSE] Success status:", response.success);
 
         if (response.success) {
           const data = response.data;
@@ -247,10 +237,7 @@ export default function Checkout() {
         payload.cart_item_ids = cartItemIds;
       }
 
-      console.log("📤 [ORDER SUBMIT PAYLOAD]:", payload);
-
       const result = await placeOrderAPI(payload);
-      console.log("📥 [ORDER SUBMIT RESPONSE]:", result);
 
       if (result.success) {
         showAlert(
@@ -351,6 +338,10 @@ export default function Checkout() {
                   ? item.product.image
                   : `http://192.168.1.120:8000${item.product.image || ""}`;
 
+                // LOCAL / NATIONAL LABEL
+                const scope = item.product.cooperative_scope;
+                const badge = scope ? SCOPE_BADGE[scope] : null;
+
                 return (
                   <View key={item.id} className="flex-row mb-4">
                     <Image
@@ -359,9 +350,24 @@ export default function Checkout() {
                     />
 
                     <View className="flex-1 ml-3 justify-between">
+                      {badge && (
+                        <View
+                          className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
+                        >
+                          <Ionicons
+                            name={badge.icon}
+                            size={9}
+                            color="#ffffff"
+                          />
+                          <Text className="text-white text-[9px] font-bold ml-1">
+                            {badge.label}
+                          </Text>
+                        </View>
+                      )}
+
                       <Text
                         numberOfLines={2}
-                        className="font-medium text-slate-800"
+                        className="font-semibold text-primary"
                       >
                         {item.product.name}
                       </Text>

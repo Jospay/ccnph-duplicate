@@ -23,6 +23,8 @@ export interface CheckoutItem {
     name: string;
     slug: string;
     image: string | null;
+    cooperative_id?: number | null;
+    cooperative_scope?: "local" | "national";
     store: {
       name: string;
       slug: string;

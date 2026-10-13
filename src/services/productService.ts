@@ -1,5 +1,14 @@
 import api from "./api";
 
+export type CooperativeScopeType = "local" | "national";
+
+export interface ProductCooperative {
+  id: number;
+  name: string;
+  slug: string;
+  logo: string | null;
+}
+
 export interface Category {
   id: number | string;
   name: string;
@@ -22,7 +31,8 @@ export interface Product {
   stock: number;
   is_liked: boolean;
   cooperative_id?: number | null;
-  cooperative_scope?: "local" | "national";
+  cooperative_scope?: CooperativeScopeType | null;
+  cooperative_name?: string | null;
 }
 
 export interface Pagination {
@@ -86,6 +96,9 @@ export interface DetailedProduct {
   images: ProductImage[];
   video: string | null;
   variants: ProductVariant[];
+  cooperative_id?: number | null;
+  cooperative_scope?: CooperativeScopeType | null;
+  cooperative?: ProductCooperative | null;
   store: Store;
   is_liked?: boolean;
 }

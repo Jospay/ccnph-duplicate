@@ -1,3 +1,4 @@
+import { CustomAlert } from "@/components/CustomAlert";
 import {
   fetchOrdersAPI,
   OrderBadges,
@@ -10,7 +11,6 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Image,
   KeyboardAvoidingView,
@@ -33,6 +33,33 @@ const filterTabs = [
   { label: "Return/Refund", slug: "return_requested" },
   { label: "Cancelled", slug: "cancelled" },
 ];
+
+// LOCAL / NATIONAL BADGE LOOK
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
+
+// --- PRICE FORMATTER: adds thousands commas (1000 -> 1,000, 1000.50 -> 1,000.50) ---
+const formatPrice = (value: string | number | null | undefined): string => {
+  if (value === null || value === undefined || value === "") return "0";
+
+  const raw = String(value).replace(/,/g, "").trim();
+  const [whole, decimals] = raw.split(".");
+
+  if (!/^-?\d+$/.test(whole)) return String(value);
+
+  const withCommas = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decimals !== undefined ? `${withCommas}.${decimals}` : withCommas;
+};
 
 export default function OrderList() {
   const router = useRouter();
@@ -59,6 +86,46 @@ export default function OrderList() {
   );
   const [cancellationReason, setCancellationReason] = useState<string>("");
   const [cancelReasonError, setCancelReasonError] = useState<string>("");
+
+  // --- CUSTOM ALERT STATE ---
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+    confirmText?: string;
+    onConfirm?: () => void;
+    onClose: () => void;
+  }>({
+    visible: false,
+    title: "",
+    message: "",
+    onClose: () => hideAlert(),
+  });
+
+  const showAlert = (
+    title: string,
+    message: string,
+    onConfirm?: () => void,
+    confirmText = "Confirm",
+    customOnClose?: () => void,
+  ) => {
+    setAlertConfig({
+      visible: true,
+      title,
+      message,
+      onConfirm,
+      confirmText,
+      onClose: customOnClose || (() => hideAlert()),
+    });
+  };
+
+  const hideAlert = () => {
+    setAlertConfig((prev) => ({
+      ...prev,
+      visible: false,
+      onConfirm: undefined,
+    }));
+  };
 
   const getOrders = useCallback(
     async (
@@ -131,7 +198,7 @@ export default function OrderList() {
     setSelectedSlug(slug);
   };
 
-  // --- CANCEL ORDER: opens the reason modal instead of a plain Alert ---
+  // --- CANCEL ORDER: opens the reason modal ---
   const handleCancelOrder = (orderId: number) => {
     setCancellationReason("");
     setCancelReasonError("");
@@ -139,7 +206,7 @@ export default function OrderList() {
   };
 
   const closeCancelModal = () => {
-    if (actionLoadingId !== null) return; // don't allow closing mid-submit
+    if (actionLoadingId !== null) return;
     setCancelModalOrderId(null);
     setCancellationReason("");
     setCancelReasonError("");
@@ -161,15 +228,23 @@ export default function OrderList() {
       const response = await updateOrderStatusAPI(orderId, "cancelled", {
         cancellation_reason: trimmedReason,
       });
+
       if (response.success) {
         setCancelModalOrderId(null);
         setCancellationReason("");
         setCancelReasonError("");
-        Alert.alert(
+
+        // Success alert without onConfirm so it renders only the single 'Okay' button
+        showAlert(
           "Success",
           response.message || "Order successfully cancelled.",
+          undefined,
+          "Okay",
+          () => {
+            hideAlert();
+            handleTabChange("cancelled");
+          },
         );
-        handleTabChange("cancelled");
       } else {
         setCancelReasonError(response.message || "Failed to cancel order.");
       }
@@ -184,83 +259,84 @@ export default function OrderList() {
   };
 
   const handleOrderReceived = (orderId: number) => {
-    Alert.alert(
+    showAlert(
       "Order Received",
       "Have you received your items? This will update the order status to completed.",
-      [
-        { text: "Not Yet", style: "cancel" },
-        {
-          text: "Yes, Received",
-          onPress: async () => {
-            try {
-              setActionLoadingId(orderId);
-              const response = await updateOrderStatusAPI(orderId, "completed");
-              if (response.success) {
-                Alert.alert(
-                  "Success",
-                  response.message || "Order marked as received!",
-                );
+      async () => {
+        hideAlert();
+        try {
+          setActionLoadingId(orderId);
+          const response = await updateOrderStatusAPI(orderId, "completed");
+          if (response.success) {
+            showAlert(
+              "Success",
+              response.message || "Order marked as received!",
+              undefined,
+              "Okay",
+              () => {
+                hideAlert();
                 handleTabChange("completed");
-              } else {
-                Alert.alert(
-                  "Error",
-                  response.message || "Failed to update order status.",
-                );
-              }
-            } catch (error: any) {
-              Alert.alert(
-                "Error",
-                error?.response?.data?.message || "Something went wrong.",
-              );
-            } finally {
-              setActionLoadingId(null);
-            }
-          },
-        },
-      ],
+              },
+            );
+          } else {
+            showAlert(
+              "Error",
+              response.message || "Failed to update order status.",
+            );
+          }
+        } catch (error: any) {
+          showAlert(
+            "Error",
+            error?.response?.data?.message || "Something went wrong.",
+          );
+        } finally {
+          setActionLoadingId(null);
+        }
+      },
+      "Yes, Received",
     );
   };
 
   const handleRefundOrder = (orderId: number) => {
-    Alert.alert(
+    showAlert(
       "Request Refund / Return",
       "Are you sure you want to request a return or refund for this order?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Submit Request",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setActionLoadingId(orderId);
-              const response = await updateOrderStatusAPI(
-                orderId,
-                "return_requested",
-              );
-              if (response.success) {
-                Alert.alert(
-                  "Request Submitted",
-                  response.message ||
-                    "Your return request is now pending approval.",
-                );
+      async () => {
+        hideAlert();
+        try {
+          setActionLoadingId(orderId);
+          const response = await updateOrderStatusAPI(
+            orderId,
+            "return_requested",
+          );
+          if (response.success) {
+            showAlert(
+              "Request Submitted",
+              response.message ||
+                "Your return request is now pending approval.",
+              undefined,
+              "Okay",
+              () => {
+                hideAlert();
                 handleTabChange("return_requested");
-              } else {
-                Alert.alert(
-                  "Error",
-                  response.message || "Failed to submit return request.",
-                );
-              }
-            } catch (error: any) {
-              Alert.alert(
-                "Error",
-                error?.response?.data?.message || "Something went wrong.",
-              );
-            } finally {
-              setActionLoadingId(null);
-            }
-          },
-        },
-      ],
+              },
+            );
+          } else {
+            showAlert(
+              "Error",
+              response.message || "Failed to submit return request.",
+            );
+          }
+        } catch (error: any) {
+          showAlert(
+            "Error",
+            error?.response?.data?.message || "Something went wrong.",
+          );
+        } finally {
+          setActionLoadingId(null);
+        }
+      },
+      "Submit Request",
     );
   };
 
@@ -351,10 +427,8 @@ export default function OrderList() {
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
           renderItem={({ item }) => {
-            // Strictly check boolean value, handling true, 1, or "1" strings from API JSON
             const isRated =
               item.is_rated === true ||
-              // item.is_rated === 1 ||
               String(item.is_rated) === "true" ||
               String(item.is_rated) === "1";
 
@@ -386,95 +460,135 @@ export default function OrderList() {
                 </View>
 
                 {/* PRODUCTS */}
-                {item.items?.map((product, index) => (
-                  <View
-                    key={`${product.product_name}-${index}`}
-                    className="flex-row mb-3"
-                  >
-                    <Image
-                      source={{
-                        uri: `${product.product_image}`,
-                      }}
-                      style={{
-                        width: 75,
-                        height: 75,
-                        borderRadius: 12,
-                        backgroundColor: "#f1f5f9",
-                      }}
-                    />
-                    <View className="flex-1 ml-3 justify-between">
-                      <View>
-                        <Text
-                          numberOfLines={2}
-                          className="font-medium text-slate-800 text-md"
+                {item.items?.map((product, index) => {
+                  const scope = product.cooperative_scope;
+                  const badge = scope ? SCOPE_BADGE[scope] : null;
+
+                  return (
+                    <View
+                      key={`${product.product_name}-${index}`}
+                      className="flex-row mb-3"
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          const productSlug = slugify(product.product_name);
+                          router.push({
+                            pathname: "/products/[slug]",
+                            params: { slug: productSlug },
+                          });
+                        }}
+                      >
+                        <Image
+                          source={{
+                            uri: `${product.product_image}`,
+                          }}
+                          style={{
+                            width: 75,
+                            height: 75,
+                            borderRadius: 12,
+                            backgroundColor: "#f1f5f9",
+                          }}
+                        />
+                      </TouchableOpacity>
+
+                      <View className="flex-1 ml-3 justify-between">
+                        <TouchableOpacity
+                          onPress={() => {
+                            const productSlug = slugify(product.product_name);
+                            router.push({
+                              pathname: "/products/[slug]",
+                              params: { slug: productSlug },
+                            });
+                          }}
                         >
-                          {product.product_name}
-                        </Text>
-                        {product.variant_name ? (
-                          <View className="flex-row justify-between items-center mt-1">
-                            <Text className="text-[11px] text-slate-400 mt-0.5">
-                              {product.variant_name}
-                            </Text>
-                            <Text className="text-slate-400 text-xs">
-                              x{product.quantity}
-                            </Text>
-                          </View>
-                        ) : null}
-                      </View>
-                      <View className="mt-1">
-                        {/* BUY AGAIN BUTTON */}
-                        {[
-                          "cancelled",
-                          "return_requested",
-                          "return_approved",
-                          "returned",
-                        ].includes(item.status) || isCompletedAndRated ? (
-                          <View className="flex-row justify-between items-center">
-                            <TouchableOpacity
-                              onPress={() => {
-                                const productSlug = slugify(
-                                  product.product_name,
-                                );
-                                router.push({
-                                  pathname: "/products/[slug]",
-                                  params: { slug: productSlug },
-                                });
-                              }}
-                              className="bg-primary px-4 py-2 rounded-lg"
+                          <View>
+                            {badge && (
+                              <View
+                                className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
+                              >
+                                <Ionicons
+                                  name={badge.icon}
+                                  size={9}
+                                  color="#ffffff"
+                                />
+                                <Text className="text-white text-[9px] font-bold ml-1">
+                                  {badge.label}
+                                </Text>
+                              </View>
+                            )}
+
+                            <Text
+                              numberOfLines={2}
+                              className="font-semibold text-primary"
                             >
-                              <Text className="text-white text-xs font-semibold">
-                                Buy Again
+                              {product.product_name}
+                            </Text>
+                            {product.variant_name ? (
+                              <View className="flex-row justify-between items-center mt-1">
+                                <Text className="text-[11px] text-slate-400 mt-0.5">
+                                  {product.variant_name}
+                                </Text>
+                                <Text className="text-slate-400 text-xs">
+                                  x{product.quantity}
+                                </Text>
+                              </View>
+                            ) : null}
+                          </View>
+                        </TouchableOpacity>
+                        <View className="mt-1">
+                          {/* BUY AGAIN BUTTON */}
+                          {[
+                            "cancelled",
+                            "return_requested",
+                            "return_approved",
+                            "returned",
+                          ].includes(item.status) || isCompletedAndRated ? (
+                            <View className="flex-row justify-between items-center">
+                              <TouchableOpacity
+                                onPress={() => {
+                                  const productSlug = slugify(
+                                    product.product_name,
+                                  );
+                                  router.push({
+                                    pathname: "/products/[slug]",
+                                    params: { slug: productSlug },
+                                  });
+                                }}
+                                className="bg-primary px-4 py-2 rounded-lg"
+                              >
+                                <Text className="text-white text-xs font-semibold">
+                                  Buy Again
+                                </Text>
+                              </TouchableOpacity>
+                              <Text className="font-semibold text-slate-800">
+                                ₱{formatPrice(product.price)}
                               </Text>
-                            </TouchableOpacity>
-                            <Text className="font-semibold text-slate-800">
-                              ₱{product.price}
-                            </Text>
-                          </View>
-                        ) : (
-                          <View className="flex-row justify-end">
-                            <Text className="font-semibold text-slate-800">
-                              ₱{product.price}
-                            </Text>
-                          </View>
-                        )}
+                            </View>
+                          ) : (
+                            <View className="flex-row justify-end">
+                              <Text className="font-semibold text-slate-800">
+                                ₱{formatPrice(product.price)}
+                              </Text>
+                            </View>
+                          )}
+                        </View>
                       </View>
                     </View>
-                  </View>
-                ))}
+                  );
+                })}
 
                 {/* BILLING SECTION */}
                 <View className="pt-3 mt-1 border-t border-slate-100">
                   <View className="flex-row justify-end items-center gap-2">
                     <Text className="text-slate-500 text-sm">Order Total:</Text>
                     <Text className="font-bold text-base text-primary">
-                      ₱{item.total}
+                      ₱{formatPrice(item.total)}
                     </Text>
                   </View>
                 </View>
 
                 {/* DYNAMIC ACTION TRIGGERS */}
                 <View className="flex-row justify-end mt-4 gap-2 flex-wrap">
-                  {/* 1. Cancel Option */}
                   {item.status === "to-pay" && (
                     <TouchableOpacity
                       disabled={actionLoadingId === item.id}
@@ -494,7 +608,6 @@ export default function OrderList() {
                     </TouchableOpacity>
                   )}
 
-                  {/* 2. Order Received Option */}
                   {item.status === "delivered" && (
                     <TouchableOpacity
                       disabled={actionLoadingId === item.id}
@@ -514,7 +627,6 @@ export default function OrderList() {
                     </TouchableOpacity>
                   )}
 
-                  {/* 3. Refund / Return Option — hidden once completed order is already rated */}
                   {(item.status_label === "Delivered" ||
                     (item.status === "completed" && !isCompletedAndRated)) && (
                     <TouchableOpacity
@@ -535,7 +647,6 @@ export default function OrderList() {
                     </TouchableOpacity>
                   )}
 
-                  {/* 4. Return Requested Status Badge */}
                   {item.status === "return_requested" && (
                     <View className="border border-slate-300 px-4 py-2 rounded-lg bg-slate-50">
                       <Text className="text-xs text-slate-700 font-semibold">
@@ -544,7 +655,6 @@ export default function OrderList() {
                     </View>
                   )}
 
-                  {/* 5. Return Approved Status Badge */}
                   {item.status === "return_approved" && (
                     <View className="border border-slate-300 px-4 py-2 rounded-lg bg-slate-50">
                       <Text className="text-xs text-slate-700 font-semibold">
@@ -553,7 +663,6 @@ export default function OrderList() {
                     </View>
                   )}
 
-                  {/* 6. Returned / Completed Refund Status Badge */}
                   {item.status === "returned" && (
                     <View className="border border-slate-300 px-4 py-2 rounded-lg bg-slate-50">
                       <Text className="text-xs text-slate-700 font-semibold">
@@ -562,7 +671,6 @@ export default function OrderList() {
                     </View>
                   )}
 
-                  {/* 7. Rate Order Button — Strictly hidden when isCompletedAndRated is true */}
                   {item.status === "completed" && !isCompletedAndRated && (
                     <TouchableOpacity
                       onPress={() =>
@@ -579,7 +687,6 @@ export default function OrderList() {
                     </TouchableOpacity>
                   )}
 
-                  {/* TRACK ORDER BUTTON */}
                   {(item.status === "to-pay" ||
                     item.status === "to-ship" ||
                     item.status === "return_requested" ||
@@ -630,6 +737,8 @@ export default function OrderList() {
         visible={cancelModalOrderId !== null}
         transparent
         animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={closeCancelModal}
       >
         <KeyboardAvoidingView
@@ -691,13 +800,23 @@ export default function OrderList() {
                   />
                 ) : null}
                 <Text className="text-white text-sm font-semibold">
-                  Yes, Cancel Order
+                  Yes, Cancel Order.
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* CUSTOM ALERT COMPONENT */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={alertConfig.onClose}
+        onConfirm={alertConfig.onConfirm}
+        confirmText={alertConfig.confirmText}
+      />
     </View>
   );
 }

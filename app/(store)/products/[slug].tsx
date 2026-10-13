@@ -2,6 +2,7 @@ import { CustomAlert } from "@/components/CustomAlert";
 import { ProductCard } from "@/components/ProductItems";
 import { addToCart, getCart } from "@/services/cart";
 import {
+  CooperativeScopeType,
   DetailedProduct,
   fetchProductReviewsAPI,
   getProductShow,
@@ -34,6 +35,33 @@ import UserProfile from "../../../assets/images/UserProfile.jpg";
 type ActionType = "cart" | "buy_now" | null;
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+// Scope badge look-up (local vs national)
+const SCOPE_META: Record<
+  CooperativeScopeType,
+  {
+    label: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    iconColor: string;
+    bgClass: string;
+    textClass: string;
+  }
+> = {
+  local: {
+    label: "Local",
+    icon: "location-outline",
+    iconColor: "#15803d",
+    bgClass: "bg-green-100",
+    textClass: "text-green-700",
+  },
+  national: {
+    label: "National",
+    icon: "globe-outline",
+    iconColor: "#0052cc",
+    bgClass: "bg-blue",
+    textClass: "text-primary",
+  },
+};
 
 export default function Products() {
   const router = useRouter();
@@ -725,6 +753,36 @@ const GallerySection = ({
   </View>
 );
 
+/**
+ * Local / National badge + cooperative name chip
+ */
+const CooperativeBadges = ({ product }: { product: DetailedProduct }) => {
+  const scope = product.cooperative_scope;
+  const scopeMeta = scope ? SCOPE_META[scope] : null;
+  const coopName = product.cooperative?.name;
+
+  if (!scopeMeta && !coopName) return null;
+
+  return (
+    <View className="flex-row items-center flex-wrap gap-2 mb-2">
+      {scopeMeta && (
+        <View
+          className={`flex-row items-center px-3 py-1 rounded-full ${scopeMeta.bgClass}`}
+        >
+          <Ionicons
+            name={scopeMeta.icon}
+            size={14}
+            color={scopeMeta.iconColor}
+          />
+          <Text className={`ml-1 text-xs font-semibold ${scopeMeta.textClass}`}>
+            {scopeMeta.label}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
 const ProductInfoSection = ({
   product,
   displayPrice,
@@ -791,6 +849,9 @@ const ProductInfoSection = ({
           <Text className="text-slate-500">Stock: {currentStock}</Text>
         </View>
       </View>
+
+      {/* LOCAL / NATIONAL + COOPERATIVE NAME */}
+      <CooperativeBadges product={product} />
 
       <Text className="text-2xl font-semibold text-primary">
         {product.name}
@@ -880,106 +941,122 @@ const ProductInfoSection = ({
   );
 };
 
-const MerchantPartnerSection = ({ product, router }: any) => (
-  <View className="px-3 pb-4">
-    <View className="border-2 border-blue rounded-xl p-4">
-      <View className="flex-row justify-between items-center">
-        <View className="flex-row items-center flex-1">
-          <View
-            style={{
-              position: "relative",
-              width: 45,
-              height: 45,
-              alignItems: "center",
+const MerchantPartnerSection = ({ product, router }: any) => {
+  const scope: CooperativeScopeType | null | undefined =
+    product.cooperative_scope;
+
+  return (
+    <View className="px-3 pb-4">
+      <View className="border-2 border-blue rounded-xl p-4">
+        <View className="flex-row justify-between items-center">
+          <View className="flex-row items-center flex-1">
+            <View
+              style={{
+                position: "relative",
+                width: 45,
+                height: 45,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={
+                  product.store.logo ? { uri: product.store.logo } : UserProfile
+                }
+                style={{ width: 45, height: 45, borderRadius: 100 }}
+              />
+
+              {product.store.is_official && (
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: -4,
+                    alignSelf: "center",
+                    backgroundColor: "#D70127",
+                    borderRadius: 3,
+                    paddingHorizontal: 6,
+                    paddingVertical: 1,
+                  }}
+                  className="w-full"
+                >
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      textAlign: "center",
+                    }}
+                  >
+                    Mall
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <View className="flex-1 ml-2 mr-3" style={{ minWidth: 0 }}>
+              <Text
+                className="text-primary text-xl font-semibold"
+                style={{ lineHeight: 24 }}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {product.store.name}
+              </Text>
+
+              <Text className="text-xs mt-1 text-slate-500" numberOfLines={1}>
+                {product.store?.description}
+              </Text>
+
+              {/* COOPERATIVE FROM SELLER */}
+              {product.cooperative?.name && (
+                <View className="flex-row items-center mt-1">
+                  {product.cooperative.logo ? (
+                    <Image
+                      source={{ uri: product.cooperative.logo }}
+                      style={{ width: 16, height: 16, borderRadius: 8 }}
+                    />
+                  ) : (
+                    <Ionicons
+                      name={
+                        scope === "national"
+                          ? "globe-outline"
+                          : "location-outline"
+                      }
+                      size={14}
+                      color="#0052cc"
+                    />
+                  )}
+                  <Text
+                    className="ml-1.5 text-xs text-primary font-medium flex-1"
+                    numberOfLines={1}
+                  >
+                    {product.cooperative.name}
+                    {scope
+                      ? ` • ${scope === "national" ? "National" : "Local"}`
+                      : ""}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => {
+              if (!product.store?.slug) return;
+              router.push({
+                pathname: "/store/[slug]",
+                params: { slug: product.store.slug },
+              });
             }}
           >
-            <Image
-              source={
-                product.store.logo ? { uri: product.store.logo } : UserProfile
-              }
-              style={{ width: 45, height: 45, borderRadius: 100 }}
-            />
-
-            {product.store.is_official && (
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: -4,
-                  alignSelf: "center",
-                  backgroundColor: "#D70127",
-                  borderRadius: 3,
-                  paddingHorizontal: 6,
-                  paddingVertical: 1,
-                }}
-                className="w-full"
-              >
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontWeight: "bold",
-                    color: "#FFFFFF",
-                    textAlign: "center",
-                  }}
-                >
-                  Mall
-                </Text>
-              </View>
-            )}
-          </View>
-
-          <View className="flex-1 ml-2 mr-3" style={{ minWidth: 0 }}>
-            <Text
-              className="text-primary text-xl font-semibold"
-              style={{ lineHeight: 24 }}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {product.store.name}
-            </Text>
-
-            <Text className="text-xs mt-1 text-slate-500" numberOfLines={1}>
-              {product.store?.description}
-            </Text>
-          </View>
+            <View className="bg-blue py-1 px-5 border border-primary rounded-lg">
+              <Text className="text-primary font-semibold">Visit</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          onPress={() => {
-            if (!product.store?.slug) return;
-            router.push({
-              pathname: "/store/[slug]",
-              params: { slug: product.store.slug },
-            });
-          }}
-        >
-          <View className="bg-blue py-1 px-5 border border-primary rounded-lg">
-            <Text className="text-primary font-semibold">Visit</Text>
-          </View>
-        </TouchableOpacity>
       </View>
-      {/* <View className="flex-row justify-between mt-4">
-        <View>
-          <Text className="text-center font-semibold">
-            {product.store?.rating ?? 0}
-          </Text>
-          <Text className="text-center text-xs text-slate-500">Rating</Text>
-        </View>
-        <View>
-          <Text className="text-center font-semibold">Official</Text>
-          <Text className="text-center text-xs text-slate-500">
-            Store Status
-          </Text>
-        </View>
-        <View>
-          <Text className="text-center font-semibold">100%</Text>
-          <Text className="text-center text-xs text-slate-500">
-            Chat Response
-          </Text>
-        </View>
-      </View> */}
     </View>
-  </View>
-);
+  );
+};
 
 const VariantPickerModal = ({
   modal,

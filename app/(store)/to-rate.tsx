@@ -17,17 +17,29 @@ import {
   Image,
   Modal,
   Platform,
+  Pressable,
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+// --- LOCAL / NATIONAL BADGE LOOK ---
+const SCOPE_BADGE = {
+  local: {
+    label: "Local",
+    icon: "location" as const,
+    bg: "bg-emerald-600",
+  },
+  national: {
+    label: "National",
+    icon: "globe" as const,
+    bg: "bg-[#3E4093]",
+  },
+};
 
 // --- SEPARATE VIDEO PLAYER COMPONENT ---
 function ReviewVideoPlayer({ videoUrl }: { videoUrl: string }) {
@@ -71,10 +83,18 @@ export default function ToRateScreen() {
   const isFeedbackModalVisible = selectedFeedbackItems.length > 0;
   const isImageModalVisible = !!selectedImageUri;
 
-  // Used to pad the bottom sheet's content below the actual bottom edge —
-  // that's the fix for the gap: the sheet needs breathing room that
-  // accounts for the phone's gesture/nav bar or home indicator, same
-  // pattern as the addresses screen's Save button bar.
+  const slugify = (text: string): string => {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/[\s_]+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "");
+  };
+
   const insets = useSafeAreaInsets();
 
   const closeFeedbackModal = () => {
@@ -173,36 +193,65 @@ export default function ToRateScreen() {
         </View>
 
         {/* Items list preview */}
-        {item.items.map((prod, index) => (
-          <View key={prod.id || index} className="flex-row mb-3">
-            <Image
-              source={{
-                uri: prod.product_image || "https://via.placeholder.com/100",
+        {item.items.map((prod, index) => {
+          const badge = prod.cooperative_scope
+            ? SCOPE_BADGE[prod.cooperative_scope]
+            : null;
+
+          return (
+            <TouchableOpacity
+              key={prod.id || index}
+              onPress={() => {
+                const productSlug = slugify(prod.product_name);
+                router.push({
+                  pathname: "/products/[slug]",
+                  params: { slug: productSlug },
+                });
               }}
-              className="w-16 h-16 rounded-xl bg-slate-100"
-              resizeMode="cover"
-            />
-            <View className="flex-1 ml-3 justify-center">
-              <Text
-                className="font-semibold text-slate-800 text-sm"
-                numberOfLines={1}
-              >
-                {prod.product_name}
-              </Text>
-              {prod.variant_name && (
-                <Text className="text-xs text-slate-400 mt-0.5">
-                  Variation: {prod.variant_name}
+              className="flex-row mb-3"
+            >
+              <Image
+                source={{
+                  uri: prod.product_image || "https://via.placeholder.com/100",
+                }}
+                className="w-16 h-16 rounded-xl bg-slate-100"
+                resizeMode="cover"
+              />
+              <View className="flex-1 ml-3 justify-center">
+                {badge && (
+                  <View
+                    className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
+                  >
+                    <Ionicons name={badge.icon} size={9} color="#ffffff" />
+                    <Text className="text-white text-[9px] font-bold ml-1">
+                      {badge.label}
+                    </Text>
+                  </View>
+                )}
+
+                <Text
+                  className="font-semibold text-slate-800 text-sm"
+                  numberOfLines={1}
+                >
+                  {prod.product_name}
                 </Text>
-              )}
-              <View className="flex-row justify-between items-center mt-2">
-                <Text className="text-xs font-bold text-slate-700">
-                  ₱{Number(prod.price).toLocaleString()}
-                </Text>
-                <Text className="text-xs text-slate-400">x{prod.quantity}</Text>
+                {prod.variant_name && (
+                  <Text className="text-xs text-slate-400 mt-0.5">
+                    Variation: {prod.variant_name}
+                  </Text>
+                )}
+                <View className="flex-row justify-between items-center mt-2">
+                  <Text className="text-xs font-bold text-slate-700">
+                    ₱{Number(prod.price).toLocaleString()}
+                  </Text>
+                  <Text className="text-xs text-slate-400">
+                    x{prod.quantity}
+                  </Text>
+                </View>
               </View>
-            </View>
-          </View>
-        ))}
+            </TouchableOpacity>
+          );
+        })}
 
         {/* Total & Actions Footer */}
         <View className="flex-row justify-between items-center pt-3 mt-1 border-t border-slate-100">
@@ -339,153 +388,176 @@ export default function ToRateScreen() {
         onRequestClose={closeFeedbackModal}
         statusBarTranslucent={Platform.OS === "android"}
       >
-        <TouchableWithoutFeedback onPress={closeFeedbackModal}>
-          <View className="flex-1 bg-black/50 justify-end">
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <SafeAreaView
-                edges={["bottom"]}
-                className="bg-white rounded-t-3xl max-h-[85%]"
+        <View className="flex-1 bg-black/50 justify-end">
+          {/* Backdrop: tap outside the sheet to close */}
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={closeFeedbackModal}
+          />
+
+          {/* Bottom sheet with a FIXED height so the ScrollView can scroll */}
+          <View
+            className="bg-white rounded-t-3xl overflow-hidden"
+            style={{ height: "80%" }}
+          >
+            {/* Modal Drag Handle & Header */}
+            <View className="p-4 border-b border-slate-100 flex-row justify-between items-center">
+              <View className="flex-row items-center">
+                <Ionicons name="star" size={20} color="#EAB308" />
+                <Text className="text-base font-bold text-slate-800 ml-2">
+                  Your Submitted Feedback
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={closeFeedbackModal}
+                className="p-1 rounded-full bg-slate-100"
               >
-                {/* Modal Drag Handle & Header */}
-                <View className="p-4 border-b border-slate-100 flex-row justify-between items-center">
-                  <View className="flex-row items-center">
-                    <Ionicons name="star" size={20} color="#EAB308" />
-                    <Text className="text-base font-bold text-slate-800 ml-2">
-                      Your Submitted Feedback
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    onPress={closeFeedbackModal}
-                    className="p-1 rounded-full bg-slate-100"
+                <Ionicons name="close" size={20} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Modal Body (scrollable) */}
+            <ScrollView
+              style={{ flex: 1 }}
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled
+              bounces
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{
+                padding: 16,
+                paddingBottom: insets.bottom + 20,
+              }}
+            >
+              {selectedFeedbackItems.map((item, index) => {
+                const review = item.review;
+                const badge = item.cooperative_scope
+                  ? SCOPE_BADGE[item.cooperative_scope]
+                  : null;
+
+                return (
+                  <View
+                    key={item.order_item_id || index}
+                    className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100"
                   >
-                    <Ionicons name="close" size={20} color="#64748B" />
-                  </TouchableOpacity>
-                </View>
-
-                {/* Modal Body */}
-                <ScrollView
-                  className="p-4"
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
-                >
-                  {selectedFeedbackItems.map((item, index) => {
-                    const review = item.review;
-
-                    return (
-                      <View
-                        key={item.order_item_id || index}
-                        className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100"
-                      >
-                        {/* Product info */}
-                        <View className="flex-row items-center mb-3">
-                          <Image
-                            source={{
-                              uri:
-                                item.product_image ||
-                                "https://via.placeholder.com/100",
-                            }}
-                            className="w-12 h-12 rounded-xl bg-slate-200"
-                          />
-                          <View className="ml-3 flex-1">
-                            <Text
-                              className="font-bold text-slate-800 text-sm"
-                              numberOfLines={1}
-                            >
-                              {item.product_name}
+                    {/* Product info */}
+                    <View className="flex-row items-center mb-3">
+                      <Image
+                        source={{
+                          uri:
+                            item.product_image ||
+                            "https://via.placeholder.com/100",
+                        }}
+                        className="w-12 h-12 rounded-xl bg-slate-200"
+                      />
+                      <View className="ml-3 flex-1">
+                        {badge && (
+                          <View
+                            className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
+                          >
+                            <Ionicons
+                              name={badge.icon}
+                              size={9}
+                              color="#ffffff"
+                            />
+                            <Text className="text-white text-[9px] font-bold ml-1">
+                              {badge.label}
                             </Text>
-                            {item.variant_name && (
-                              <Text className="text-xs text-slate-400">
-                                {item.variant_name}
-                              </Text>
-                            )}
                           </View>
-                        </View>
-
-                        {/* Rating stars & date */}
-                        {review ? (
-                          <>
-                            <View className="flex-row justify-between items-center mb-2">
-                              <View className="flex-row items-center space-x-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <Ionicons
-                                    key={star}
-                                    name={
-                                      star <= review.rating
-                                        ? "star"
-                                        : "star-outline"
-                                    }
-                                    size={16}
-                                    color={
-                                      star <= review.rating
-                                        ? "#EAB308"
-                                        : "#CBD5E1"
-                                    }
-                                  />
-                                ))}
-                                <Text className="text-xs font-bold text-slate-700 ml-1.5">
-                                  {review.rating}.0
-                                </Text>
-                              </View>
-                              <Text className="text-[11px] text-slate-400">
-                                {review.created_at}
-                              </Text>
-                            </View>
-
-                            {/* Comment */}
-                            {review.comment ? (
-                              <Text className="text-slate-700 text-xs leading-5 bg-white p-3 rounded-xl border border-slate-100 mb-3">
-                                {review.comment}
-                              </Text>
-                            ) : null}
-
-                            {/* Video */}
-                            {review.video_url ? (
-                              <ReviewVideoPlayer videoUrl={review.video_url} />
-                            ) : null}
-
-                            {/* Images */}
-                            {review.images && review.images.length > 0 && (
-                              <View className="mt-1">
-                                <Text className="text-[11px] font-semibold text-slate-400 mb-1.5">
-                                  Photos:
-                                </Text>
-                                <ScrollView
-                                  horizontal
-                                  showsHorizontalScrollIndicator={false}
-                                  className="flex-row"
-                                >
-                                  {review.images.map((imgUri, imgIdx) => (
-                                    <TouchableOpacity
-                                      key={imgIdx}
-                                      onPress={() =>
-                                        setSelectedImageUri(imgUri)
-                                      }
-                                      className="mr-2"
-                                    >
-                                      <Image
-                                        source={{ uri: imgUri }}
-                                        className="w-20 h-20 rounded-xl bg-slate-200"
-                                        resizeMode="cover"
-                                      />
-                                    </TouchableOpacity>
-                                  ))}
-                                </ScrollView>
-                              </View>
-                            )}
-                          </>
-                        ) : (
-                          <Text className="text-xs italic text-slate-400">
-                            No review details available.
+                        )}
+                        <Text
+                          className="font-bold text-slate-800 text-sm"
+                          numberOfLines={1}
+                        >
+                          {item.product_name}
+                        </Text>
+                        {item.variant_name && (
+                          <Text className="text-xs text-slate-400">
+                            {item.variant_name}
                           </Text>
                         )}
                       </View>
-                    );
-                  })}
-                </ScrollView>
-              </SafeAreaView>
-            </TouchableWithoutFeedback>
+                    </View>
+
+                    {/* Rating stars & date */}
+                    {review ? (
+                      <>
+                        <View className="flex-row justify-between items-center mb-2">
+                          <View className="flex-row items-center space-x-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Ionicons
+                                key={star}
+                                name={
+                                  star <= review.rating
+                                    ? "star"
+                                    : "star-outline"
+                                }
+                                size={16}
+                                color={
+                                  star <= review.rating ? "#EAB308" : "#CBD5E1"
+                                }
+                              />
+                            ))}
+                            <Text className="text-xs font-bold text-slate-700 ml-1.5">
+                              {review.rating}.0
+                            </Text>
+                          </View>
+                          <Text className="text-[11px] text-slate-400">
+                            {review.created_at}
+                          </Text>
+                        </View>
+
+                        {/* Comment */}
+                        {review.comment ? (
+                          <Text className="text-slate-700 text-xs leading-5 bg-white p-3 rounded-xl border border-slate-100 mb-3">
+                            {review.comment}
+                          </Text>
+                        ) : null}
+
+                        {/* Video */}
+                        {review.video_url ? (
+                          <ReviewVideoPlayer videoUrl={review.video_url} />
+                        ) : null}
+
+                        {/* Images */}
+                        {review.images && review.images.length > 0 && (
+                          <View className="mt-1">
+                            <Text className="text-[11px] font-semibold text-slate-400 mb-1.5">
+                              Photos:
+                            </Text>
+                            <ScrollView
+                              horizontal
+                              showsHorizontalScrollIndicator={false}
+                              nestedScrollEnabled
+                              className="flex-row"
+                            >
+                              {review.images.map((imgUri, imgIdx) => (
+                                <TouchableOpacity
+                                  key={imgIdx}
+                                  onPress={() => setSelectedImageUri(imgUri)}
+                                  className="mr-2"
+                                >
+                                  <Image
+                                    source={{ uri: imgUri }}
+                                    className="w-20 h-20 rounded-xl bg-slate-200"
+                                    resizeMode="cover"
+                                  />
+                                </TouchableOpacity>
+                              ))}
+                            </ScrollView>
+                          </View>
+                        )}
+                      </>
+                    ) : (
+                      <Text className="text-xs italic text-slate-400">
+                        No review details available.
+                      </Text>
+                    )}
+                  </View>
+                );
+              })}
+            </ScrollView>
           </View>
-        </TouchableWithoutFeedback>
+        </View>
       </Modal>
 
       {/* FULL-SCREEN IMAGE PREVIEW MODAL */}
