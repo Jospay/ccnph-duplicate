@@ -479,7 +479,7 @@ export default function DashboardPage() {
               </View>
               <View className="flex-row gap-3">
                 <TouchableOpacity
-                  onPress={() => router.push("/(load)")}
+                  onPress={() => router.push("/(load-wallet)")}
                   // onPress={handleComingSoon}
                   className="bg-white h-10 w-10 flex justify-center items-center rounded-lg"
                 >

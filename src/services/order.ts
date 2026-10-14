@@ -117,6 +117,7 @@ export interface ReviewData {
   video_url: string | null;
   is_anonymous: boolean;
   images: string[];
+  created_at: string;
 }
 
 export interface RateItem {

@@ -162,6 +162,7 @@ export interface ShopDetails {
   is_official: boolean;
   followers_count: number;
   is_followed: boolean;
+  cooperative?: ProductCooperative | null;
   created_at: string;
 }
 
@@ -176,6 +177,9 @@ export interface ShopProduct {
   compare_price: string | number | null;
   stock: number;
   is_liked: boolean;
+  cooperative_id?: number | null;
+  cooperative_scope?: CooperativeScopeType | null;
+  cooperative_name?: string | null;
 }
 
 export interface ShopPagination {

@@ -125,7 +125,7 @@ export default function WalletPage() {
     setIsProcessing(true);
 
     router.push({
-      pathname: "/(load)/checkout",
+      pathname: "/(load-wallet)/checkout",
       params: {
         amount: cleanAmount.toString(),
         type: "wallet_load",

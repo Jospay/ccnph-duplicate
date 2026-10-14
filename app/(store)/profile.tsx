@@ -1,9 +1,15 @@
+import { CustomAlert } from "@/components/CustomAlert";
+import echo from "@/services/echo";
 import { fetchOrdersAPI } from "@/services/order";
+import {
+  getPointBalance,
+  updatePointVisibility,
+} from "@/services/pointService";
 import { profileService } from "@/services/profileService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -54,12 +60,21 @@ export default function BuyerProfile() {
   // Component State
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<BuyerUserData | null>(null);
+  const [points, setPoints] = useState<string>("0.00");
+  const [showPoints, setShowPoints] = useState(false);
+  const [tamperAlert, setTamperAlert] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
   const [orderBadges, setOrderBadges] = useState({
     toPay: 0,
     toShip: 0,
     toReceive: 0,
     toRate: 0,
   });
+
+  const isToggling = useRef(false);
 
   // Fetch profile and badge counts automatically whenever screen comes into focus
   useFocusEffect(
@@ -73,6 +88,27 @@ export default function BuyerProfile() {
           if (isMounted) {
             setUser(profile);
             setUserData(profile);
+          }
+
+          // Load points balance (don't let a failure block the profile)
+          try {
+            const pointRes = await getPointBalance();
+            if (isMounted) {
+              setPoints(pointRes.data.balance);
+              setShowPoints(Boolean(pointRes.data.show));
+
+              if (pointRes.data.is_tampered) {
+                setTamperAlert({
+                  visible: true,
+                  title: "Security Notice",
+                  message:
+                    pointRes.data.message ||
+                    "Your points balance integrity check failed. Please contact chat support for assistance.",
+                });
+              }
+            }
+          } catch (e) {
+            console.log("Failed to load points", e);
           }
 
           // Load order badges
@@ -102,6 +138,40 @@ export default function BuyerProfile() {
       };
     }, []),
   );
+
+  // Realtime points balance (backend broadcasts PointBalanceUpdated on point.{user_id})
+  useEffect(() => {
+    if (!userData?.id || !echo) return;
+
+    const channelName = `point.${userData.id}`;
+    const channel = echo.private(channelName);
+
+    channel.listen(".point.balance.updated", (e: any) => {
+      setPoints(String(e.balance));
+    });
+
+    return () => {
+      if (echo) echo.leave(channelName);
+    };
+  }, [userData?.id]);
+
+  const handleTogglePoints = async () => {
+    if (isToggling.current) return; // ignore double taps
+    isToggling.current = true;
+
+    const previous = showPoints;
+    setShowPoints(!previous); // optimistic
+
+    try {
+      const res = await updatePointVisibility();
+      // Server is the source of truth, so what's saved matches what's displayed
+      setShowPoints(Boolean(res?.data?.show));
+    } catch {
+      setShowPoints(previous);
+    } finally {
+      isToggling.current = false;
+    }
+  };
 
   // Structural evaluation flags matching profile rule sets
   const userTypeName = userData?.user_type?.name?.toUpperCase() || "";
@@ -195,11 +265,46 @@ export default function BuyerProfile() {
           </View>
         </View>
 
-        {/* TRACKING ORDER STATES LAYER */}
+        {/* POINTS BALANCE CARD */}
         <View
-          className="mx-4 bg-white rounded-3xl p-4 border border-slate-100 shadow-sm"
+          className="mx-4 bg-white rounded-3xl p-4 border border-slate-100 shadow-sm flex-row justify-between items-center"
           style={{ marginTop: -20, zIndex: 10 }}
         >
+          <View>
+            <Text className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+              My Points
+            </Text>
+            <View className="flex-row items-center gap-3 mt-1">
+              <Text className="text-primary text-2xl font-bold">
+                {showPoints
+                  ? Number(points).toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  : "**.**"}{" "}
+                <Text className="text-sm font-medium text-slate-500">pts</Text>
+              </Text>
+              <TouchableOpacity onPress={handleTogglePoints}>
+                <Ionicons
+                  name={showPoints ? "eye-off" : "eye"}
+                  size={22}
+                  color="#3E4093"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push("/load-point")}
+            className="bg-primary h-10 w-10 rounded-lg items-center justify-center"
+          >
+            <Ionicons name="add" size={26} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* TRACKING ORDER STATES LAYER */}
+        <View className="mx-4 mt-4 bg-white rounded-3xl p-4 border border-slate-100 shadow-sm">
           <View className="flex-row justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <Text className="font-bold text-primary text-base tracking-tight">
               My Purchases
@@ -277,7 +382,7 @@ export default function BuyerProfile() {
             {/* TO RATE SELECTION */}
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => router.push("/to-rate")} // <-- Direct routing here
+              onPress={() => router.push("/to-rate")}
               className="items-center justify-center w-16 relative"
             >
               <Ionicons name="star-outline" size={24} color="#3E4093" />
@@ -365,6 +470,14 @@ export default function BuyerProfile() {
           </TouchableOpacity>
         )}
       </View>
+
+      {/* TAMPER DETECTED CUSTOM ALERT */}
+      <CustomAlert
+        visible={tamperAlert.visible}
+        title={tamperAlert.title}
+        message={tamperAlert.message}
+        onClose={() => setTamperAlert((prev) => ({ ...prev, visible: false }))}
+      />
     </View>
   );
 }

@@ -41,7 +41,9 @@ const SCOPE_BADGE = {
   },
 };
 
-// --- SEPARATE VIDEO PLAYER COMPONENT ---
+{
+  /* --- SEPARATE VIDEO PLAYER COMPONENT --- */
+}
 function ReviewVideoPlayer({ videoUrl }: { videoUrl: string }) {
   const player = useVideoPlayer(videoUrl, (player) => {
     player.loop = false;
@@ -52,12 +54,26 @@ function ReviewVideoPlayer({ videoUrl }: { videoUrl: string }) {
       <Text className="text-[11px] font-semibold text-slate-400 mb-1.5">
         Video:
       </Text>
-      <View className="w-full h-48 rounded-xl overflow-hidden bg-black">
+
+      <View
+        style={{
+          width: "100%",
+          height: 192,
+          borderRadius: 12,
+          overflow: "hidden",
+          backgroundColor: "#000",
+        }}
+      >
         <VideoView
-          style={{ width: "100%", height: "100%" }}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
           player={player}
-          allowsFullscreen
-          allowsPictureInPicture
+          contentFit="contain"
+          nativeControls
+          allowsPictureInPicture={false}
+          surfaceType="textureView"
         />
       </View>
     </View>
@@ -436,8 +452,8 @@ export default function ToRateScreen() {
 
                 return (
                   <View
-                    key={item.order_item_id || index}
-                    className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100"
+                    key={index}
+                    className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200"
                   >
                     {/* Product info */}
                     <View className="flex-row items-center mb-3">
@@ -563,8 +579,9 @@ export default function ToRateScreen() {
       {/* FULL-SCREEN IMAGE PREVIEW MODAL */}
       <Modal
         visible={isImageModalVisible}
-        transparent={true}
+        transparent
         animationType="fade"
+        statusBarTranslucent
         onRequestClose={closeImageModal}
       >
         <View className="flex-1 bg-black justify-center items-center">

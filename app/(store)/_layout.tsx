@@ -44,8 +44,8 @@ function NavigationBarWrapper({ children }: { children: React.ReactNode }) {
       try {
         await NavigationBar.setVisibilityAsync("visible");
         await NavigationBar.setButtonStyleAsync("dark");
-      } catch (error) {
-        console.log("NavigationBar setup error:", error);
+      } catch {
+        // console.log("NavigationBar setup error:", error);
       }
     };
 
@@ -112,11 +112,8 @@ export default function RootLayout() {
         const id = rawData?.id || res.data?.id || res.data?.user?.id;
 
         if (id) {
-          console.log("✅ Store layout User ID fetched for notifications:", id);
           setUserId(id);
           fetchUnreadCount();
-        } else {
-          console.log("⚠️ Could not find User ID in response:", res.data);
         }
       })
       .catch((err) =>
@@ -158,22 +155,11 @@ export default function RootLayout() {
     const channelName = `App.Models.User.${userId}`;
     const channel = echo.private(channelName);
 
-    channel.subscribed(() => {
-      console.log(
-        `✅ Subscribed to global store notification channel: ${channelName}`,
-      );
-    });
-
     channel.notification((notificationData: any) => {
-      console.log("🔔 New Shop Notification Received:", notificationData);
-
       setUnreadCount((prev) => prev + 1);
 
       // Don't show the toast if the user is already inside a chat screen
       if (isChatSellerRef.current) {
-        console.log(
-          "🔕 User is currently in the seller chat screen, ignoring toast.",
-        );
         return;
       }
 
@@ -192,7 +178,6 @@ export default function RootLayout() {
     return () => {
       if (echo) {
         echo.leave(channelName);
-        console.log(`👋 Left store notification channel: ${channelName}`);
       }
     };
   }, [userId]);

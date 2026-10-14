@@ -270,7 +270,7 @@ export default function CheckoutPage() {
         setNavigating(true);
 
         router.push({
-          pathname: "/(load)/load-qrph",
+          pathname: "/(load-wallet)/load-qrph",
           params: {
             qrUrl: String(qr),
             paymentIntentId: String(paymentIntentId),
@@ -395,7 +395,7 @@ export default function CheckoutPage() {
         startInLoadingState
         onNavigationStateChange={(nav) => {
           if (nav.url.includes("payment/success")) {
-            router.replace("/(load)/payment-success");
+            router.replace("/(load-wallet)/payment-success");
           }
         }}
       />
