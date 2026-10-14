@@ -452,6 +452,55 @@ export default function Store() {
                   </TouchableOpacity>
                 </View>
 
+                {/* COOPERATIVE PROFILE */}
+                {storeDetails.cooperative && (
+                  <View
+                    className={`flex-row items-center mt-4 p-3 rounded-2xl border ${
+                      storeDetails.banner
+                        ? "bg-white/15 border-white/40"
+                        : "bg-slate-50 border-slate-200"
+                    }`}
+                  >
+                    {storeDetails.cooperative.logo ? (
+                      <Image
+                        source={{ uri: storeDetails.cooperative.logo }}
+                        style={{
+                          width: 36,
+                          height: 36,
+                        }}
+                        resizeMode="contain"
+                      />
+                    ) : (
+                      <View className="w-9 h-9 rounded-full bg-blue items-center justify-center">
+                        <Ionicons
+                          name="people-outline"
+                          size={18}
+                          color="#0052cc"
+                        />
+                      </View>
+                    )}
+
+                    <View className="ml-3 flex-1">
+                      <Text
+                        className={`text-[11px] ${
+                          storeDetails.banner
+                            ? "text-slate-200"
+                            : "text-slate-500"
+                        }`}
+                      >
+                        Member of
+                      </Text>
+                      <Text
+                        className={`font-semibold ${
+                          storeDetails.banner ? "text-white" : "text-primary"
+                        }`}
+                      >
+                        {storeDetails.cooperative.name}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
                 {/* SHOP INFO / METRICS BLOCK */}
                 <View
                   className={`flex-row justify-between mt-6 pt-4 border-t ${
@@ -548,6 +597,8 @@ export default function Store() {
               stock: item.stock,
               category: "",
               isLiked: item.is_liked,
+              // Local / National label on the product image
+              scope: item.cooperative_scope ?? undefined,
             }}
             onPress={() =>
               router.push({

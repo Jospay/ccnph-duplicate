@@ -500,6 +500,7 @@ export default function Products() {
                     stock: item.stock,
                     category: "",
                     isLiked: item.is_liked,
+                    scope: item.cooperative_scope ?? undefined, // NEW
                   }}
                   onPress={() =>
                     item.slug &&
