@@ -46,8 +46,7 @@ export default function TopDealPage() {
 
       setPage(response.data.pagination.current_page);
       setHasMore(response.data.pagination.has_more);
-    } catch (e) {
-      console.log(e);
+    } catch {
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -84,7 +83,6 @@ export default function TopDealPage() {
    */
   const handleToggleFavorite = async (productId: number, slug: string) => {
     if (!slug) {
-      console.warn("Cannot toggle favorite: Missing slug.");
       return;
     }
 
@@ -102,8 +100,6 @@ export default function TopDealPage() {
 
     try {
       const result = await toggleCollection(slug);
-
-      console.log(`Backend sync complete for [${slug}]`, result.message);
     } catch (error) {
       console.error(error);
 

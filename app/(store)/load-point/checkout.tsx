@@ -74,9 +74,7 @@ export default function PointsCheckoutPage() {
           onConfirm: () => {},
         });
       }
-    } catch (err) {
-      console.log("Failed to verify points state", err);
-    }
+    } catch {}
   };
 
   useFocusEffect(

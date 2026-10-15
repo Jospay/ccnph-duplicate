@@ -127,9 +127,7 @@ export default function MainLayout() {
       try {
         await NavigationBar.setVisibilityAsync("visible");
         await NavigationBar.setButtonStyleAsync("dark");
-      } catch (error) {
-        console.log("NavigationBar setup error:", error);
-      }
+      } catch {}
     };
 
     setupNavigationBar();

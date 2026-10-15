@@ -87,8 +87,7 @@ const compressImage = async (
     });
 
     return result.uri;
-  } catch (error) {
-    console.log("[IMAGE_COMPRESS_ERROR]:", error);
+  } catch {
     return uri;
   }
 };

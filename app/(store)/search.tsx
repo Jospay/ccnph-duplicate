@@ -95,8 +95,7 @@ export default function SearchPage() {
 
         const rawProducts: Product[] = response?.data?.productsDiscover ?? [];
         setRecommendations(rawProducts.slice(0, 8)); // Top 8 suggestions limit
-      } catch (err) {
-        console.log("Suggestions Error:", err);
+      } catch {
         if (requestId === suggestionRequestRef.current) setRecommendations([]);
       } finally {
         if (requestId === suggestionRequestRef.current) {

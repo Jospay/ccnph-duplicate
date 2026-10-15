@@ -76,8 +76,7 @@ export default function PointsLoadQRPage() {
           // Go straight to the success screen (no double confirmation)
           router.replace("/load-point/payment-success");
         }
-      } catch (err) {
-        console.log("Points payment polling error:", err);
+      } catch {
       } finally {
         isPolling.current = false;
       }

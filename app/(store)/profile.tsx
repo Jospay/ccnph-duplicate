@@ -107,9 +107,7 @@ export default function BuyerProfile() {
                 });
               }
             }
-          } catch (e) {
-            console.log("Failed to load points", e);
-          }
+          } catch {}
 
           // Load order badges
           const response = await fetchOrdersAPI("all", 1);

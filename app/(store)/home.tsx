@@ -97,8 +97,6 @@ export default function HomePage() {
     try {
       const response = await getStoreHome(catId, targetPage, scope);
 
-      console.log("STORE RESPONSE:", response);
-
       if (targetPage === 1 && response?.data?.categories) {
         setCategories([
           { id: "All", name: "All", slug: "all" },
@@ -123,8 +121,7 @@ export default function HomePage() {
       } else {
         setHasMore(false);
       }
-    } catch (error: any) {
-      console.log("Failed to load products:", error?.response?.data ?? error);
+    } catch {
       if (targetPage === 1) {
         setProducts([]);
         setTopDeals([]);
@@ -198,7 +195,6 @@ export default function HomePage() {
 
   const handleProductPress = (slug: string) => {
     if (!slug) {
-      console.warn("Cannot navigate: Selected product item slug is missing.");
       return;
     }
     router.push({

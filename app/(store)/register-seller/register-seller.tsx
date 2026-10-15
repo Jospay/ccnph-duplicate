@@ -74,9 +74,7 @@ export default function RegisterSeller() {
       } else {
         setBanner(selectedFile);
       }
-    } catch (error) {
-      console.log("FILE PICK ERROR:", error);
-    }
+    } catch {}
   };
 
   const handleSubmit = async () => {
