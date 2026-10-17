@@ -101,6 +101,21 @@ export interface PlaceOrderResponse {
 
 export type CheckoutPaymentState = "pending" | "paid" | "failed";
 
+// full receipt of an online checkout (all values in pesos)
+export interface PaymentBreakdown {
+  subtotal: number;
+  shipping_fee: number;
+  membership_discount: number;
+  shared_capital_discount: number;
+  point_discount: number;
+  // subtotal + shipping - discounts (what the order costs)
+  order_total: number;
+  // online processing fee (TransactionFee "Store")
+  fee: number;
+  // order_total + fee = what the user actually pays
+  amount: number;
+}
+
 export interface CheckoutPaymentStatusResponse {
   success: boolean;
   data: {
@@ -112,6 +127,8 @@ export interface CheckoutPaymentStatusResponse {
     fee?: number;
     // order total without the fee
     order_total?: number;
+    // full breakdown for the payment + success screens
+    breakdown?: PaymentBreakdown;
     checkout_number: string;
     redirect_url: string | null;
     qr_image: string | null;
