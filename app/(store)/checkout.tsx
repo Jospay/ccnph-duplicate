@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import api from "@/services/api";
 import {
   Address,
   CheckoutItem,
@@ -8,9 +9,9 @@ import {
   placeOrderAPI,
 } from "@/services/checkout";
 import { Ionicons } from "@expo/vector-icons";
-import { useIsFocused } from "@react-navigation/native"; // Added to detect screen focus returns
+import { useIsFocused } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -23,22 +24,55 @@ import {
 
 // LOCAL / NATIONAL BADGE LOOK
 const SCOPE_BADGE = {
-  local: {
-    label: "Local",
-    icon: "location" as const,
-    bg: "bg-emerald-600",
+  local: { label: "Local", icon: "location" as const, bg: "bg-emerald-600" },
+  national: { label: "National", icon: "globe" as const, bg: "bg-[#3E4093]" },
+};
+
+// payment_methods.id
+const PM = { COD: 9, QR: 3, MAYA: 4, BILLEASE: 5, GRABPAY: 6, POINT: 11 };
+const PAYMENT_ORDER = [
+  PM.COD,
+  PM.POINT,
+  PM.QR,
+  PM.MAYA,
+  PM.BILLEASE,
+  PM.GRABPAY,
+];
+const ONLINE_IDS = [PM.QR, PM.MAYA, PM.BILLEASE, PM.GRABPAY];
+
+const PAYMENT_META: Record<number, { icon: any; hint: string }> = {
+  [PM.COD]: { icon: "cash-outline", hint: "Pay when your order arrives" },
+  [PM.POINT]: { icon: "wallet-outline", hint: "Pay using your store points" },
+  [PM.QR]: {
+    icon: "qr-code-outline",
+    hint: "Scan with GCash, Maya or bank app",
   },
-  national: {
-    label: "National",
-    icon: "globe" as const,
-    bg: "bg-[#3E4093]",
-  },
+  [PM.MAYA]: { icon: "card-outline", hint: "Pay with Maya" },
+  [PM.BILLEASE]: { icon: "calendar-outline", hint: "Buy now, pay later" },
+  [PM.GRABPAY]: { icon: "phone-portrait-outline", hint: "Pay with GrabPay" },
+};
+
+// Server origin taken from the API base URL (works on LAN and on the live domain),
+// e.g. "http://192.168.1.120:8000/api" -> "http://192.168.1.120:8000"
+const API_ORIGIN = String(api.defaults.baseURL || "")
+  .replace(/\/+$/, "")
+  .replace(/\/api$/, "");
+
+// Where to send the user when this checkout is no longer valid (cart items already
+// paid/deleted). Only used when there is no previous screen to go back to.
+// Change it to your real cart route if it is different.
+const CART_ROUTE = "/(store)/cart";
+
+const resolveImageUrl = (path?: string | null): string | undefined => {
+  if (!path) return undefined;
+  if (path.startsWith("http")) return path;
+  return `${API_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
 export default function Checkout() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const isFocused = useIsFocused(); // Tracks whether the screen is active/focused
+  const isFocused = useIsFocused();
 
   const mode = params.mode === "direct" ? "direct" : "cart";
   const rawCartItemIds = params.cart_item_ids;
@@ -47,11 +81,23 @@ export default function Checkout() {
     : null;
   const quantity = params.quantity ? Number(params.quantity) : 1;
 
-  // View Layout States
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  // Custom Alert State
+  // true while we are silently leaving because the cart items are gone
+  const isLeaving = useRef(false);
+
+  const leaveCheckout = () => {
+    if (isLeaving.current) return;
+    isLeaving.current = true;
+
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(CART_ROUTE as any);
+    }
+  };
+
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
     title: string;
@@ -59,14 +105,8 @@ export default function Checkout() {
     confirmText?: string;
     onClose: () => void;
     onConfirm?: () => void;
-  }>({
-    visible: false,
-    title: "",
-    message: "",
-    onClose: () => {},
-  });
+  }>({ visible: false, title: "", message: "", onClose: () => {} });
 
-  // Helper function to trigger the custom modal alert easily
   const showAlert = (
     title: string,
     message: string,
@@ -92,7 +132,6 @@ export default function Checkout() {
     });
   };
 
-  // Compute clean numeric array from route params if mode is cart
   const cartItemIds = useMemo<number[]>(() => {
     if (mode === "direct") return [];
 
@@ -105,7 +144,6 @@ export default function Checkout() {
     return parsed;
   }, [rawCartItemIds, mode]);
 
-  // Dynamic Model Data Arrays
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -113,10 +151,16 @@ export default function Checkout() {
     useState<PaymentMethod | null>(null);
   const [items, setItems] = useState<CheckoutItem[]>([]);
   const [summary, setSummary] = useState<CheckoutSummary | null>(null);
+  const [pointBalance, setPointBalance] = useState<number>(0);
   const [note, setNote] = useState<string>("");
 
+  const fmt = (n: number) =>
+    Number(n || 0).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
   useEffect(() => {
-    // If the screen is hidden/blurred, stop processing execution.
     if (!isFocused) return;
 
     if (mode === "cart" && cartItemIds.length === 0) {
@@ -145,39 +189,46 @@ export default function Checkout() {
             quantity: quantity,
           });
         } else {
-          response = await fetchCheckoutDetails({
-            cart_item_ids: cartItemIds,
-          });
+          response = await fetchCheckoutDetails({ cart_item_ids: cartItemIds });
         }
 
         if (response.success) {
           const data = response.data;
           setAddresses(data.addresses);
-          setPaymentMethods(data.paymentMethods);
           setItems(data.items);
           setSummary(data.summary);
+          setPointBalance(Number(data.points_balance || 0));
 
-          // Auto select default or updated address profile setup
           const defaultAddr =
             data.addresses.find((addr) => addr.is_default) || data.addresses[0];
           setSelectedAddress(defaultAddr || null);
 
-          // Filter payment methods safely
-          const allowedMethods = data.paymentMethods.filter((method) => {
-            const name = method.name.toLowerCase();
-            return (
-              name.includes("cash on delivery") || name.includes("pay online")
-            );
-          });
+          const allowed = PAYMENT_ORDER.map((id) =>
+            data.paymentMethods.find((m) => Number(m.id) === id),
+          ).filter(Boolean) as PaymentMethod[];
 
-          // Auto select primary allowed payment method
-          if (allowedMethods.length > 0) {
-            setSelectedPaymentMethod(allowedMethods[0]);
-          } else if (data.paymentMethods.length > 0) {
-            setSelectedPaymentMethod(data.paymentMethods[0]);
-          }
+          setPaymentMethods(allowed);
+
+          // keep the previous selection if it's still available, otherwise COD
+          setSelectedPaymentMethod((prev) =>
+            prev && allowed.some((m) => m.id === prev.id)
+              ? prev
+              : allowed.find((m) => Number(m.id) === PM.COD) ||
+                allowed[0] ||
+                null,
+          );
         }
       } catch (error: any) {
+        const httpStatus = error?.response?.status;
+
+        // The selected cart items no longer exist (already paid and removed from
+        // the cart, e.g. the user pressed back after a successful order): go back
+        // to the cart quietly instead of showing an error.
+        if (httpStatus === 422 || httpStatus === 404) {
+          leaveCheckout();
+          return;
+        }
+
         console.error(
           "❌ [API ERROR] Network breakdown or backend rejection:",
           error,
@@ -188,14 +239,16 @@ export default function Checkout() {
           () => router.back(),
         );
       } finally {
-        setLoading(false);
+        // keep the loader visible while leaving so the empty checkout never flashes
+        if (!isLeaving.current) setLoading(false);
       }
     };
 
+    // coming back to this screen again later starts fresh
+    isLeaving.current = false;
     loadCheckoutData();
-  }, [rawCartItemIds, productVariantId, quantity, mode, isFocused]); // Added isFocused as a dependent rule
+  }, [rawCartItemIds, productVariantId, quantity, mode, isFocused]);
 
-  // Group items by store vendor block sections
   const groupedItems = useMemo(() => {
     const groups: {
       [key: string]: { seller: string; products: CheckoutItem[] };
@@ -210,18 +263,34 @@ export default function Checkout() {
     return Object.values(groups);
   }, [items]);
 
-  const handlePlaceOrder = async () => {
-    if (!selectedAddress) {
-      showAlert("Validation Error", "Please choose a delivery address.");
-      return;
-    }
-    if (!selectedPaymentMethod) {
-      showAlert("Validation Error", "Please select a payment method.");
-      return;
-    }
+  // Pricing comes from the backend (same numbers CheckoutService charges):
+  //   COD    -> total
+  //   Points -> total - point_discount
+  //   Online -> total + online_fee
+  const selectedId = Number(selectedPaymentMethod?.id);
+  const isPointSelected = selectedId === PM.POINT;
+  const isOnlineSelected = ONLINE_IDS.includes(selectedId);
+
+  const baseTotal = Number(summary?.total || 0);
+  const membershipDiscount = Number(summary?.membership_discount || 0);
+  const sharedCapitalDiscount = Number(summary?.shared_capital_discount || 0);
+  const pointDiscountAvailable = Number(summary?.point_discount || 0);
+  const pointDiscount = isPointSelected ? pointDiscountAvailable : 0;
+  const processingFee = isOnlineSelected ? Number(summary?.online_fee || 0) : 0;
+
+  // what the customer pays with the selected method
+  const total = baseTotal - pointDiscount + processingFee;
+  // points needed if they choose Points (discount already applied)
+  const pointsNeeded = baseTotal - pointDiscountAvailable;
+  const insufficientPoints = pointBalance < pointsNeeded;
+
+  const submitOrder = async () => {
+    if (!selectedAddress || !selectedPaymentMethod) return;
 
     try {
       setSubmitting(true);
+
+      const methodId = Number(selectedPaymentMethod.id);
 
       const payload: any = {
         address_id: selectedAddress.id,
@@ -237,27 +306,80 @@ export default function Checkout() {
         payload.cart_item_ids = cartItemIds;
       }
 
+      // where PayMongo sends the user back after paying (Maya / BillEase / GrabPay)
+      if (ONLINE_IDS.includes(methodId)) {
+        const base = String(api.defaults.baseURL || "").replace(/\/$/, "");
+        payload.return_url = `${base}/payment/success`;
+      }
+
       const result = await placeOrderAPI(payload);
 
-      if (result.success) {
-        showAlert(
-          "Success",
-          result.message || "Order placed successfully!",
-          () => {
-            router.replace("/order-list");
-          },
-        );
+      if (!result.success) {
+        showAlert("Order Failure", result.message || "Unable to place order.");
+        return;
       }
+
+      // ONLINE: the order only counts after the third-party payment succeeds
+      if (result.payment?.status === "pending" && result.checkout_id) {
+        router.push({
+          pathname: "/(store)/checkout-payment",
+          params: {
+            checkoutId: String(result.checkout_id),
+            total: String(total),
+          },
+        });
+        return;
+      }
+
+      // COD / POINTS: already complete
+      showAlert("Success", result.message || "Order placed successfully!", () =>
+        router.replace("/order-list"),
+      );
     } catch (error: any) {
       console.error("❌ [ORDER PLACEMENT REJECTION] Request failure:", error);
+      const data = error?.response?.data;
       showAlert(
         "Order Failure",
-        error?.response?.data?.message ||
+        data?.errors?.payment_method_id?.[0] ||
+          data?.errors?.checkout?.[0] ||
+          data?.message ||
           "Something went wrong processing your transaction.",
       );
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handlePlaceOrder = () => {
+    if (!selectedAddress) {
+      showAlert("Validation Error", "Please choose a delivery address.");
+      return;
+    }
+    if (!selectedPaymentMethod) {
+      showAlert("Validation Error", "Please select a payment method.");
+      return;
+    }
+
+    if (Number(selectedPaymentMethod.id) === PM.POINT) {
+      if (insufficientPoints) {
+        showAlert(
+          "Insufficient Points",
+          `You need ${fmt(total)} pts but only have ${fmt(pointBalance)} pts.`,
+        );
+        return;
+      }
+
+      showAlert(
+        "Pay with Points",
+        `Use ${fmt(total)} pts to pay for this order?`,
+        () => {},
+        submitOrder,
+        "Pay",
+      );
+      return;
+    }
+
+    submitOrder();
   };
 
   if (loading) {
@@ -270,6 +392,13 @@ export default function Checkout() {
       </View>
     );
   }
+
+  const totalLabel = fmt(total);
+  const placeOrderLabel = submitting
+    ? "Processing Order..."
+    : isOnlineSelected
+      ? `Pay ₱${totalLabel}`
+      : `Place Order ₱${totalLabel}`;
 
   return (
     <View className="flex-1 bg-slate-100">
@@ -334,11 +463,8 @@ export default function Checkout() {
                     ?.map((attr) => `${attr.name}: ${attr.value}`)
                     .join(" • ") || "";
 
-                const cleanImgUrl = item.product.image?.startsWith("http")
-                  ? item.product.image
-                  : `http://192.168.1.120:8000${item.product.image || ""}`;
+                const cleanImgUrl = resolveImageUrl(item.product.image);
 
-                // LOCAL / NATIONAL LABEL
                 const scope = item.product.cooperative_scope;
                 const badge = scope ? SCOPE_BADGE[scope] : null;
 
@@ -346,7 +472,12 @@ export default function Checkout() {
                   <View key={item.id} className="flex-row mb-4">
                     <Image
                       source={{ uri: cleanImgUrl }}
-                      style={{ width: 75, height: 75, borderRadius: 12 }}
+                      style={{
+                        width: 75,
+                        height: 75,
+                        borderRadius: 12,
+                        backgroundColor: "#f1f5f9",
+                      }}
                     />
 
                     <View className="flex-1 ml-3 justify-between">
@@ -413,34 +544,62 @@ export default function Checkout() {
         <View className="bg-white rounded-2xl p-4 mb-3">
           <Text className="font-bold text-lg mb-3">Payment Method</Text>
 
-          {paymentMethods
-            .filter((method) => {
-              const name = method.name.toLowerCase();
-              return (
-                // name.includes("cash on delivery") || name.includes("pay online")
-                name.includes("cash on delivery")
-              );
-            })
-            .map((method) => (
+          {paymentMethods.map((method) => {
+            const id = Number(method.id);
+            const active = selectedPaymentMethod?.id === method.id;
+            const meta = PAYMENT_META[id];
+            const isPoint = id === PM.POINT;
+            const disabled = isPoint && insufficientPoints;
+
+            return (
               <TouchableOpacity
                 key={method.id}
+                disabled={disabled}
                 onPress={() => setSelectedPaymentMethod(method)}
-                className="flex-row items-center mb-3"
+                className={`flex-row items-center p-3 mb-2 rounded-xl border ${
+                  active ? "border-[#3E4093] bg-slate-50" : "border-slate-200"
+                } ${disabled ? "opacity-50" : ""}`}
               >
                 <Ionicons
-                  name={
-                    selectedPaymentMethod?.id === method.id
-                      ? "radio-button-on"
-                      : "radio-button-off"
-                  }
+                  name={active ? "radio-button-on" : "radio-button-off"}
                   size={22}
                   color="#3E4093"
                 />
-                <Text className="ml-3 font-medium text-slate-700">
-                  {method.name}
-                </Text>
+                {meta && (
+                  <Ionicons
+                    name={meta.icon}
+                    size={22}
+                    color="#3E4093"
+                    style={{ marginLeft: 12 }}
+                  />
+                )}
+                <View className="ml-3 flex-1">
+                  <Text className="font-medium text-slate-700">
+                    {method.name}
+                  </Text>
+                  {isPoint ? (
+                    <Text
+                      className={`text-xs ${
+                        insufficientPoints ? "text-red-500" : "text-slate-400"
+                      }`}
+                    >
+                      Balance: {fmt(pointBalance)} pts
+                      {insufficientPoints ? " · Insufficient" : ""}
+                      {!insufficientPoints && pointDiscountAvailable > 0
+                        ? ` · Save ₱${fmt(pointDiscountAvailable)}`
+                        : ""}
+                    </Text>
+                  ) : (
+                    meta && (
+                      <Text className="text-xs text-slate-400">
+                        {meta.hint}
+                      </Text>
+                    )
+                  )}
+                </View>
               </TouchableOpacity>
-            ))}
+            );
+          })}
         </View>
 
         {/* SUMMARY */}
@@ -455,12 +614,32 @@ export default function Checkout() {
               </Text>
             </View>
 
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-slate-500">Cooperative Discount</Text>
-              <Text className="text-[#D70127] font-medium">
-                -₱{Number(summary.discount).toLocaleString()}
-              </Text>
-            </View>
+            {membershipDiscount > 0 && (
+              <View className="flex-row justify-between mb-2">
+                <Text className="text-slate-500">Membership Discount</Text>
+                <Text className="text-[#D70127] font-medium">
+                  -₱{fmt(membershipDiscount)}
+                </Text>
+              </View>
+            )}
+
+            {sharedCapitalDiscount > 0 && (
+              <View className="flex-row justify-between mb-2">
+                <Text className="text-slate-500">Shared Capital Discount</Text>
+                <Text className="text-[#D70127] font-medium">
+                  -₱{fmt(sharedCapitalDiscount)}
+                </Text>
+              </View>
+            )}
+
+            {pointDiscount > 0 && (
+              <View className="flex-row justify-between mb-2">
+                <Text className="text-slate-500">Points Discount</Text>
+                <Text className="text-[#D70127] font-medium">
+                  -₱{fmt(pointDiscount)}
+                </Text>
+              </View>
+            )}
 
             <View className="flex-row justify-between mb-2">
               <Text className="text-slate-500">Shipping Subtotal</Text>
@@ -469,12 +648,21 @@ export default function Checkout() {
               </Text>
             </View>
 
+            {processingFee > 0 && (
+              <View className="flex-row justify-between mb-2">
+                <Text className="text-slate-500">Processing Fee</Text>
+                <Text className="text-slate-800 font-medium">
+                  ₱{fmt(processingFee)}
+                </Text>
+              </View>
+            )}
+
             <View className="border-t border-slate-200 mt-3 pt-3 flex-row justify-between">
               <Text className="font-bold text-lg text-slate-800">
                 Total Payment
               </Text>
               <Text className="font-bold text-primary text-lg">
-                ₱{Number(summary.total).toLocaleString()}
+                ₱{fmt(total)}
               </Text>
             </View>
           </View>
@@ -489,14 +677,11 @@ export default function Checkout() {
           className={`rounded-2xl py-4 items-center ${submitting ? "bg-slate-400" : "bg-primary"}`}
         >
           <Text className="text-white font-bold text-lg">
-            {submitting
-              ? "Processing Order..."
-              : `Place Order ₱${summary?.total ? Number(summary.total).toLocaleString() : "0"}`}
+            {placeOrderLabel}
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Global Custom Alert Renderer */}
       <CustomAlert
         visible={alertConfig.visible}
         title={alertConfig.title}
