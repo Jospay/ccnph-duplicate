@@ -276,7 +276,8 @@ export default function Checkout() {
   const sharedCapitalDiscount = Number(summary?.shared_capital_discount || 0);
   const pointDiscountAvailable = Number(summary?.point_discount || 0);
   const pointDiscount = isPointSelected ? pointDiscountAvailable : 0;
-  const processingFee = isOnlineSelected ? Number(summary?.online_fee || 0) : 0;
+  const onlineFeeAvailable = Number(summary?.online_fee || 0);
+  const processingFee = isOnlineSelected ? onlineFeeAvailable : 0;
 
   // what the customer pays with the selected method
   const total = baseTotal - pointDiscount + processingFee;
@@ -593,6 +594,9 @@ export default function Checkout() {
                     meta && (
                       <Text className="text-xs text-slate-400">
                         {meta.hint}
+                        {ONLINE_IDS.includes(id) && onlineFeeAvailable > 0
+                          ? ` · +₱${fmt(onlineFeeAvailable)} processing fee`
+                          : ""}
                       </Text>
                     )
                   )}
@@ -649,12 +653,24 @@ export default function Checkout() {
             </View>
 
             {processingFee > 0 && (
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-slate-500">Processing Fee</Text>
-                <Text className="text-slate-800 font-medium">
-                  ₱{fmt(processingFee)}
+              <>
+                <View className="flex-row justify-between mb-2">
+                  <Text className="text-slate-500">Order Total</Text>
+                  <Text className="text-slate-800 font-medium">
+                    ₱{fmt(baseTotal)}
+                  </Text>
+                </View>
+                <View className="flex-row justify-between mb-1">
+                  <Text className="text-slate-500">Online Processing Fee</Text>
+                  <Text className="text-slate-800 font-medium">
+                    ₱{fmt(processingFee)}
+                  </Text>
+                </View>
+                <Text className="text-xs text-slate-400 mb-1">
+                  Charged by the payment gateway for online payments only.
+                  Choose Cash on Delivery or Points to avoid this fee.
                 </Text>
-              </View>
+              </>
             )}
 
             <View className="border-t border-slate-200 mt-3 pt-3 flex-row justify-between">
