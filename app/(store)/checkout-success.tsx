@@ -1,21 +1,74 @@
+import PaymentBreakdownCard from "@/components/PaymentBreakdownCard";
+import {
+  CheckoutPaymentStatusResponse,
+  getCheckoutPaymentStatus,
+} from "@/services/checkout";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+type PaymentData = CheckoutPaymentStatusResponse["data"];
+
+const pick = (v: string | string[] | undefined) =>
+  Array.isArray(v) ? v[0] : v;
+
+const fmt = (n: number) =>
+  Number(n || 0).toLocaleString("en-PH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 export default function CheckoutSuccessPage() {
-  const { checkoutNumber, amount, method } = useLocalSearchParams();
+  const { checkoutId, checkoutNumber, amount, method } = useLocalSearchParams();
   const router = useRouter();
 
-  const pick = (v: string | string[] | undefined) =>
-    Array.isArray(v) ? v[0] : v;
+  const id = pick(checkoutId);
+  const [data, setData] = useState<PaymentData | null>(null);
+  const [loading, setLoading] = useState<boolean>(!!id);
 
-  const ref = pick(checkoutNumber);
-  const methodName = pick(method);
-  const total = Number(pick(amount) || 0);
+  // load the full receipt (items total, discounts, shipping, fee) from the backend
+  useEffect(() => {
+    if (!id) return;
+
+    let active = true;
+    (async () => {
+      try {
+        const res = await getCheckoutPaymentStatus(id);
+        if (active) setData(res.data);
+      } catch {
+        // fall back to the params below
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  const ref = data?.checkout_number ?? pick(checkoutNumber);
+  const methodName = data?.method ?? pick(method);
+  const total = Number(data?.amount ?? pick(amount) ?? 0);
+  const breakdown = data?.breakdown;
 
   return (
-    <View className="flex-1 bg-white p-6 items-center justify-center">
+    <ScrollView
+      className="flex-1 bg-white"
+      contentContainerStyle={{
+        flexGrow: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
+      }}
+    >
       <View className="bg-green-100 p-6 rounded-full mb-6">
         <Ionicons name="checkmark-done-circle" size={80} color="#22c55e" />
       </View>
@@ -29,33 +82,49 @@ export default function CheckoutSuccessPage() {
         will start preparing it shortly.
       </Text>
 
-      {(total > 0 || ref) && (
-        <View className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-10">
-          {total > 0 && (
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-slate-500">Amount Paid</Text>
-              <Text className="font-bold text-slate-800">
-                ₱
-                {total.toLocaleString("en-PH", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </Text>
-            </View>
-          )}
-          {!!methodName && (
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-slate-500">Payment Method</Text>
-              <Text className="font-medium text-slate-700">{methodName}</Text>
-            </View>
-          )}
-          {!!ref && (
-            <View className="flex-row justify-between">
-              <Text className="text-slate-500">Reference</Text>
-              <Text className="font-medium text-slate-700">{ref}</Text>
-            </View>
-          )}
-        </View>
+      {loading ? (
+        <ActivityIndicator size="small" color="#3E4093" className="mb-10" />
+      ) : (
+        (total > 0 || !!ref) && (
+          <View className="w-full mb-10">
+            {breakdown ? (
+              <PaymentBreakdownCard
+                breakdown={breakdown}
+                totalLabel="Total Paid"
+              />
+            ) : (
+              total > 0 && (
+                <View className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                  <View className="flex-row justify-between">
+                    <Text className="text-slate-500">Amount Paid</Text>
+                    <Text className="font-bold text-slate-800">
+                      ₱{fmt(total)}
+                    </Text>
+                  </View>
+                </View>
+              )
+            )}
+
+            {(!!methodName || !!ref) && (
+              <View className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 mt-3">
+                {!!methodName && (
+                  <View className="flex-row justify-between mb-2">
+                    <Text className="text-slate-500">Payment Method</Text>
+                    <Text className="font-medium text-slate-700">
+                      {methodName}
+                    </Text>
+                  </View>
+                )}
+                {!!ref && (
+                  <View className="flex-row justify-between">
+                    <Text className="text-slate-500">Reference</Text>
+                    <Text className="font-medium text-slate-700">{ref}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        )
       )}
 
       <TouchableOpacity
@@ -66,6 +135,6 @@ export default function CheckoutSuccessPage() {
           View My Orders
         </Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
