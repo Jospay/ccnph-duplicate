@@ -1,4 +1,5 @@
 import { CustomAlert } from "@/components/CustomAlert";
+import PaymentBreakdownCard from "@/components/PaymentBreakdownCard";
 import {
   cancelCheckoutPayment,
   CheckoutPaymentStatusResponse,
@@ -61,6 +62,8 @@ export default function CheckoutPaymentPage() {
     router.replace({
       pathname: "/(store)/checkout-success",
       params: {
+        // the success screen loads the full breakdown from this id
+        checkoutId: String(id ?? ""),
         checkoutNumber: d.checkout_number ?? "",
         amount: String(d.amount ?? 0),
         method: d.method ?? "",
@@ -256,6 +259,34 @@ export default function CheckoutPaymentPage() {
             if (nav.url.includes("payment/success")) checkStatus();
           }}
         />
+        {data.breakdown && (
+          <View className="bg-white border-t border-slate-100 px-4 py-3">
+            <View className="flex-row justify-between">
+              <Text className="text-slate-500 text-xs">Order Total</Text>
+              <Text className="text-slate-700 text-xs font-semibold">
+                ₱ {orderTotalLabel}
+              </Text>
+            </View>
+            {feeValue > 0 && (
+              <View className="flex-row justify-between mt-0.5">
+                <Text className="text-slate-500 text-xs">
+                  Online Processing Fee
+                </Text>
+                <Text className="text-slate-700 text-xs font-semibold">
+                  ₱ {fmtPeso(feeValue)}
+                </Text>
+              </View>
+            )}
+            <View className="flex-row justify-between mt-1 pt-1 border-t border-slate-100">
+              <Text className="text-slate-800 text-sm font-bold">
+                Total to Pay
+              </Text>
+              <Text className="text-slate-900 text-sm font-bold">
+                ₱ {amount}
+              </Text>
+            </View>
+          </View>
+        )}
         <TouchableOpacity
           onPress={handleCancel}
           disabled={cancelling}
@@ -291,28 +322,18 @@ export default function CheckoutPaymentPage() {
             Your order is placed once payment is confirmed
           </Text>
 
-          {feeValue > 0 && (
-            <View className="w-full max-w-[320px] bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 mb-6">
-              <View className="flex-row justify-between mb-1">
-                <Text className="text-slate-500 text-sm">Order Total</Text>
-                <Text className="text-slate-700 text-sm font-semibold">
-                  ₱ {orderTotalLabel}
+          {data.breakdown && (
+            <View className="w-full max-w-[340px] mb-6">
+              <PaymentBreakdownCard
+                breakdown={data.breakdown}
+                totalLabel="Total to Scan/Pay"
+              />
+              {feeValue > 0 && (
+                <Text className="text-slate-400 text-[11px] mt-2 text-center">
+                  The online processing fee is charged by the payment gateway
+                  and is included in the amount you scan.
                 </Text>
-              </View>
-              <View className="flex-row justify-between mb-1">
-                <Text className="text-slate-500 text-sm">Processing Fee</Text>
-                <Text className="text-slate-700 text-sm font-semibold">
-                  ₱ {fmtPeso(feeValue)}
-                </Text>
-              </View>
-              <View className="flex-row justify-between pt-1 border-t border-slate-200">
-                <Text className="text-slate-600 text-sm font-semibold">
-                  Total to Scan/Pay
-                </Text>
-                <Text className="text-slate-900 text-sm font-bold">
-                  ₱ {amount}
-                </Text>
-              </View>
+              )}
             </View>
           )}
 
