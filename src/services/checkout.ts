@@ -14,6 +14,7 @@ export interface PaymentMethod {
   id: number;
   slug: string;
   name: string;
+  gateway_type?: string | null;
 }
 
 export interface CheckoutItem {
@@ -43,8 +44,16 @@ export interface CheckoutItem {
 export interface CheckoutSummary {
   subtotal: number;
   shipping_fee: number;
+  // membership + shared capital (always applied)
   discount: number;
+  membership_discount?: number;
+  shared_capital_discount?: number;
+  // only applied when paying with Points
+  point_discount?: number;
+  // price for COD. Points: total - point_discount. Online: total + online_fee
   total: number;
+  // online payment processing fee (TransactionFee "Store")
+  online_fee?: number;
 }
 
 export interface CheckoutDetailsResponse {
@@ -53,11 +62,11 @@ export interface CheckoutDetailsResponse {
     addresses: Address[];
     paymentMethods: PaymentMethod[];
     items: CheckoutItem[];
+    points_balance: number;
     summary: CheckoutSummary;
   };
 }
 
-// Unified input parameter capabilities interface supporting both modes
 export interface FetchCheckoutParams {
   mode?: "direct" | "cart";
   cart_item_ids?: number[];
@@ -65,7 +74,6 @@ export interface FetchCheckoutParams {
   quantity?: number;
 }
 
-// Flexible structural payload type supporting both direct buy configurations and cart array arrays
 export interface PlaceOrderPayload {
   address_id: number;
   payment_method_id: number;
@@ -74,23 +82,47 @@ export interface PlaceOrderPayload {
   cart_item_ids?: number[];
   product_variant_id?: number | null;
   quantity?: number;
+  return_url?: string;
 }
 
 export interface PlaceOrderResponse {
   success: boolean;
   message: string;
   checkout_id?: number;
+  order_id?: number;
+  // present only for online payments (QR / Maya / BillEase / GrabPay)
+  payment?: {
+    status: "pending";
+    gateway_type: string;
+    redirect_url: string | null;
+    qr_image: string | null;
+  };
 }
 
-/**
- * Fetches the checkout records from Laravel supporting standard cart setups and direct bypasses
- */
+export type CheckoutPaymentState = "pending" | "paid" | "failed";
+
+export interface CheckoutPaymentStatusResponse {
+  success: boolean;
+  data: {
+    status: CheckoutPaymentState;
+    method: string | null;
+    // what the user pays: order total + processing fee
+    amount: number;
+    // online processing fee included in `amount`
+    fee?: number;
+    // order total without the fee
+    order_total?: number;
+    checkout_number: string;
+    redirect_url: string | null;
+    qr_image: string | null;
+  };
+}
+
 export const fetchCheckoutDetails = async (
   params: FetchCheckoutParams,
 ): Promise<CheckoutDetailsResponse> => {
   const response = await api.get<CheckoutDetailsResponse>("/store/checkout", {
     params,
-    // ✅ FIXED: Lookahead checks implemented to verify array properties before running mutations
     paramsSerializer: (serializedParams) => {
       const searchParams = new URLSearchParams();
 
@@ -121,9 +153,6 @@ export const fetchCheckoutDetails = async (
   return response.data;
 };
 
-/**
- * Dispatches the complete order structural data payload transaction to Laravel
- */
 export const placeOrderAPI = async (
   payload: PlaceOrderPayload,
 ): Promise<PlaceOrderResponse> => {
@@ -132,4 +161,19 @@ export const placeOrderAPI = async (
     payload,
   );
   return response.data;
+};
+
+export const getCheckoutPaymentStatus = async (
+  checkoutId: number | string,
+): Promise<CheckoutPaymentStatusResponse> => {
+  const response = await api.get<CheckoutPaymentStatusResponse>(
+    `/store/checkout/${checkoutId}/payment-status`,
+  );
+  return response.data;
+};
+
+export const cancelCheckoutPayment = async (
+  checkoutId: number | string,
+): Promise<void> => {
+  await api.post(`/store/checkout/${checkoutId}/cancel`);
 };
