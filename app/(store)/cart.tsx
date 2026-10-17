@@ -35,6 +35,19 @@ const SCOPE_BADGE = {
   },
 };
 
+// --- PRICE FORMATTER: adds thousands commas (1000 -> 1,000, 1000.50 -> 1,000.50) ---
+const formatPrice = (value: string | number | null | undefined): string => {
+  if (value === null || value === undefined || value === "") return "0";
+
+  const raw = String(value).replace(/,/g, "").trim();
+  const [whole, decimals] = raw.split(".");
+
+  if (!/^-?\d+$/.test(whole)) return String(value);
+
+  const withCommas = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decimals !== undefined ? `${withCommas}.${decimals}` : withCommas;
+};
+
 export default function CartPage() {
   const router = useRouter();
   const [cartItems, setCartItems] = useState<UIItems[]>([]);
@@ -339,12 +352,12 @@ export default function CartPage() {
                           {item.variant.compare_price &&
                           item.variant.compare_price > item.variant.price ? (
                             <Text className="text-xs text-slate-400 line-through mr-2">
-                              ₱{item.variant.compare_price}
+                              ₱{formatPrice(item.variant.compare_price)}
                             </Text>
                           ) : null}
 
                           <Text className="text-primary font-bold text-lg">
-                            ₱{item.variant.price}
+                            ₱{formatPrice(item.variant.price)}
                           </Text>
                         </View>
                       </TouchableOpacity>
