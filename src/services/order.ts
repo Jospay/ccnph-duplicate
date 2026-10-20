@@ -45,7 +45,12 @@ export interface OrderListItem {
   raw_status: string;
   status_label: string;
   shipping_fee: number;
+  // order total after discounts, without the online processing fee
   total: number;
+  // online processing fee share of this order (0 for COD / Points)
+  online_fee?: number;
+  // Total Payment = total + online_fee (what the customer actually pays)
+  amount?: number;
   items: OrderItem[];
   tracking: OrderTracking;
   created_at: string;
