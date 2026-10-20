@@ -61,6 +61,13 @@ const formatPrice = (value: string | number | null | undefined): string => {
   return decimals !== undefined ? `${withCommas}.${decimals}` : withCommas;
 };
 
+// --- MONEY FORMATTER: always 2 decimals (for the Order Total / Total Payment) ---
+const formatMoney = (value: number | string | null | undefined): string =>
+  Number(value || 0).toLocaleString("en-PH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 export default function OrderList() {
   const router = useRouter();
   const { status: routeStatus } = useLocalSearchParams<{ status?: string }>();
@@ -434,6 +441,10 @@ export default function OrderList() {
 
             const isCompletedAndRated = item.status === "completed" && isRated;
 
+            // Total Payment = order total (after discounts) + online fee share.
+            // Same number as the Total Payment on the track order screen.
+            const orderTotalPayment = item.amount ?? item.total;
+
             return (
               <View className="bg-white rounded-2xl mb-4 p-3 border border-slate-200 shadow-sm">
                 {/* SHOP HEADER */}
@@ -582,7 +593,7 @@ export default function OrderList() {
                   <View className="flex-row justify-end items-center gap-2">
                     <Text className="text-slate-500 text-sm">Order Total:</Text>
                     <Text className="font-bold text-base text-primary">
-                      ₱{formatPrice(item.total)}
+                      ₱{formatMoney(orderTotalPayment)}
                     </Text>
                   </View>
                 </View>
