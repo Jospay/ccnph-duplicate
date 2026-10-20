@@ -1,4 +1,5 @@
 import api from "./api";
+import type { PaymentBreakdown } from "./checkout";
 
 // --- EXISTING INTERFACES ---
 export interface OrderItem {
@@ -21,6 +22,8 @@ export interface OrderTracking {
   shipped_at: string | null;
   delivered_at: string | null;
   cancelled_at: string | null;
+  return_requested_at?: string | null;
+  return_approved_at?: string | null;
   returned_at: string | null;
 }
 
@@ -49,25 +52,53 @@ export interface OrderListItem {
   is_rated: boolean;
 }
 
+// payment method used for an order (null for very old orders with no payment row)
+export interface OrderPayment {
+  method_id: number;
+  method: string;
+  is_online: boolean;
+  is_cod: boolean;
+  is_points: boolean;
+  status: "paid" | "pending";
+  // "Paid" | "Pay on delivery" | "Pending"
+  status_label: string;
+  paid_at: string | null;
+}
+
+export interface SingleOrder {
+  id: number;
+  order_number: string;
+  status: string;
+  raw_status?: string;
+  status_label?: string;
+  shipping_fee: number;
+  total: number;
+  created_at: string;
+  store: { id: number; name: string };
+  note?: string | null;
+  // payment method + price breakdown (same shape as the checkout payment screen)
+  payment: OrderPayment | null;
+  breakdown: PaymentBreakdown;
+  items: OrderItem[];
+  shipping_name: string;
+  shipping_phone: string;
+  shipping_address: string;
+  tracking: OrderTracking;
+  confirmed_at?: string | null;
+  processing_at?: string | null;
+  packed_at?: string | null;
+  shipped_at?: string | null;
+  delivered_at?: string | null;
+  cancelled_at?: string | null;
+  return_requested_at?: string | null;
+  return_approved_at?: string | null;
+  returned_at?: string | null;
+}
+
 export interface SingleOrderResponse {
   success: boolean;
   data: {
-    order: {
-      id: number;
-      order_number: string;
-      status: string;
-      shipping_fee: number;
-      total: number;
-      created_at: string;
-      store: { id: number; name: string };
-      items: OrderItem[];
-      shipping_name: string;
-      shipping_phone: string;
-      shipping_address: string;
-      paid_at: string | null;
-      shipped_at: string | null;
-      completed_at: string | null;
-    };
+    order: SingleOrder;
   };
 }
 
