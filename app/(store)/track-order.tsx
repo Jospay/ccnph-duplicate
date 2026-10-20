@@ -1,4 +1,6 @@
-import { fetchSingleOrderAPI } from "@/services/order";
+import PaymentBreakdownCard from "@/components/PaymentBreakdownCard";
+import api from "@/services/api";
+import { fetchSingleOrderAPI, SingleOrder } from "@/services/order";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -34,11 +36,38 @@ const SCOPE_BADGE = {
   },
 };
 
+// payment_methods.id -> icon (same ids as the checkout screen)
+const PAYMENT_ICON: Record<number, any> = {
+  9: "cash-outline", // COD
+  11: "wallet-outline", // Points
+  3: "qr-code-outline", // QR Ph
+  4: "card-outline", // Maya
+  5: "calendar-outline", // BillEase
+  6: "phone-portrait-outline", // GrabPay
+};
+
+// Server origin taken from the API base URL (works on LAN and on the live domain)
+const API_ORIGIN = String(api.defaults.baseURL || "")
+  .replace(/\/+$/, "")
+  .replace(/\/api$/, "");
+
+const resolveImageUrl = (path?: string | null): string | undefined => {
+  if (!path) return undefined;
+  if (path.startsWith("http")) return path;
+  return `${API_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
+};
+
+const fmt = (n: number) =>
+  Number(n || 0).toLocaleString("en-PH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 export default function TrackOrder() {
   const router = useRouter();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
 
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<SingleOrder | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -78,7 +107,7 @@ export default function TrackOrder() {
   }
 
   // Extract database timestamps (handling direct fields or nested tracking object)
-  const tracking = order.tracking || {};
+  const tracking: any = order.tracking || {};
   const createdAt = order.created_at || tracking.created_at;
   const confirmedAt = order.confirmed_at || tracking.confirmed_at;
   const processingAt = order.processing_at || tracking.processing_at;
@@ -93,9 +122,6 @@ export default function TrackOrder() {
   const returnedAt = order.returned_at || tracking.returned_at;
 
   const isCancelled = order.status === "cancelled" || !!cancelledAt;
-
-  // Detect if return flow should be activated
-  const hasReturnInitiated = !!returnRequestedAt;
 
   // Standard delivery steps
   const steps: TimelineStep[] = [
@@ -195,7 +221,7 @@ export default function TrackOrder() {
     );
   }
 
-  const formatDate = (isoString: string | null) => {
+  const formatDate = (isoString: string | null | undefined) => {
     if (!isoString) return "--";
     const d = new Date(isoString);
     return d.toLocaleDateString("en-US", {
@@ -206,10 +232,36 @@ export default function TrackOrder() {
     });
   };
 
+  const payment = order.payment;
+  const breakdown = order.breakdown;
+  const isPaid = payment?.status === "paid";
+
+  const itemShares: number[] = (() => {
+    const items = order.items || [];
+    const lines = items.map((it) => Number(it.price) * Number(it.quantity));
+    const sub = lines.reduce((a, b) => a + b, 0);
+    const amount = Number(breakdown?.amount ?? sub);
+
+    if (sub <= 0) return lines;
+
+    let running = 0;
+    return lines.map((line, idx) => {
+      if (idx === lines.length - 1) {
+        return Math.round((amount - running) * 100) / 100;
+      }
+      const share = Math.round((line / sub) * amount * 100) / 100;
+      running += share;
+      return share;
+    });
+  })();
+
   return (
-    <ScrollView className="flex-1 bg-slate-100 p-4">
+    <ScrollView
+      className="flex-1 bg-slate-100 p-4"
+      contentContainerStyle={{ paddingBottom: 32 }}
+    >
       {/* ORDER NUMBER & STATUS INFO BAR */}
-      <View className="m-4 mb-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm flex-row justify-between items-center">
+      <View className="mb-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm flex-row justify-between items-center">
         <View>
           <Text className="text-xs text-slate-400 font-medium">
             Order Number
@@ -255,7 +307,7 @@ export default function TrackOrder() {
 
       {/* TIMELINE CARD */}
       {!isCancelled && (
-        <View className="m-4 p-5 bg-white mb-2 rounded-2xl border border-slate-200 shadow-sm">
+        <View className="p-5 bg-white mb-2 rounded-2xl border border-slate-200 shadow-sm">
           <Text className="font-bold text-slate-800 text-base mb-4">
             Delivery Status
           </Text>
@@ -335,28 +387,19 @@ export default function TrackOrder() {
       </View>
 
       {/* ITEM SUMMARY */}
-      <View className="mb-8 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+      <View className="mb-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
         <Text className="font-bold text-slate-800 text-sm mb-3">
           Order Items ({order.items?.length || 0})
         </Text>
-        {order.items?.map((item: any, i: number) => {
+        {order.items?.map((item, i) => {
           // LOCAL / NATIONAL LABEL
-          const scope = item.cooperative_scope as
-            | "local"
-            | "national"
-            | null
-            | undefined;
+          const scope = item.cooperative_scope;
           const badge = scope ? SCOPE_BADGE[scope] : null;
 
           return (
-            <View key={i} className="flex-row items-center mb-3">
+            <View key={item.id ?? i} className="flex-row items-center mb-3">
               <Image
-                source={{
-                  uri:
-                    item.product_image && item.product_image.startsWith("http")
-                      ? item.product_image
-                      : `http://192.168.1.120:8000${item.product_image || ""}`,
-                }}
+                source={{ uri: resolveImageUrl(item.product_image) }}
                 style={{
                   width: 50,
                   height: 50,
@@ -382,17 +425,107 @@ export default function TrackOrder() {
                 >
                   {item.product_name}
                 </Text>
+                {!!item.variant_name && (
+                  <Text className="text-[10px] text-slate-400 mt-0.5">
+                    {item.variant_name}
+                  </Text>
+                )}
                 <Text className="text-[10px] text-slate-400 mt-0.5">
-                  Qty: {item.quantity}
+                  ₱{fmt(item.price)} x {item.quantity}
                 </Text>
               </View>
+
+              {/* this item's share of the Total Payment */}
               <Text className="text-xs font-bold text-primary">
-                ₱{item.price}
+                ₱{fmt(itemShares[i] ?? 0)}
               </Text>
             </View>
           );
         })}
       </View>
+
+      {/* NOTE TO SELLER */}
+      {!!order.note && (
+        <View className="mb-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <View className="flex-row items-center mb-2">
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={18}
+              color="#3E4093"
+            />
+            <Text className="ml-2 font-bold text-slate-800 text-sm">
+              Message to Seller
+            </Text>
+          </View>
+          <Text className="text-slate-500 text-xs">{order.note}</Text>
+        </View>
+      )}
+
+      {/* PAYMENT METHOD */}
+      {payment && (
+        <View className="mb-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <Text className="font-bold text-slate-800 text-sm mb-3">
+            Payment Method
+          </Text>
+          <View className="flex-row items-center">
+            <View className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center">
+              <Ionicons
+                name={PAYMENT_ICON[payment.method_id] || "card-outline"}
+                size={20}
+                color="#3E4093"
+              />
+            </View>
+            <View className="flex-1 ml-3">
+              <Text className="font-semibold text-slate-800 text-sm">
+                {payment.method}
+              </Text>
+              <Text className="text-[11px] text-slate-400 mt-0.5">
+                {payment.is_cod
+                  ? "Pay in cash when your order arrives"
+                  : payment.is_points
+                    ? "Paid using your store points"
+                    : "Paid online"}
+                {isPaid && payment.paid_at
+                  ? ` · ${formatDate(payment.paid_at)}`
+                  : ""}
+              </Text>
+            </View>
+            <View
+              className={`px-3 py-1 rounded-full ${
+                isPaid ? "bg-emerald-50" : "bg-amber-50"
+              }`}
+            >
+              <Text
+                className={`text-[11px] font-bold ${
+                  isPaid ? "text-emerald-600" : "text-amber-600"
+                }`}
+              >
+                {payment.status_label}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* PRICE BREAKDOWN (subtotal, all discounts, shipping, online fee, total) */}
+      {breakdown && (
+        <View className="mb-6 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <Text className="font-bold text-slate-800 text-sm mb-3">
+            Order Summary
+          </Text>
+          <PaymentBreakdownCard
+            breakdown={breakdown}
+            totalLabel={
+              payment?.is_cod && !isPaid ? "Total to Pay" : "Total Payment"
+            }
+          />
+          {breakdown.fee > 0 && (
+            <Text className="text-slate-400 text-[11px] mt-2">
+              The online processing fee was charged by the payment gateway.
+            </Text>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 }
