@@ -123,6 +123,18 @@ export default function TrackOrder() {
 
   const isCancelled = order.status === "cancelled" || !!cancelledAt;
 
+  const slugify = (text: string): string => {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/[\s_]+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "");
+  };
+
   // Standard delivery steps
   const steps: TimelineStep[] = [
     {
@@ -391,55 +403,72 @@ export default function TrackOrder() {
         <Text className="font-bold text-slate-800 text-sm mb-3">
           Order Items ({order.items?.length || 0})
         </Text>
+
         {order.items?.map((item, i) => {
           // LOCAL / NATIONAL LABEL
           const scope = item.cooperative_scope;
           const badge = scope ? SCOPE_BADGE[scope] : null;
 
           return (
-            <View key={item.id ?? i} className="flex-row items-center mb-3">
-              <Image
-                source={{ uri: resolveImageUrl(item.product_image) }}
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#f1f5f9",
-                }}
-              />
-              <View className="flex-1 ml-3">
-                {badge && (
-                  <View
-                    className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
-                  >
-                    <Ionicons name={badge.icon} size={9} color="#ffffff" />
-                    <Text className="text-white text-[9px] font-bold ml-1">
-                      {badge.label}
-                    </Text>
-                  </View>
-                )}
+            <TouchableOpacity
+              key={item.id ?? i}
+              activeOpacity={0.7}
+              onPress={() => {
+                const productSlug = slugify(item.product_name);
 
-                <Text
-                  numberOfLines={1}
-                  className="text-xs font-semibold text-slate-800"
-                >
-                  {item.product_name}
-                </Text>
-                {!!item.variant_name && (
-                  <Text className="text-[10px] text-slate-400 mt-0.5">
-                    {item.variant_name}
+                router.push({
+                  pathname: "/products/[slug]",
+                  params: { slug: productSlug },
+                });
+              }}
+            >
+              <View className="flex-row items-center mb-3">
+                <Image
+                  source={{ uri: resolveImageUrl(item.product_image) }}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 8,
+                    backgroundColor: "#f1f5f9",
+                  }}
+                />
+
+                <View className="flex-1 ml-3">
+                  {badge && (
+                    <View
+                      className={`self-start flex-row items-center px-2 py-0.5 rounded-full mb-1 ${badge.bg}`}
+                    >
+                      <Ionicons name={badge.icon} size={9} color="#ffffff" />
+                      <Text className="text-white text-[9px] font-bold ml-1">
+                        {badge.label}
+                      </Text>
+                    </View>
+                  )}
+
+                  <Text
+                    numberOfLines={1}
+                    className="text-xs font-semibold text-slate-800"
+                  >
+                    {item.product_name}
                   </Text>
-                )}
-                <Text className="text-[10px] text-slate-400 mt-0.5">
-                  ₱{fmt(item.price)} x {item.quantity}
+
+                  {!!item.variant_name && (
+                    <Text className="text-[10px] text-slate-400 mt-0.5">
+                      {item.variant_name}
+                    </Text>
+                  )}
+
+                  <Text className="text-[10px] text-slate-400 mt-0.5">
+                    ₱{fmt(item.price)} x {item.quantity}
+                  </Text>
+                </View>
+
+                {/* This item's share of the Total Payment */}
+                <Text className="text-xs font-bold text-primary">
+                  ₱{fmt(itemShares[i] ?? 0)}
                 </Text>
               </View>
-
-              {/* this item's share of the Total Payment */}
-              <Text className="text-xs font-bold text-primary">
-                ₱{fmt(itemShares[i] ?? 0)}
-              </Text>
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>
