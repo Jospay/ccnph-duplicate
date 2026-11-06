@@ -347,18 +347,6 @@ export default function OrderList() {
     );
   };
 
-  const slugify = (text: string): string => {
-    return text
-      .toString()
-      .toLowerCase()
-      .trim()
-      .replace(/[\s_]+/g, "-")
-      .replace(/[^\w\-]+/g, "")
-      .replace(/\-\-+/g, "-")
-      .replace(/^-+/, "")
-      .replace(/-+$/, "");
-  };
-
   const getBadgeCount = (slug: string) => {
     switch (slug) {
       case "to-pay":
@@ -481,13 +469,12 @@ export default function OrderList() {
                       className="flex-row mb-3"
                     >
                       <TouchableOpacity
-                        onPress={() => {
-                          const productSlug = slugify(product.product_name);
+                        onPress={() =>
                           router.push({
-                            pathname: "/products/[slug]",
-                            params: { slug: productSlug },
-                          });
-                        }}
+                            pathname: "/track-order",
+                            params: { orderId: item.id },
+                          })
+                        }
                       >
                         <Image
                           source={{
@@ -504,13 +491,12 @@ export default function OrderList() {
 
                       <View className="flex-1 ml-3 justify-between">
                         <TouchableOpacity
-                          onPress={() => {
-                            const productSlug = slugify(product.product_name);
+                          onPress={() =>
                             router.push({
-                              pathname: "/products/[slug]",
-                              params: { slug: productSlug },
-                            });
-                          }}
+                              pathname: "/track-order",
+                              params: { orderId: item.id },
+                            })
+                          }
                         >
                           <View>
                             {badge && (
@@ -556,15 +542,12 @@ export default function OrderList() {
                           ].includes(item.status) || isCompletedAndRated ? (
                             <View className="flex-row justify-between items-center">
                               <TouchableOpacity
-                                onPress={() => {
-                                  const productSlug = slugify(
-                                    product.product_name,
-                                  );
+                                onPress={() =>
                                   router.push({
-                                    pathname: "/products/[slug]",
-                                    params: { slug: productSlug },
-                                  });
-                                }}
+                                    pathname: "/track-order",
+                                    params: { orderId: item.id },
+                                  })
+                                }
                                 className="bg-primary px-4 py-2 rounded-lg"
                               >
                                 <Text className="text-white text-xs font-semibold">
@@ -590,12 +573,23 @@ export default function OrderList() {
 
                 {/* BILLING SECTION */}
                 <View className="pt-3 mt-1 border-t border-slate-100">
-                  <View className="flex-row justify-end items-center gap-2">
-                    <Text className="text-slate-500 text-sm">Order Total:</Text>
-                    <Text className="font-bold text-base text-primary">
-                      ₱{formatMoney(orderTotalPayment)}
-                    </Text>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push({
+                        pathname: "/track-order",
+                        params: { orderId: item.id },
+                      })
+                    }
+                  >
+                    <View className="flex-row justify-end items-center gap-2">
+                      <Text className="text-slate-500 text-sm">
+                        Order Total:
+                      </Text>
+                      <Text className="font-bold text-base text-primary">
+                        ₱{formatMoney(orderTotalPayment)}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
 
                 {/* DYNAMIC ACTION TRIGGERS */}
@@ -698,7 +692,7 @@ export default function OrderList() {
                     </TouchableOpacity>
                   )}
 
-                  {(item.status === "to-pay" ||
+                  {/* {(item.status === "to-pay" ||
                     item.status === "to-ship" ||
                     item.status === "return_requested" ||
                     item.status === "return_approved" ||
@@ -717,7 +711,7 @@ export default function OrderList() {
                         Track Order
                       </Text>
                     </TouchableOpacity>
-                  )}
+                  )} */}
                 </View>
               </View>
             );
