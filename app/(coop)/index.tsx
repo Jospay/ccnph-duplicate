@@ -158,20 +158,28 @@ function SummarySkeleton() {
 /* Only two types exist: PHP and PERCENTAGE                          */
 /* ------------------------------------------------------------------ */
 
-function renderAllocationBadge(allocation: AllocationBreakdown) {
+function renderAllocationBadge(
+  allocation: AllocationBreakdown,
+  hasFixedDeductions: boolean,
+) {
+  const shareOfTotal = `${allocation.actual_percentage ?? 0}% of total`;
+
+  // PHP: fixed peso amount per transaction, deducted FIRST
   if (allocation.type === "PHP") {
     return {
-      badge: "PHP",
-      targetText: `Fixed ${peso(allocation.configured_value ?? 0)}/txn · ${
-        allocation.actual_percentage ?? 0
-      }% of total`,
+      badge: `${peso(allocation.configured_value ?? 0)}/txn`,
+      detail: `Fixed amount, deducted first · ${shareOfTotal}`,
     };
   }
 
-  // PERCENTAGE
+  // PERCENTAGE: applied to what is left after the PHP deductions
+  const rule = `${allocation.configured_percentage ?? 0}%`;
+
   return {
-    badge: `${allocation.actual_percentage ?? 0}%`,
-    targetText: `Target ${allocation.configured_percentage ?? 0}%`,
+    badge: hasFixedDeductions ? `${rule} of remaining` : rule,
+    detail: hasFixedDeductions
+      ? `After fixed deductions · ${shareOfTotal}`
+      : shareOfTotal,
   };
 }
 
@@ -575,8 +583,14 @@ export default function CooperativeMembershipPage() {
                           <View className="gap-y-3">
                             {service.allocations.map(
                               (allocation: AllocationBreakdown) => {
-                                const { badge, targetText } =
-                                  renderAllocationBadge(allocation);
+                                const hasFixedDeductions =
+                                  service.allocations.some(
+                                    (a) => a.type === "PHP",
+                                  );
+                                const { badge, detail } = renderAllocationBadge(
+                                  allocation,
+                                  hasFixedDeductions,
+                                );
 
                                 return (
                                   <View
@@ -611,7 +625,7 @@ export default function CooperativeMembershipPage() {
                                         {peso(allocation.amount)}
                                       </Text>
                                       <Text className="text-xs text-slate-400 mt-1">
-                                        {targetText} ·{" "}
+                                        {detail} ·{" "}
                                         {allocation.transaction_count} txn
                                         {allocation.transaction_count === 1
                                           ? ""
