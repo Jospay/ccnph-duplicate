@@ -14,14 +14,17 @@ export interface Cooperative {
   logo: string | null;
 }
 
+// Only two allocation types exist: PHP (fixed peso) and PERCENTAGE
+export type AllocationType = "PHP" | "PERCENTAGE";
+
 export interface AllocationBreakdown {
   id: number;
   name: string;
   slug: string;
-  description?: string;
-  type?: "PERCENTAGE" | "PHP";
-  configured_value?: number;
-  configured_percentage?: number;
+  description?: string | null;
+  type: AllocationType;
+  configured_value: number;
+  configured_percentage: number;
   amount: number;
   actual_percentage: number;
   transaction_count: number;
@@ -42,7 +45,7 @@ export interface AllocationSummary {
   name: string;
   slug: string;
   description: string | null;
-  type?: "PERCENTAGE" | "PHP";
+  type: AllocationType;
   amount: number;
 }
 

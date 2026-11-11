@@ -155,25 +155,20 @@ function SummarySkeleton() {
 
 /* ------------------------------------------------------------------ */
 /* HELPER FUNCTION FOR ALLOCATION BADGES & TARGETS                   */
+/* Only two types exist: PHP and PERCENTAGE                          */
 /* ------------------------------------------------------------------ */
 
 function renderAllocationBadge(allocation: AllocationBreakdown) {
-  const isFixed =
-    (allocation as any).type === "PHP" ||
-    (allocation as any).type === "FIXED" ||
-    (allocation as any).is_fixed === true;
-
-  if (isFixed) {
-    const val =
-      (allocation as any).configured_value ??
-      allocation.configured_percentage ??
-      0;
+  if (allocation.type === "PHP") {
     return {
-      badge: "Fixed",
-      targetText: `Target ${peso(val)}/txn`,
+      badge: "PHP",
+      targetText: `Fixed ${peso(allocation.configured_value ?? 0)}/txn · ${
+        allocation.actual_percentage ?? 0
+      }% of total`,
     };
   }
 
+  // PERCENTAGE
   return {
     badge: `${allocation.actual_percentage ?? 0}%`,
     targetText: `Target ${allocation.configured_percentage ?? 0}%`,
@@ -313,13 +308,10 @@ export default function CooperativeMembershipPage() {
     if (canAccess) {
       await fetchFilters();
       if (selectedYear) {
-        fetchSummary(selectedYear, selectedService.slug);
-      } else {
-        setRefreshing(false);
+        await fetchSummary(selectedYear, selectedService.slug);
       }
-    } else {
-      setRefreshing(false);
     }
+    setRefreshing(false);
   }, [selectedYear, selectedService, fetchSummary]);
 
   if (loading) {
@@ -346,8 +338,8 @@ export default function CooperativeMembershipPage() {
           </Text>
 
           <Text className="text-slate-500 mt-3 mb-8">
-            View yearly membership contribution, cooperative earnings, and fund
-            allocation.
+            View your yearly contributions, how they were allocated, and the
+            cooperative fund they support.
           </Text>
 
           {/* --- GATE: BASIC & ACTIVE --- */}
@@ -521,7 +513,7 @@ export default function CooperativeMembershipPage() {
                       </Text>
                     ) : null}
                     <Text className="text-slate-500 text-center">
-                      TOTAL COOPERATIVE FUND {summary.year}
+                      YOUR TOTAL CONTRIBUTION {summary.year}
                       {selectedService.slug !== "all"
                         ? ` · ${selectedService.name}`
                         : ""}
@@ -595,15 +587,30 @@ export default function CooperativeMembershipPage() {
                                       <Text className="font-bold text-slate-700 flex-1 mr-2">
                                         {allocation.name}
                                       </Text>
+                                      <View
+                                        className="px-3 py-1 rounded-full"
+                                        style={{ backgroundColor: secondary }}
+                                      >
+                                        <Text
+                                          style={{ color: primary }}
+                                          className="text-xs font-bold"
+                                        >
+                                          {badge}
+                                        </Text>
+                                      </View>
                                     </View>
-                                    <Text className="text-slate-500 text-sm mt-1">
-                                      {allocation.description}
-                                    </Text>
-                                    <View className="flex-row justify-between items-center mt-3">
+
+                                    {allocation.description ? (
+                                      <Text className="text-slate-500 text-sm mt-1">
+                                        {allocation.description}
+                                      </Text>
+                                    ) : null}
+
+                                    <View className="mt-3">
                                       <Text className="font-bold">
                                         {peso(allocation.amount)}
                                       </Text>
-                                      <Text className="text-xs text-slate-400">
+                                      <Text className="text-xs text-slate-400 mt-1">
                                         {targetText} ·{" "}
                                         {allocation.transaction_count} txn
                                         {allocation.transaction_count === 1
@@ -635,9 +642,11 @@ export default function CooperativeMembershipPage() {
                         <Text className="font-bold text-slate-700">
                           {item.name}
                         </Text>
-                        <Text className="text-slate-500 mt-2">
-                          {item.description}
-                        </Text>
+                        {item.description ? (
+                          <Text className="text-slate-500 mt-2">
+                            {item.description}
+                          </Text>
+                        ) : null}
                         <Text
                           style={{ color: primary }}
                           className="font-black mt-3"
