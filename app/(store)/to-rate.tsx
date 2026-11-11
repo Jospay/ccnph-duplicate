@@ -99,18 +99,6 @@ export default function ToRateScreen() {
   const isFeedbackModalVisible = selectedFeedbackItems.length > 0;
   const isImageModalVisible = !!selectedImageUri;
 
-  const slugify = (text: string): string => {
-    return text
-      .toString()
-      .toLowerCase()
-      .trim()
-      .replace(/[\s_]+/g, "-")
-      .replace(/[^\w\-]+/g, "")
-      .replace(/\-\-+/g, "-")
-      .replace(/^-+/, "")
-      .replace(/-+$/, "");
-  };
-
   const insets = useSafeAreaInsets();
 
   const closeFeedbackModal = () => {
@@ -217,13 +205,12 @@ export default function ToRateScreen() {
           return (
             <TouchableOpacity
               key={prod.id || index}
-              onPress={() => {
-                const productSlug = slugify(prod.product_name);
+              onPress={() =>
                 router.push({
-                  pathname: "/products/[slug]",
-                  params: { slug: productSlug },
-                });
-              }}
+                  pathname: "/track-order",
+                  params: { orderId: item.id },
+                })
+              }
               className="flex-row mb-3"
             >
               <Image
