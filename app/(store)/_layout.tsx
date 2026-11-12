@@ -29,6 +29,7 @@ import ProfileGrey from "../../assets/images/icon/profilegrey.png";
 
 import api from "@/services/api";
 import echo from "@/services/echo";
+import { getStoreNotifications } from "@/services/storeNotificationService";
 import "../../global.css";
 
 const queryClient = new QueryClient();
@@ -99,7 +100,9 @@ export default function RootLayout() {
 
   // ===== Notification & Global Unread Badging State =====
   const [userId, setUserId] = useState<number | null>(null);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(0); // chat unread
+  const [notificationUnreadCount, setNotificationUnreadCount] =
+    useState<number>(0); // store notifications unread
   const [notification, setNotification] = useState<any>(null);
   const slideAnim = useRef(new Animated.Value(-100)).current;
 
@@ -123,6 +126,31 @@ export default function RootLayout() {
         ),
       );
   }, []);
+
+  // ===== Store notification count fetch =====
+  useEffect(() => {
+    if (!userId) return;
+
+    let isMounted = true;
+
+    const loadNotificationCount = async () => {
+      try {
+        const { unreadCount: count } = await getStoreNotifications();
+
+        if (isMounted) {
+          setNotificationUnreadCount(count);
+        }
+      } catch (error) {
+        console.error("Failed to load store notification count:", error);
+      }
+    };
+
+    loadNotificationCount();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, pathname]);
 
   // Re-sync unread count whenever we land back on a non-chat screen
   useEffect(() => {
@@ -401,15 +429,28 @@ export default function RootLayout() {
                   <TouchableOpacity
                     className="items-center flex-1"
                     onPress={() => router.push("/(store)/notification")}
+                    activeOpacity={0.7}
                   >
-                    <Image
-                      source={isNotification ? NotifBlue : NotifGrey}
-                      style={{
-                        width: 26,
-                        height: 26,
-                      }}
-                      resizeMode="contain"
-                    />
+                    <View className="relative">
+                      <Image
+                        source={isNotification ? NotifBlue : NotifGrey}
+                        style={{
+                          width: 26,
+                          height: 26,
+                        }}
+                        resizeMode="contain"
+                      />
+
+                      {notificationUnreadCount > 0 && (
+                        <View className="absolute -top-1 -right-2 bg-[#D70127] rounded-full min-w-[18px] h-[18px] items-center justify-center px-1 border-2 border-white">
+                          <Text className="text-white text-[9px] font-extrabold text-center">
+                            {notificationUnreadCount > 9
+                              ? "9+"
+                              : notificationUnreadCount}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
 
                     <Text
                       className={
