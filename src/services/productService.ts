@@ -95,6 +95,7 @@ export interface DetailedProduct {
   categories: Category[];
   images: ProductImage[];
   video: string | null;
+  video_thumbnail?: string | null;
   variants: ProductVariant[];
   cooperative_id?: number | null;
   cooperative_scope?: CooperativeScopeType | null;

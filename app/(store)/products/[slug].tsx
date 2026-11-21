@@ -14,11 +14,13 @@ import {
 } from "@/services/productService";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useVideoPlayer, VideoView } from "expo-video";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
   Dimensions,
+  FlatList,
   Image,
   Modal,
   ScrollView,
@@ -33,6 +35,7 @@ import delivery from "../../../assets/images/icon/deliveryBlueB.png";
 import UserProfile from "../../../assets/images/UserProfile.jpg";
 
 type ActionType = "cart" | "buy_now" | null;
+type MediaItem = { type: "video" | "image"; url: string };
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -82,6 +85,11 @@ export default function Products() {
   const [modalAction, setModalAction] = useState<ActionType>(null);
   const [cartCount, setCartCount] = useState<number>(0);
 
+  // Video + fullscreen media viewer state
+  const [showVideo, setShowVideo] = useState<boolean>(false);
+  const [viewerVisible, setViewerVisible] = useState<boolean>(false);
+  const [viewerIndex, setViewerIndex] = useState<number>(0);
+
   // Custom Alert State
   const [alert, setAlert] = useState({
     visible: false,
@@ -130,6 +138,7 @@ export default function Products() {
         setLoading(true);
         setError(null);
         setQuantity(1);
+        setShowVideo(false);
 
         const response = await getProductShow(slug);
         const detailedProduct = response.product;
@@ -280,7 +289,10 @@ export default function Products() {
         ) && v.attributes.length === Object.keys(updatedSelections).length,
     );
 
-    if (matchingVariant?.image) setMainImage(matchingVariant.image);
+    if (matchingVariant?.image) {
+      setMainImage(matchingVariant.image);
+      setShowVideo(false);
+    }
 
     if (matchingVariant) {
       if (matchingVariant.stock === 0) setQuantity(0);
@@ -443,6 +455,33 @@ export default function Products() {
     )
     .filter((url, index, self) => self.indexOf(url) === index);
 
+  // Video (from backend `video` field) + all images, used by the fullscreen viewer
+  const videoUrl = product.video ? formatImageUrl(product.video) : null;
+  const videoThumbnailUrl = product.video_thumbnail
+    ? formatImageUrl(product.video_thumbnail)
+    : null;
+
+  const mediaItems: MediaItem[] = [
+    ...(videoUrl ? [{ type: "video" as const, url: videoUrl }] : []),
+    ...dynamicGalleryUrls.map((u) => ({
+      type: "image" as const,
+      url: formatImageUrl(u),
+    })),
+  ];
+
+  const openViewer = () => {
+    if (showVideo && videoUrl) {
+      setViewerIndex(0);
+    } else {
+      const current = formatImageUrl(mainImage || fallbackImageUri);
+      const idx = mediaItems.findIndex(
+        (m) => m.type === "image" && m.url === current,
+      );
+      setViewerIndex(idx >= 0 ? idx : 0);
+    }
+    setViewerVisible(true);
+  };
+
   return (
     <View className="flex-1 bg-white relative">
       <HeaderSection
@@ -462,6 +501,12 @@ export default function Products() {
           dynamicGalleryUrls={dynamicGalleryUrls}
           formatImageUrl={formatImageUrl}
           setMainImage={setMainImage}
+          videoUrl={videoUrl}
+          videoThumbnailUrl={videoThumbnailUrl}
+          showVideo={showVideo && !viewerVisible}
+          isVideoSelected={showVideo}
+          setShowVideo={setShowVideo}
+          onOpenViewer={openViewer}
         />
 
         <ProductInfoSection
@@ -595,6 +640,14 @@ export default function Products() {
         formatImageUrl={formatImageUrl}
       />
 
+      {/* FULLSCREEN MEDIA VIEWER (video + images, next / previous) */}
+      <MediaViewerModal
+        visible={viewerVisible}
+        items={mediaItems}
+        initialIndex={viewerIndex}
+        onClose={() => setViewerVisible(false)}
+      />
+
       {/* FLY TO CART ANIMATED CONTAINER */}
       {showFlyAnimation && (
         <Animated.View
@@ -707,21 +760,96 @@ const HeaderSection = ({
   </View>
 );
 
+/**
+ * Inline video player shown in the main gallery area
+ */
+const InlineVideo = ({
+  uri,
+  poster,
+}: {
+  uri: string;
+  poster?: string | null;
+}) => {
+  const [started, setStarted] = useState<boolean>(!poster);
+  const player = useVideoPlayer(uri, (p) => {
+    p.loop = false;
+  });
+
+  const handlePlay = () => {
+    setStarted(true);
+    player.play();
+  };
+
+  return (
+    <View style={{ width: "100%", height: 350 }}>
+      <VideoView
+        player={player}
+        style={{ width: "100%", height: 350, borderRadius: 12 }}
+        nativeControls
+        contentFit="contain"
+      />
+      {!started && poster && (
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={handlePlay}
+          style={StyleSheet.absoluteFill}
+        >
+          <Image
+            source={{ uri: poster }}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="cover"
+          />
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(0,0,0,0.25)",
+              },
+            ]}
+          >
+            <Ionicons name="play-circle" size={72} color="#fff" />
+          </View>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};
+
 const GallerySection = ({
   mainImage,
   fallbackImageUri,
   dynamicGalleryUrls,
   formatImageUrl,
   setMainImage,
+  videoUrl,
+  videoThumbnailUrl,
+  showVideo,
+  isVideoSelected,
+  setShowVideo,
+  onOpenViewer,
 }: any) => (
   <View>
     <View className="p-1 mt-2 border border-primary/20 shadow-brand rounded-2xl relative mx-3">
-      {mainImage || fallbackImageUri ? (
-        <Image
-          source={{ uri: formatImageUrl(mainImage || fallbackImageUri) }}
-          className="rounded-xl"
-          style={{ width: "100%", height: 350 }}
-        />
+      {showVideo && videoUrl ? (
+        <View
+          style={{ width: "100%", height: 350, backgroundColor: "#000" }}
+          className="rounded-xl overflow-hidden"
+        >
+          <InlineVideo uri={videoUrl} poster={videoThumbnailUrl} />
+        </View>
+      ) : mainImage || fallbackImageUri ? (
+        <TouchableOpacity activeOpacity={0.9} onPress={onOpenViewer}>
+          <Image
+            source={{ uri: formatImageUrl(mainImage || fallbackImageUri) }}
+            className="rounded-xl"
+            style={{ width: "100%", height: 350 }}
+          />
+          <View className="absolute bottom-2 right-2 bg-black/50 rounded-full p-2">
+            <Ionicons name="expand-outline" size={18} color="#fff" />
+          </View>
+        </TouchableOpacity>
       ) : (
         <View
           style={{ width: "100%", height: 350 }}
@@ -731,17 +859,50 @@ const GallerySection = ({
         </View>
       )}
     </View>
-    {dynamicGalleryUrls.length > 0 && (
+
+    {(dynamicGalleryUrls.length > 0 || videoUrl) && (
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        className="mt-4 px-2"
+        className="mt-4"
+        contentContainerStyle={{ paddingHorizontal: 12 }}
       >
+        {/* VIDEO THUMBNAIL (first slide) */}
+        {videoUrl && (
+          <TouchableOpacity
+            onPress={() => setShowVideo(true)}
+            className={`mr-3 rounded-md overflow-hidden border-2 ${isVideoSelected ? "border-primary" : "border-slate-200"}`}
+          >
+            <View
+              style={{ width: 70, height: 70 }}
+              className="bg-slate-900 items-center justify-center"
+            >
+              {videoThumbnailUrl && (
+                <Image
+                  source={{ uri: videoThumbnailUrl }}
+                  style={{ width: 70, height: 70, position: "absolute" }}
+                />
+              )}
+              <View
+                style={[
+                  StyleSheet.absoluteFill,
+                  { backgroundColor: "rgba(0,0,0,0.3)" },
+                ]}
+              />
+              <Ionicons name="play-circle" size={34} color="#fff" />
+              <Text className="text-white text-[10px] mt-0.5">Video</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         {dynamicGalleryUrls.map((imgUrl: string, index: number) => (
           <TouchableOpacity
             key={`gallery-img-${index}`}
-            onPress={() => setMainImage(imgUrl)}
-            className={`mr-3 rounded-md overflow-hidden border-2 ${mainImage === imgUrl ? "border-primary" : "border-slate-200"}`}
+            onPress={() => {
+              setShowVideo(false);
+              setMainImage(imgUrl);
+            }}
+            className={`mr-3 rounded-md overflow-hidden border-2 ${!isVideoSelected && mainImage === imgUrl ? "border-primary" : "border-slate-200"}`}
           >
             <Image
               source={{ uri: formatImageUrl(imgUrl) }}
@@ -753,6 +914,143 @@ const GallerySection = ({
     )}
   </View>
 );
+
+/**
+ * Video slide inside the fullscreen viewer (pauses when not the active slide)
+ */
+const ViewerVideo = ({ uri, isActive }: { uri: string; isActive: boolean }) => {
+  const player = useVideoPlayer(uri, (p) => {
+    p.loop = false;
+  });
+
+  useEffect(() => {
+    if (!isActive) player.pause();
+  }, [isActive, player]);
+
+  return (
+    <VideoView
+      player={player}
+      style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT * 0.6 }}
+      nativeControls
+      contentFit="contain"
+    />
+  );
+};
+
+/**
+ * Fullscreen viewer: swipe or use previous / next arrows
+ */
+const MediaViewerModal = ({
+  visible,
+  items,
+  initialIndex,
+  onClose,
+}: {
+  visible: boolean;
+  items: MediaItem[];
+  initialIndex: number;
+  onClose: () => void;
+}) => {
+  const listRef = useRef<FlatList<MediaItem>>(null);
+  const [index, setIndex] = useState<number>(initialIndex);
+
+  useEffect(() => {
+    if (visible) setIndex(initialIndex);
+  }, [visible, initialIndex]);
+
+  const goTo = (next: number) => {
+    if (next < 0 || next >= items.length) return;
+    listRef.current?.scrollToIndex({ index: next, animated: true });
+    setIndex(next);
+  };
+
+  if (!visible || items.length === 0) return null;
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
+      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.95)" }}>
+        {/* TOP BAR */}
+        <View className="absolute top-12 left-0 right-0 z-20 flex-row justify-between items-center px-5">
+          <View className="bg-black/50 px-3 py-1 rounded-full">
+            <Text className="text-white font-semibold">
+              {index + 1} / {items.length}
+            </Text>
+          </View>
+          <TouchableOpacity onPress={onClose} className="p-1">
+            <Ionicons name="close-circle" size={34} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* SLIDES */}
+        <FlatList
+          ref={listRef}
+          data={items}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={Math.min(initialIndex, items.length - 1)}
+          getItemLayout={(_, i) => ({
+            length: SCREEN_WIDTH,
+            offset: SCREEN_WIDTH * i,
+            index: i,
+          })}
+          keyExtractor={(item, i) => `${item.type}-${i}`}
+          onMomentumScrollEnd={(e) =>
+            setIndex(Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH))
+          }
+          renderItem={({ item, index: i }) => (
+            <View
+              style={{
+                width: SCREEN_WIDTH,
+                height: SCREEN_HEIGHT,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {item.type === "video" ? (
+                <ViewerVideo uri={item.url} isActive={i === index} />
+              ) : (
+                <Image
+                  source={{ uri: item.url }}
+                  style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT * 0.7 }}
+                  resizeMode="contain"
+                />
+              )}
+            </View>
+          )}
+        />
+
+        {/* PREVIOUS */}
+        {index > 0 && (
+          <TouchableOpacity
+            onPress={() => goTo(index - 1)}
+            className="absolute left-2 bg-black/30 rounded-full p-1"
+            style={{ top: SCREEN_HEIGHT / 2 - 22, zIndex: 20 }}
+          >
+            <Ionicons name="chevron-back" size={28} color="#fff" />
+          </TouchableOpacity>
+        )}
+
+        {/* NEXT */}
+        {index < items.length - 1 && (
+          <TouchableOpacity
+            onPress={() => goTo(index + 1)}
+            className="absolute right-2 bg-black/30 rounded-full p-1"
+            style={{ top: SCREEN_HEIGHT / 2 - 22, zIndex: 20 }}
+          >
+            <Ionicons name="chevron-forward" size={28} color="#fff" />
+          </TouchableOpacity>
+        )}
+      </View>
+    </Modal>
+  );
+};
 
 /**
  * Local / National badge + cooperative name chip
@@ -928,6 +1226,31 @@ const ProductInfoSection = ({
                 </View>
                 {review.comment ? (
                   <Text className="text-slate-600 mt-3">{review.comment}</Text>
+                ) : null}
+
+                {review.reply ? (
+                  <View className="mt-4 border border-slate-200 bg-slate-100 rounded-xl p-3">
+                    <View className="flex-row justify-between items-center mb-1.5">
+                      <View className="flex-row items-center">
+                        <Ionicons
+                          name="storefront-outline"
+                          size={14}
+                          color="#3E4093"
+                        />
+                        <Text className="text-[11px] font-bold text-primary ml-1.5">
+                          Seller Response
+                        </Text>
+                      </View>
+                      {review.replied_at ? (
+                        <Text className="text-[10px] text-slate-400">
+                          {review.replied_at}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <Text className="text-slate-700 text-xs leading-5">
+                      {review.reply}
+                    </Text>
+                  </View>
                 ) : null}
               </View>
             ))
