@@ -242,24 +242,24 @@ export default function DashboardPage() {
       iconFamily: Ionicons,
       iconName: "school-outline",
     },
-    // {
-    //   label: "Intellectual Property Assistant",
-    //   href: "/(intellectual)/",
-    //   iconFamily: Ionicons,
-    //   iconName: "bulb-outline",
-    // },
+    {
+      label: "Intellectual Property Assistant",
+      href: "/(intellectual)/",
+      iconFamily: Ionicons,
+      iconName: "bulb-outline",
+    },
     // {
     //   label: "Loan Assistance",
     //   href: "/(loan)/",
-    //   iconFamily: FontAwesome,
-    //   iconName: "bank",
-    // },
-    // {
-    //   label: "Funding & Invest Opportunities",
-    //   href: "/(funding-investment-opportunities)/",
     //   iconFamily: Ionicons,
-    //   iconName: "trending-up-outline",
+    //   iconName: "cash-outline",
     // },
+    {
+      label: "Funding & Invest Opportunities",
+      href: "/(funding-investment-opportunities)/",
+      iconFamily: Ionicons,
+      iconName: "trending-up-outline",
+    },
     // {
     //   label: "Licensing & Permit Assistance",
     //   href: "/(licensing-permit-assistance)/",
