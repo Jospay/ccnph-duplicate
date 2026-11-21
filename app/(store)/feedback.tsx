@@ -189,6 +189,25 @@ export default function ProductFeedbackScreen() {
           ))}
         </ScrollView>
       )}
+
+      {item.reply ? (
+        <View className="mt-4 border border-slate-200 bg-slate-100 rounded-xl p-3">
+          <View className="flex-row justify-between items-center mb-1.5">
+            <View className="flex-row items-center">
+              <Ionicons name="storefront-outline" size={14} color="#3E4093" />
+              <Text className="text-[11px] font-bold text-primary ml-1.5">
+                Seller Response
+              </Text>
+            </View>
+            {item.replied_at ? (
+              <Text className="text-[10px] text-slate-400">
+                {item.replied_at}
+              </Text>
+            ) : null}
+          </View>
+          <Text className="text-slate-700 text-xs leading-5">{item.reply}</Text>
+        </View>
+      ) : null}
     </View>
   );
 

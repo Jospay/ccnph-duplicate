@@ -319,6 +319,8 @@ export interface ReviewItem {
   user_avatar: string | null;
   video_url: string | null;
   images: string[];
+  reply?: string | null;
+  replied_at?: string | null;
 }
 
 export interface ReviewStats {
