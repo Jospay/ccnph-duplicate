@@ -154,6 +154,8 @@ export interface ReviewData {
   is_anonymous: boolean;
   images: string[];
   created_at: string;
+  reply?: string | null;
+  replied_at?: string | null;
 }
 
 export interface RateItem {
